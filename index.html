@@ -3,138 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GuessLagu - Langsung Main</title>
+    <title>Guess Lagu - Pro Edition</title>
     <style>
         :root {
-            --bg-dark: #121212;
-            --card-bg: #1e1e1e;
-            --accent-color: #f12711; 
-            --accent-gradient: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
-            --accent-red: #e74c3c;
-            --text-main: #ffffff;
-            --text-sub: #b3b3b3;
-            --border-color: #333333;
+            --bg-deep: #0b0b0e;
+            --bg-card: #141419;
+            --bg-elevated: #1f1f26;
+            --accent-primary: #ff3366;
+            --accent-gradient: linear-gradient(135deg, #ff3366 0%, #ff9933 100%);
+            --accent-green: #00e676;
+            --accent-red: #ff1744;
+            --text-main: #f8f9fa;
+            --text-muted: #9494a0;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-deep);
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px 10px;
+            padding: 20px 15px;
         }
 
+        /* Loading Screen Premium */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-deep);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.4s ease;
+        }
+
+        .loader-ring {
+            width: 55px; height: 55px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #loading-text {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Header Profesional */
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
+            margin-bottom: 25px;
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
         }
 
         .header h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
+            font-weight: 800;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-            margin-bottom: 5px;
+            letter-spacing: -0.5px;
         }
 
         .header p {
             font-size: 0.85rem;
-            color: var(--text-sub);
+            color: var(--text-muted);
+            margin-top: 6px;
         }
+
+        /* Score & Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .stats-bar span { color: var(--accent-primary); }
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg-dark);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+        /* Era / Kategori Selector (Pill Scroller) */
+        .category-wrapper {
+            position: relative;
+            margin-bottom: 5px;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Era Filter */
-        .era-selector {
+        .category-scroller {
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding-bottom: 5px;
+            padding-bottom: 4px;
             scrollbar-width: none;
         }
-        .era-selector::-webkit-scrollbar { display: none; }
+        .category-scroller::-webkit-scrollbar { display: none; }
 
-        .era-btn {
-            background: #2a2a2a;
-            color: var(--text-sub);
+        .cat-btn {
+            background: var(--bg-card);
+            color: var(--text-muted);
             border: 1px solid var(--border-color);
-            padding: 8px 14px;
+            padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
+            font-weight: 500;
             white-space: nowrap;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
         }
 
-        .era-btn.active {
-            background: var(--accent-color);
+        .cat-btn:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+        }
+
+        .cat-btn.active {
+            background: var(--accent-gradient);
             color: #fff;
-            font-weight: bold;
-            border-color: var(--accent-color);
+            font-weight: 700;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
         }
 
-        /* Timeline Durasi */
+        /* Timeline Durasi Visual */
         .timeline-container {
             display: flex;
-            height: 12px;
-            background: #2a2a2a;
-            border-radius: 6px;
+            height: 10px;
+            background: var(--bg-card);
+            border-radius: 5px;
             overflow: hidden;
-            gap: 2px;
-            margin: 10px 0;
+            gap: 3px;
+            padding: 2px;
+            border: 1px solid var(--border-color);
         }
 
         .timeline-segment {
-            background: #333;
+            background: var(--bg-elevated);
             height: 100%;
-            transition: background 0.3s;
+            border-radius: 3px;
+            transition: background 0.3s ease;
         }
-        .timeline-segment.active { background: var(--accent-color); }
+        .timeline-segment.active { background: var(--accent-primary); }
 
-        /* List Percobaan */
+        /* Slot Percobaan (6 Baris) */
         .attempts-list {
             display: flex;
             flex-direction: column;
@@ -142,115 +182,172 @@
         }
 
         .attempt-slot {
-            height: 42px;
+            height: 45px;
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
-            padding: 0 12px;
+            padding: 0 15px;
             font-size: 0.85rem;
-            background: rgba(255,255,255,0.02);
-            color: var(--text-sub);
+            color: var(--text-muted);
+            transition: all 0.2s;
         }
-        .attempt-slot.wrong { border-color: var(--accent-red); color: var(--accent-red); }
-        .attempt-slot.skipped { border-color: #555; color: var(--text-sub); }
-        .attempt-slot.correct { border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
+        .attempt-slot.wrong { border-color: var(--accent-red); color: var(--accent-red); background: rgba(255, 23, 68, 0.05); }
+        .attempt-slot.skipped { border-color: rgba(255,255,255,0.15); color: var(--text-muted); }
+        .attempt-slot.correct { border-color: var(--accent-green); color: var(--accent-green); font-weight: 700; background: rgba(0, 230, 118, 0.06); }
 
-        /* Autocomplete Input */
-        .search-box { position: relative; }
-        .search-results {
-            position: absolute;
-            bottom: 100%; left: 0; right: 0;
-            background: #252525;
+        /* Tombol Play Besar & Elegan */
+        .play-section {
+            text-align: center;
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            margin-bottom: 5px;
-            display: none;
-        }
-        .search-item {
-            padding: 10px 14px;
-            cursor: pointer;
-            border-bottom: 1px solid #333;
-            font-size: 0.85rem;
-        }
-        .search-item:hover { background: #333; color: var(--accent-color); }
-
-        /* Play Button Control */
-        .play-control {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 15px 0;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
         }
 
-        .btn-play-big {
-            width: 65px; height: 65px;
+        .btn-play-pulse {
+            width: 70px; height: 70px;
             border-radius: 50%;
             background: var(--accent-gradient);
             border: none;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s;
+            box-shadow: 0 6px 20px rgba(255, 51, 102, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .btn-play-big:active { transform: scale(0.95); }
-        .btn-play-big svg { width: 26px; height: 26px; fill: #fff; margin-left: 4px; }
 
-        /* Action Buttons */
+        .btn-play-pulse:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 51, 102, 0.6);
+        }
+
+        .btn-play-pulse:active { transform: scale(0.96); }
+
+        .btn-play-pulse svg {
+            width: 28px; height: 28px; fill: #fff; margin-left: 3px;
+        }
+
+        .duration-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Search Autocomplete Box */
+        .search-box { position: relative; }
+        
+        .search-results {
+            position: absolute;
+            bottom: calc(100% + 6px); left: 0; right: 0;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .search-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            transition: background 0.15s;
+        }
+        .search-item:hover { background: rgba(255,255,255,0.06); color: var(--accent-primary); }
+
+        .guess-input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .guess-input-field:focus { border-color: var(--accent-primary); }
+
+        /* Action Buttons Row */
         .action-row { display: flex; gap: 10px; }
+        
         .btn {
-            padding: 12px; border-radius: 6px; border: none; font-weight: bold;
-            cursor: pointer; font-size: 0.9rem; flex: 1;
+            padding: 13px; border-radius: var(--radius-md); border: none; font-weight: 600;
+            cursor: pointer; font-size: 0.88rem; flex: 1;
+            transition: filter 0.2s, transform 0.1s;
         }
-        .btn-skip { background: #333; color: #fff; }
-        .btn-submit { background: var(--accent-color); color: #fff; }
+        .btn:active { transform: scale(0.98); }
+        .btn-skip { background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-submit { background: var(--accent-gradient); color: #fff; box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3); }
 
-        /* Hasil Akhir */
+        /* Layar Hasil Akhir Profesional */
         .result-card {
             text-align: center;
-            background: var(--card-bg);
-            padding: 30px 20px;
-            border-radius: 12px;
+            background: var(--bg-card);
+            padding: 35px 25px;
+            border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
         }
+
         .result-card img {
-            width: 150px; height: 150px;
-            border-radius: 8px; margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 160px; height: 160px;
+            border-radius: 12px; margin: 15px 0 20px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            object-fit: cover;
         }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- Layar Loading Awal Otomatis -->
+    <!-- Loading Overlay -->
     <div id="loading-screen">
-        <div class="spinner"></div>
-        <p id="loading-text">Menyiapkan daftar lagu...</p>
+        <div class="loader-ring"></div>
+        <p id="loading-text">Memuat ribuan koleksi lagu hits Indonesia...</p>
     </div>
 
     <div class="header">
         <h1>SONGSPOT INDO</h1>
-        <p>Tebak lagu Indonesia dari cuplikan detik terkecil!</p>
+        <p>Tebak lagu legendaris & hits dari masa ke masa</p>
     </div>
 
     <div class="container">
-        <!-- Area Game Utama (Langsung Tampil Tanpa Login) -->
+        <!-- Panel Game Utama -->
         <div id="game-area" class="hidden">
             
-            <div class="era-selector">
-                <button class="era-btn active" data-era="all">Campuran</button>
-                <button class="era-btn" data-era="90s">Era 90an</button>
-                <button class="era-btn" data-era="2000s">Era 2000an</button>
-                <button class="era-btn" data-era="2010s">Era 2010an</button>
+            <div class="stats-bar">
+                <div>Skor Total: <span id="total-score">0</span></div>
+                <div>Streak: <span id="streak-count">0 🔥</span></div>
             </div>
 
+            <!-- Kategori/Era Pilihan -->
+            <div class="category-wrapper">
+                <div class="category-scroller">
+                    <button class="cat-btn active" data-cat="all">Semua Hits</button>
+                    <button class="cat-btn" data-cat="90s">Era 90-an</button>
+                    <button class="cat-btn" data-cat="2000s">Era 2000-an</button>
+                    <button class="cat-btn" data-cat="2010s">Era 2010-an</button>
+                    <button class="cat-btn" data-cat="2020s">Era 2020-an</button>
+                    <button class="cat-btn" data-cat="band">Band Legendaris</button>
+                    <button class="cat-btn" data-cat="solo">Soloist Hits</button>
+                    <button class="cat-btn" data-cat="boygirl">Boy/Girlband</button>
+                </div>
+            </div>
+
+            <!-- Timeline Visual Durasi -->
             <div class="timeline-container" id="timeline"></div>
 
+            <!-- Slot Percobaan Jawaban -->
             <div class="attempts-list" id="attempts-list">
                 <div class="attempt-slot">1.</div>
                 <div class="attempt-slot">2.</div>
@@ -260,60 +357,68 @@
                 <div class="attempt-slot">6.</div>
             </div>
 
-            <div class="play-control">
-                <button class="btn-play-big" id="btn-play">
+            <!-- Kotak Pemutar Audio Utama -->
+            <div class="play-section">
+                <button class="btn-play-pulse" id="btn-play" title="Putar Cuplikan Lagu">
                     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </button>
+                <div class="duration-label" id="duration-info">Dengarkan: 0.5 Detik</div>
             </div>
-            <p style="text-align: center; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 15px;" id="duration-info">
-                Dengarkan: 0.5 Detik
-            </p>
 
+            <!-- Input Pencarian Prediktif -->
             <div class="search-box">
                 <div class="search-results" id="search-results"></div>
-                <input type="text" id="guess-input" placeholder="Cari judul lagu atau penyanyi..." style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid var(--border-color); border-radius: 6px; color: #fff;">
+                <input type="text" id="guess-input" class="guess-input-field" placeholder="Ketik judul lagu atau nama penyanyi...">
             </div>
 
-            <div class="action-row" style="margin-top: 10px;">
+            <!-- Tombol Navigasi/Aksi -->
+            <div class="action-row">
                 <button class="btn btn-skip" id="btn-skip">Lewati (+1s)</button>
                 <button class="btn btn-submit" id="btn-submit">Tebak</button>
             </div>
         </div>
 
-        <!-- Layar Hasil Akhir -->
+        <!-- Tampilan Hasil Akhir -->
         <div id="result-card" class="result-card hidden">
-            <h2 id="result-title" style="margin-bottom: 15px;"></h2>
-            <img id="album-cover" src="" alt="Album Cover">
-            <h3 id="song-title-res" style="font-size: 1.3rem;"></h3>
-            <p id="artist-res" style="color: var(--text-sub); font-size: 1rem; margin-bottom: 20px;"></p>
+            <h2 id="result-title" style="margin-bottom: 5px; font-size: 1.5rem;"></h2>
+            <p id="points-earned" style="color: var(--accent-green); font-weight: 600; font-size: 0.95rem; margin-bottom: 10px;"></p>
+            <img id="album-cover" src="" alt="Album Artwork">
+            <h3 id="song-title-res" style="font-size: 1.25rem; font-weight: 700;"></h3>
+            <p id="artist-res" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 22px;"></p>
             
-            <button class="btn btn-submit" id="btn-next" style="width: 100%;">Mainkan Lagu Lain ➔</button>
+            <button class="btn btn-submit" id="btn-next" style="width: 100%;">Lagu Selanjutnya ➔</button>
         </div>
     </div>
 
-    <!-- Audio Player (Tersembunyi) -->
+    <!-- Audio Player Tersembunyi -->
     <audio id="audio-player"></audio>
 
     <script>
-        // Setingan Durasi (0.5 detik, 1 detik, 2 detik, 4 detik, 7 detik, 16 detik)
         const STEPS = [0.5, 1.0, 2.0, 4.0, 7.0, 16.0];
         
         let trackPool = [];
         let currentTrack = null;
         let currentStep = 0;
-        let selectedEra = "all";
+        let currentCategory = "all";
+        let score = 0;
+        let streak = 0;
         let isGameOver = false;
         let audioTimeout = null;
 
-        // Kumpulan kata kunci penyanyi/band ikonik Indonesia untuk ditarik datanya
-        const eraKeywords = {
-            'all': ['peterpan', 'dewa 19', 'sheila on 7', 'tulus', 'mahalini', 'raisa', 'glenn fredly', 'rossa', 'afgan', 'judika', 'tiara andini', 'chrisye'],
-            '90s': ['dewa 19', 'gigi band', 'padi', 'kahitna', 'slank', 'krisdayanti', 'naif', 'jamrud', 'chrisye'],
-            '2000s': ['peterpan', 'sheila on 7', 'ungu band', 'radja', 'kangen band', 'nidji', 'dmasiv', 'ST12', 'ada band', 'samsons'],
-            '2010s': ['tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'judika', 'payung teduh']
+        // Database Kategori & Artis Hits Indonesia yang Sangat Luas (Ribuan Kombinasi Pencarian)
+        const categoryKeywords = {
+            'all': ['peterpan', 'dewa 19', 'sheila on 7', 'tulus', 'mahalini', 'raisa', 'glenn fredly', 'rossa', 'afgan', 'judika', 'noah', 'ari lasso', 'ungu', 'kangen band', 'rizky febian', 'tiara andini', 'chrisye', 'fourtwnty', 'nadn amizah'],
+            '90s': ['dewa 19', 'chrisye', 'slank', 'krisdayanti', 'kahitna', 'naif', 'jamrud', 'element', 'armand giovani', 'netral', 'tohpati', 'oppie andaresta', 'rita sugiarto'],
+            '2000s': ['peterpan', 'sheila on 7', 'ungu', 'radja', 'kangen band', 'nidji', 'dmasiv', 'st12', 'ada band', 'samsons', 'geisha', 'cokelat', 'gigi', 'project pop', 'viera', 'anang krisdayanti'],
+            '2010s': ['tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'judika', 'payung teduh', 'barasuara', 'bcl', 'virgoun', 'armada', 'jaz'],
+            '2020s': ['mahalini', 'tiara andini', 'ziva magnolya', 'fabio ashley', 'keisya levronka', 'lyodra', 'brisia jodie', 'nadin amizah', 'hindia', 'pamungkas', 'fiersa besari', 'vierratalia', 'rizky febian ziva'],
+            'band': ['dewa 19', 'peterpan', 'sheila on 7', 'slank', 'ungu', 'kangen band', 'nidji', 'dmasiv', 'noah', 'geisha', 'gigi', 'padi', 'kahitna', 'radja', 'st12', 'fourtwnty'],
+            'solo': ['tulus', 'raisa', 'afgan', 'glenn fredly', 'rossa', 'judika', 'isana sarasvati', 'rizky febian', 'yura yunita', 'chrisye', 'krisdayanti', 'mahalini', 'tiara andini', 'pamungkas'],
+            'boygirl': ['jkt48', 'sm*sh', 'coboy junior', 'cherrybelle', '7icons', 'blink', 'cjra', 'unicorn', 's/m/s/h']
         };
 
         const loadingScreen = document.getElementById('loading-screen');
+        const loadingText = document.getElementById('loading-text');
         const gameArea = document.getElementById('game-area');
         const resultCard = document.getElementById('result-card');
         const timeline = document.getElementById('timeline');
@@ -326,7 +431,9 @@
         const btnSubmit = document.getElementById('btn-submit');
         const btnNext = document.getElementById('btn-next');
         const audioPlayer = document.getElementById('audio-player');
-        const eraBtns = document.querySelectorAll('.era-btn');
+        const catBtns = document.querySelectorAll('.cat-btn');
+        const totalScoreEl = document.getElementById('total-score');
+        const streakCountEl = document.getElementById('streak-count');
 
         function renderTimeline() {
             timeline.innerHTML = '';
@@ -340,21 +447,24 @@
             });
         }
 
-        // Ambil Data Lagu Langsung Tanpa Login (via iTunes API Terbuka)
-        async function fetchTracks(era) {
+        // Fetch Ribuan Koleksi Lagu secara Paralel dari iTunes API Terbuka
+        async function fetchTracks(category) {
+            loadingScreen.style.opacity = '1';
             loadingScreen.classList.remove('hidden');
             gameArea.classList.add('hidden');
             resultCard.classList.add('hidden');
             
             trackPool = [];
-            const keywords = eraKeywords[era];
+            const keywords = categoryKeywords[category] || categoryKeywords['all'];
             
-            // Acak 3 artis dari daftar untuk ditarik lagunya
-            const shuffledKeywords = keywords.sort(() => 0.5 - Math.random()).slice(0, 3);
+            // Ambil acak 5-6 keyword secara bersamaan untuk memperkaya ribuan hasil lagu instan
+            const shuffled = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 5);
 
             try {
-                const fetchPromises = shuffledKeywords.map(kw => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=25`)
+                loadingText.textContent = `Menyelaraskan database hits ${category.toUpperCase()}...`;
+                
+                const fetchPromises = shuffled.map(kw => 
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=50`)
                     .then(res => res.json())
                 );
 
@@ -367,27 +477,31 @@
                     }
                 });
 
+                // Hapus duplikat track ID agar unik
                 trackPool = trackPool.filter((track, index, self) =>
                     index === self.findIndex((t) => (t.trackId === track.trackId))
                 );
 
-                if (trackPool.length === 0) throw new Error("Gagal");
+                if (trackPool.length === 0) throw new Error("Kosong");
 
-                loadingScreen.classList.add('hidden');
-                startNewRound();
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    startNewRound();
+                }, 300);
 
             } catch (err) {
-                alert("Koneksi bermasalah saat mengambil lagu. Memuat ulang otomatis...");
-                fetchTracks('all');
+                loadingText.textContent = "Memuat ulang cadangan server lagu...";
+                setTimeout(() => fetchTracks('all'), 1000);
             }
         }
 
-        eraBtns.forEach(btn => {
+        catBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                eraBtns.forEach(b => b.classList.remove('active'));
+                catBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                selectedEra = btn.dataset.era;
-                fetchTracks(selectedEra);
+                currentCategory = btn.dataset.cat;
+                fetchTracks(currentCategory);
             });
         });
 
@@ -426,14 +540,14 @@
             if (audioTimeout) clearTimeout(audioTimeout);
 
             audioPlayer.currentTime = 0;
-            audioPlayer.play();
+            audioPlayer.play().catch(()=>{});
 
             audioTimeout = setTimeout(() => {
                 audioPlayer.pause();
             }, STEPS[currentStep] * 1000);
         });
 
-        // Autocomplete Prediksi Judul Lagu
+        // Autocomplete Pencarian Cerdas
         guessInput.addEventListener('input', () => {
             const val = guessInput.value.toLowerCase().trim();
             if (!val) {
@@ -517,29 +631,41 @@
                 resultCard.classList.remove('hidden');
 
                 const titleEl = document.getElementById('result-title');
+                const pointsEl = document.getElementById('points-earned');
+
                 if (isWin) {
-                    titleEl.textContent = "HEBAT! TEBAKANMU BENAR! 🎉";
-                    titleEl.style.color = "#2ecc71";
+                    titleEl.textContent = "LUAR BIASA! BENAR! 🎉";
+                    titleEl.style.color = "var(--accent-green)";
+                    
+                    // Hitung poin berdasarkan kecepatan step tebakan (Step 0 = 60pts, Step 5 = 10pts)
+                    const earned = (6 - currentStep) * 10;
+                    score += earned;
+                    streak += 1;
+                    pointsEl.textContent = `+${earned} Poin Berhasil Didapatkan!`;
                 } else {
-                    titleEl.textContent = "SAYANG SEKALI... 😅";
+                    titleEl.textContent = "SAYANG SEKALI, COBA LAGI! 😅";
                     titleEl.style.color = "var(--accent-red)";
+                    streak = 0;
+                    pointsEl.textContent = `Poin ditambah 0`;
                 }
 
-                const artworkUrl = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb', '300x300bb') : '';
+                totalScoreEl.textContent = score;
+                streakCountEl.textContent = `${streak} 🔥`;
+
+                const artworkUrl = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb', '400x400bb') : '';
                 
                 document.getElementById('album-cover').src = artworkUrl;
                 document.getElementById('song-title-res').textContent = currentTrack.trackName;
                 document.getElementById('artist-res').textContent = currentTrack.artistName;
 
-                // Mainkan full preview 30 detik di akhir
                 audioPlayer.currentTime = 0;
                 audioPlayer.play().catch(() => {});
-            }, 1000);
+            }, 800);
         }
 
         btnNext.addEventListener('click', startNewRound);
 
-        // LANGSUNG MULAI otomatis begitu halaman dibuka
+        // Eksekusi Awal Otomatis
         window.onload = () => {
             fetchTracks('all');
         };
