@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Songspot Indo - Tebak Lagu Bertahap</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --accent-color: #f12711; /* Tema Merah untuk membedakan */
+            --accent-gradient: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
+            --accent-red: #e74c3c;
+            --text-main: #ffffff;
+            --text-sub: #b3b3b3;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Loading Overlay */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Era Filter */
+        .era-selector {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        .era-selector::-webkit-scrollbar { display: none; }
+
+        .era-btn {
+            background: #2a2a2a;
+            color: var(--text-sub);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .era-btn.active {
+            background: var(--accent-color);
+            color: #fff;
+            font-weight: bold;
+            border-color: var(--accent-color);
+        }
+
+        /* Timeline Durasi */
+        .timeline-container {
+            display: flex;
+            height: 12px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            overflow: hidden;
+            gap: 2px;
+            margin: 10px 0;
+        }
+
+        .timeline-segment {
+            background: #333;
+            height: 100%;
+            transition: background 0.3s;
+        }
+        .timeline-segment.active { background: var(--accent-color); }
+
+        /* List Percobaan */
+        .attempts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .attempt-slot {
+            height: 42px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.02);
+            color: var(--text-sub);
+        }
+        .attempt-slot.wrong { border-color: var(--accent-red); color: var(--accent-red); }
+        .attempt-slot.skipped { border-color: #555; color: var(--text-sub); }
+        .attempt-slot.correct { border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
+
+        /* Autocomplete Input */
+        .search-box { position: relative; }
+        .search-results {
+            position: absolute;
+            bottom: 100%; left: 0; right: 0;
+            background: #252525;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            margin-bottom: 5px;
+            display: none;
+        }
+        .search-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            font-size: 0.85rem;
+        }
+        .search-item:hover { background: #333; color: var(--accent-color); }
+
+        /* Play Button Control */
+        .play-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .btn-play-big {
+            width: 65px; height: 65px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        .btn-play-big:active { transform: scale(0.95); }
+        .btn-play-big svg { width: 26px; height: 26px; fill: #fff; margin-left: 4px; }
+
+        /* Action Buttons */
+        .action-row { display: flex; gap: 10px; }
+        .btn {
+            padding: 12px; border-radius: 6px; border: none; font-weight: bold;
+            cursor: pointer; font-size: 0.9rem; flex: 1;
+        }
+        .btn-skip { background: #333; color: #fff; }
+        .btn-submit { background: var(--accent-color); color: #fff; }
+
+        /* Hasil Akhir */
+        .result-card {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .result-card img {
+            width: 150px; height: 150px;
+            border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p id="loading-text">Menyiapkan daftar lagu...</p>
+    </div>
+
+    <div class="header">
+        <h1>SONGSPOT INDO</h1>
+        <p>Tebak lagu Indonesia dari cuplikan detik terkecil!</p>
+    </div>
+
+    <div class="container">
+        <!-- Area Game Utama -->
+        <div id="game-area" class="hidden">
+            
+            <div class="era-selector">
+                <button class="era-btn active" data-era="all">Campuran</button>
+                <button class="era-btn" data-era="90s">Era 90an</button>
+                <button class="era-btn" data-era="2000s">Era 2000an</button>
+                <button class="era-btn" data-era="2010s">Era 2010an</button>
+            </div>
+
+            <div class="timeline-container" id="timeline"></div>
+
+            <div class="attempts-list" id="attempts-list">
+                <div class="attempt-slot">1.</div>
+                <div class="attempt-slot">2.</div>
+                <div class="attempt-slot">3.</div>
+                <div class="attempt-slot">4.</div>
+                <div class="attempt-slot">5.</div>
+                <div class="attempt-slot">6.</div>
+            </div>
+
+            <div class="play-control">
+                <button class="btn-play-big" id="btn-play">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 15px;" id="duration-info">
+                Dengarkan: 0.5 Detik
+            </p>
+
+            <div class="search-box">
+                <div class="search-results" id="search-results"></div>
+                <input type="text" id="guess-input" placeholder="Cari judul lagu atau penyanyi..." style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid var(--border-color); border-radius: 6px; color: #fff;">
+            </div>
+
+            <div class="action-row" style="margin-top: 10px;">
+                <button class="btn btn-skip" id="btn-skip">Lewati (+1s)</button>
+                <button class="btn btn-submit" id="btn-submit">Tebak</button>
+            </div>
+        </div>
+
+        <!-- Layar Hasil Akhir -->
+        <div id="result-card" class="result-card hidden">
+            <h2 id="result-title" style="margin-bottom: 15px;"></h2>
+            <img id="album-cover" src="" alt="Album Cover">
+            <h3 id="song-title-res" style="font-size: 1.3rem;"></h3>
+            <p id="artist-res" style="color: var(--text-sub); font-size: 1rem; margin-bottom: 20px;"></p>
+            
+            <button class="btn btn-submit" id="btn-next" style="width: 100%;">Mainkan Lagu Lain ➔</button>
+        </div>
+    </div>
+
+    <audio id="audio-player"></audio>
+
+    <script>
+        const STEPS = [0.5, 1.0, 2.0, 4.0, 7.0, 16.0];
+        
+        let trackPool = [];
+        let currentTrack = null;
+        let currentStep = 0;
+        let selectedEra = "all";
+        let isGameOver = false;
+        let audioTimeout = null;
+
+        // Kumpulan kata kunci pencarian (Artis-artis ikonik Indonesia per era)
+        // iTunes API merespons pencarian spesifik lebih baik daripada pencarian genre umum
+        const eraKeywords = {
+            'all': ['peterpan', 'dewa 19', 'sheila on 7', 'tulus', 'mahalini', 'raisa', 'glenn fredly', 'rossa', 'afgan', 'judika', 'tiara andini'],
+            '90s': ['dewa 19', 'gigi band', 'padi', 'kahitna', 'slank', 'krisdayanti', 'naif', 'jamrud'],
+            '2000s': ['peterpan', 'sheila on 7', 'ungu band', 'radja', 'kangen band', 'nidji', 'dmasiv', 'ST12', 'ada band', 'samsons'],
+            '2010s': ['tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'judika', 'payung teduh']
+        };
+
+        const loadingScreen = document.getElementById('loading-screen');
+        const gameArea = document.getElementById('game-area');
+        const resultCard = document.getElementById('result-card');
+        const timeline = document.getElementById('timeline');
+        const attemptsList = document.getElementById('attempts-list');
+        const btnPlay = document.getElementById('btn-play');
+        const durationInfo = document.getElementById('duration-info');
+        const guessInput = document.getElementById('guess-input');
+        const searchResults = document.getElementById('search-results');
+        const btnSkip = document.getElementById('btn-skip');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnNext = document.getElementById('btn-next');
+        const audioPlayer = document.getElementById('audio-player');
+        const eraBtns = document.querySelectorAll('.era-btn');
+
+        function renderTimeline() {
+            timeline.innerHTML = '';
+            const total = STEPS[STEPS.length - 1];
+            STEPS.forEach((step, idx) => {
+                const seg = document.createElement('div');
+                seg.className = 'timeline-segment' + (idx <= currentStep ? ' active' : '');
+                const prev = idx === 0 ? 0 : STEPS[idx - 1];
+                seg.style.width = `${((step - prev) / total) * 100}%`;
+                timeline.appendChild(seg);
+            });
+        }
+
+        // Ambil Data dari iTunes Search API (Gratis, No Token)
+        async function fetchTracks(era) {
+            loadingScreen.classList.remove('hidden');
+            gameArea.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            
+            trackPool = [];
+            const keywords = eraKeywords[era];
+            
+            // Ambil secara acak 3 artis dari daftar era untuk dimuat agar lebih cepat
+            const shuffledKeywords = keywords.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            try {
+                // Fetch paralel untuk beberapa artis
+                const fetchPromises = shuffledKeywords.map(kw => 
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=25`)
+                    .then(res => res.json())
+                );
+
+                const results = await Promise.all(fetchPromises);
+                
+                // Gabungkan hasil dan filter lagu yang punya preview MP3
+                results.forEach(data => {
+                    if (data.results) {
+                        const validTracks = data.results.filter(t => t.previewUrl);
+                        trackPool = trackPool.concat(validTracks);
+                    }
+                });
+
+                // Hapus duplikat
+                trackPool = trackPool.filter((track, index, self) =>
+                    index === self.findIndex((t) => (t.trackId === track.trackId))
+                );
+
+                if (trackPool.length === 0) throw new Error("Gagal menemukan lagu");
+
+                loadingScreen.classList.add('hidden');
+                startNewRound();
+
+            } catch (err) {
+                alert("Koneksi bermasalah saat mengambil lagu. Memuat ulang...");
+                fetchTracks('all');
+            }
+        }
+
+        eraBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                eraBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedEra = btn.dataset.era;
+                fetchTracks(selectedEra);
+            });
+        });
+
+        function startNewRound() {
+            isGameOver = false;
+            currentStep = 0;
+            resultCard.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+
+            // Acak 1 lagu
+            currentTrack = trackPool[Math.floor(Math.random() * trackPool.length)];
+            audioPlayer.src = currentTrack.previewUrl;
+
+            // Reset Slot
+            const slots = attemptsList.querySelectorAll('.attempt-slot');
+            slots.forEach((s, i) => {
+                s.className = 'attempt-slot';
+                s.textContent = `${i + 1}.`;
+            });
+
+            guessInput.value = '';
+            guessInput.disabled = false;
+            btnSkip.disabled = false;
+            btnSubmit.disabled = false;
+
+            updateStepUI();
+        }
+
+        function updateStepUI() {
+            renderTimeline();
+            const dur = STEPS[currentStep];
+            durationInfo.textContent = `Dengarkan: ${dur} Detik`;
+            btnSkip.textContent = currentStep === 5 ? 'Menyerah' : `Lewati (+${STEPS[currentStep + 1] - dur}s)`;
+        }
+
+        btnPlay.addEventListener('click', () => {
+            if (!audioPlayer.src) return;
+            if (audioTimeout) clearTimeout(audioTimeout);
+
+            audioPlayer.currentTime = 0;
+            audioPlayer.play();
+
+            audioTimeout = setTimeout(() => {
+                audioPlayer.pause();
+            }, STEPS[currentStep] * 1000);
+        });
+
+        // Autocomplete berdasakan pool lagu yang sudah diambil
+        guessInput.addEventListener('input', () => {
+            const val = guessInput.value.toLowerCase().trim();
+            if (!val) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            const matches = trackPool.filter(t => 
+                t.trackName.toLowerCase().includes(val) || 
+                t.artistName.toLowerCase().includes(val)
+            ).slice(0, 5);
+
+            if (matches.length > 0) {
+                searchResults.innerHTML = '';
+                matches.forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = 'search-item';
+                    div.textContent = `${t.trackName} - ${t.artistName}`;
+                    div.addEventListener('click', () => {
+                        guessInput.value = div.textContent;
+                        searchResults.style.display = 'none';
+                    });
+                    searchResults.appendChild(div);
+                });
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-box')) searchResults.style.display = 'none';
+        });
+
+        btnSubmit.addEventListener('click', () => processGuess(guessInput.value.trim()));
+        btnSkip.addEventListener('click', () => processGuess('SKIPPED'));
+
+        function processGuess(guessText) {
+            if (isGameOver) return;
+            if (guessText === '' && guessText !== 'SKIPPED') return;
+
+            const slots = attemptsList.querySelectorAll('.attempt-slot');
+            const currentSlot = slots[currentStep];
+            const fullName = `${currentTrack.trackName} - ${currentTrack.artistName}`;
+
+            if (guessText.toLowerCase() === fullName.toLowerCase() || 
+               (guessText.length > 3 && currentTrack.trackName.toLowerCase().includes(guessText.toLowerCase()))) {
+                
+                currentSlot.classList.add('correct');
+                currentSlot.textContent = `✓ ${fullName}`;
+                endRound(true);
+                return;
+            }
+
+            if (guessText === 'SKIPPED') {
+                currentSlot.classList.add('skipped');
+                currentSlot.textContent = `🚫 Dilewati`;
+            } else {
+                currentSlot.classList.add('wrong');
+                currentSlot.textContent = `✗ ${guessText}`;
+            }
+
+            if (currentStep < 5) {
+                currentStep++;
+                updateStepUI();
+                guessInput.value = '';
+            } else {
+                endRound(false);
+            }
+        }
+
+        function endRound(isWin) {
+            isGameOver = true;
+            audioPlayer.pause();
+            guessInput.disabled = true;
+            btnSkip.disabled = true;
+            btnSubmit.disabled = true;
+
+            setTimeout(() => {
+                gameArea.classList.add('hidden');
+                resultCard.classList.remove('hidden');
+
+                const titleEl = document.getElementById('result-title');
+                if (isWin) {
+                    titleEl.textContent = "HEBAT! TEBAKANMU BENAR! 🎉";
+                    titleEl.style.color = "#2ecc71";
+                } else {
+                    titleEl.textContent = "SAYANG SEKALI... 😅";
+                    titleEl.style.color = "var(--accent-red)";
+                }
+
+                // Ambil gambar cover album resolusi lebih tinggi (mengganti 100x100 jadi 300x300)
+                const artworkUrl = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb', '300x300bb') : '';
+                
+                document.getElementById('album-cover').src = artworkUrl;
+                document.getElementById('song-title-res').textContent = currentTrack.trackName;
+                document.getElementById('artist-res').textContent = currentTrack.artistName;
+
+                audioPlayer.currentTime = 0;
+                audioPlayer.play().catch(() => {});
+            }, 1000);
+        }
+
+        btnNext.addEventListener('click', startNewRound);
+
+        // Mulai pertama kali otomatis
+        fetchTracks('all');
+    </script>
+</body>
+</html>
