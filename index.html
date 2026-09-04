@@ -3,31 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess Lagu - Tebak Musik Indonesia Terbesar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Guess Lagu - Ultimate Indonesian Music Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #07070a;
-            --bg-surface: #121218;
-            --bg-elevated: #1a1a24;
-            --accent-primary: #6366f1;
+            --bg-base: #030307;
+            --bg-surface: #0e0e16;
+            --bg-elevated: #161622;
+            --accent-glow: rgba(124, 58, 237, 0.25);
+            --accent-primary: #8b5cf6;
             --accent-secondary: #ec4899;
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+            --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             --success: #10b981;
             --danger: #f43f5e;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
             --border: rgba(255, 255, 255, 0.08);
-            --radius-xl: 20px;
-            --radius-lg: 14px;
-            --radius-md: 10px;
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
@@ -37,13 +38,14 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 24px 16px;
+            padding: 28px 16px;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+                radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 90%, rgba(236, 72, 153, 0.12) 0%, transparent 45%);
+            background-attachment: fixed;
         }
 
-        /* Loading Screen Ultra Modern */
+        /* Loading Screen */
         #loading-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -59,13 +61,13 @@
         }
 
         .loader-spinner {
-            width: 60px; height: 60px;
+            width: 64px; height: 64px;
             border: 4px solid var(--border);
             border-top: 4px solid var(--accent-primary);
             border-radius: 50%;
             animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 30px var(--accent-glow);
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -74,29 +76,32 @@
             font-size: 0.95rem;
             color: var(--text-muted);
             font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         /* Header */
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             width: 100%;
-            max-width: 520px;
+            max-width: 540px;
         }
 
         .header h1 {
-            font-size: 2.4rem;
-            font-weight: 800;
+            font-size: 2.6rem;
+            font-weight: 900;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
+            text-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
         }
 
         .header p {
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 6px;
+            font-weight: 400;
         }
 
         /* Stats & Score Bar */
@@ -105,18 +110,19 @@
             justify-content: space-between;
             background: var(--bg-surface);
             border: 1px solid var(--border);
-            padding: 12px 20px;
+            padding: 14px 22px;
             border-radius: var(--radius-lg);
             margin-bottom: 16px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
         .stats-bar span { color: var(--accent-secondary); }
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 540px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -125,9 +131,9 @@
         /* Kategori Scroller */
         .category-scroller {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             overflow-x: auto;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
             scrollbar-width: none;
         }
         .category-scroller::-webkit-scrollbar { display: none; }
@@ -136,69 +142,71 @@
             background: var(--bg-surface);
             color: var(--text-muted);
             border: 1px solid var(--border);
-            padding: 9px 16px;
-            border-radius: 24px;
+            padding: 10px 18px;
+            border-radius: 30px;
             cursor: pointer;
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             font-weight: 600;
             white-space: nowrap;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .cat-btn:hover {
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.25);
             color: var(--text-main);
+            background: var(--bg-elevated);
         }
 
         .cat-btn.active {
             background: var(--accent-gradient);
             color: #fff;
             border-color: transparent;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
 
         /* Timeline Durasi (5 Slot Waktu) */
         .timeline-container {
             display: flex;
-            height: 10px;
+            height: 12px;
             background: var(--bg-surface);
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
-            gap: 3px;
-            padding: 2px;
+            gap: 4px;
+            padding: 3px;
             border: 1px solid var(--border);
         }
 
         .timeline-segment {
             background: var(--bg-elevated);
             height: 100%;
-            border-radius: 4px;
+            border-radius: 5px;
             transition: background 0.3s ease;
         }
-        .timeline-segment.active { background: var(--accent-primary); }
+        .timeline-segment.active { background: var(--accent-primary); box-shadow: 0 0 10px var(--accent-primary); }
 
         /* Slot Percobaan (5 Baris) */
         .attempts-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 9px;
         }
 
         .attempt-slot {
-            height: 44px;
+            height: 48px;
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
-            padding: 0 16px;
-            font-size: 0.85rem;
+            padding: 0 18px;
+            font-size: 0.88rem;
             color: var(--text-muted);
             font-weight: 500;
+            transition: all 0.2s;
         }
-        .attempt-slot.wrong { border-color: var(--danger); color: var(--danger); background: rgba(244, 63, 94, 0.05); }
+        .attempt-slot.wrong { border-color: var(--danger); color: var(--danger); background: rgba(244, 63, 94, 0.06); }
         .attempt-slot.skipped { border-color: rgba(255,255,255,0.15); color: var(--text-muted); }
-        .attempt-slot.correct { border-color: var(--success); color: var(--success); font-weight: 700; background: rgba(16, 185, 129, 0.06); }
+        .attempt-slot.correct { border-color: var(--success); color: var(--success); font-weight: 700; background: rgba(16, 185, 129, 0.08); }
 
         /* Play Card Utama */
         .play-section {
@@ -206,13 +214,13 @@
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-xl);
-            padding: 24px;
+            padding: 28px;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
         }
 
         .btn-play-pulse {
-            width: 72px; height: 72px;
+            width: 78px; height: 78px;
             border-radius: 50%;
             background: var(--accent-gradient);
             border: none;
@@ -220,27 +228,27 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
         }
 
         .btn-play-pulse:hover {
-            transform: scale(1.06);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.6);
+            transform: scale(1.08);
+            box-shadow: 0 14px 35px rgba(139, 92, 246, 0.7);
         }
 
-        .btn-play-pulse:active { transform: scale(0.96); }
+        .btn-play-pulse:active { transform: scale(0.95); }
 
         .btn-play-pulse svg {
-            width: 30px; height: 30px; fill: #fff; margin-left: 3px;
+            width: 32px; height: 32px; fill: #fff; margin-left: 3px;
         }
 
         .duration-label {
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
-            margin-top: 12px;
+            margin-top: 14px;
             font-weight: 600;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
         }
 
         /* Search Autocomplete */
@@ -248,65 +256,71 @@
         
         .search-results {
             position: absolute;
-            bottom: calc(100% + 6px); left: 0; right: 0;
+            bottom: calc(100% + 8px); left: 0; right: 0;
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            max-height: 220px;
+            max-height: 230px;
             overflow-y: auto;
             z-index: 100;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
             display: none;
         }
 
         .search-item {
-            padding: 12px 16px;
+            padding: 13px 18px;
             cursor: pointer;
             border-bottom: 1px solid var(--border);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             transition: background 0.15s;
         }
         .search-item:hover { background: rgba(255,255,255,0.06); color: var(--accent-secondary); }
 
         .guess-input-field {
             width: 100%;
-            padding: 14px 18px;
+            padding: 15px 20px;
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             color: var(--text-main);
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
-        .guess-input-field:focus { border-color: var(--accent-primary); }
+        .guess-input-field:focus { 
+            border-color: var(--accent-primary); 
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), inset 0 2px 4px rgba(0,0,0,0.2);
+        }
 
         /* Action Buttons */
-        .action-row { display: flex; gap: 10px; }
+        .action-row { display: flex; gap: 12px; }
         
         .btn {
-            padding: 14px; border-radius: var(--radius-lg); border: none; font-weight: 700;
-            cursor: pointer; font-size: 0.9rem; flex: 1;
-            transition: filter 0.2s, transform 0.1s;
+            padding: 15px; border-radius: var(--radius-lg); border: none; font-weight: 700;
+            cursor: pointer; font-size: 0.92rem; flex: 1;
+            transition: filter 0.2s, transform 0.1s, box-shadow 0.2s;
         }
         .btn:active { transform: scale(0.98); }
         .btn-skip { background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border); }
-        .btn-submit { background: var(--accent-gradient); color: #fff; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+        .btn-skip:hover { background: var(--bg-surface); border-color: rgba(255,255,255,0.2); }
+        .btn-submit { background: var(--accent-gradient); color: #fff; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); }
+        .btn-submit:hover { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.6); }
 
         /* Result Card */
         .result-card {
             text-align: center;
             background: var(--bg-surface);
-            padding: 35px 25px;
+            padding: 40px 28px;
             border-radius: var(--radius-xl);
             border: 1px solid var(--border);
-            box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
         }
 
         .result-card img {
-            width: 160px; height: 160px;
-            border-radius: var(--radius-lg); margin: 15px 0 20px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 170px; height: 170px;
+            border-radius: var(--radius-lg); margin: 15px 0 22px 0;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.6);
             object-fit: cover;
         }
 
@@ -318,12 +332,12 @@
     <!-- Loading Screen -->
     <div id="loading-screen">
         <div class="loader-spinner"></div>
-        <p id="loading-text">Menyiapkan ribuan database hits legendaris Indonesia...</p>
+        <p id="loading-text">Menyinkronkan ribuan lagu hits lintas generasi Indonesia...</p>
     </div>
 
     <div class="header">
         <h1>GUESS LAGU</h1>
-        <p>Tebak intro lagu legendaris, band, soloist, & boy/girlband!</p>
+        <p>Tebak intro lagu legendaris, band, soloist, & group dari semua era!</p>
     </div>
 
     <div class="container">
@@ -335,9 +349,10 @@
                 <div>Streak: <span id="streak-count">0 🔥</span></div>
             </div>
 
-            <!-- Kategori / Era / Genre -->
+            <!-- Kategori / Era / Genre Komprehensif -->
             <div class="category-scroller">
-                <button class="cat-btn active" data-cat="all">Semua Hits</button>
+                <button class="cat-btn active" data-cat="all">Semua Era & Genre</button>
+                <button class="cat-btn" data-cat="legend">Legend 70-80an</button>
                 <button class="cat-btn" data-cat="band">Band Legendaris</button>
                 <button class="cat-btn" data-cat="boygirl">Boy/Girlband</button>
                 <button class="cat-btn" data-cat="90s">Era 90-an</button>
@@ -382,11 +397,11 @@
 
         <!-- Result Card -->
         <div id="result-card" class="result-card hidden">
-            <h2 id="result-title" style="margin-bottom: 5px; font-size: 1.5rem;"></h2>
-            <p id="points-earned" style="color: var(--success); font-weight: 700; font-size: 0.95rem; margin-bottom: 10px;"></p>
+            <h2 id="result-title" style="margin-bottom: 5px; font-size: 1.6rem;"></h2>
+            <p id="points-earned" style="color: var(--success); font-weight: 700; font-size: 0.98rem; margin-bottom: 12px;"></p>
             <img id="album-cover" src="" alt="Album Artwork">
-            <h3 id="song-title-res" style="font-size: 1.25rem; font-weight: 700;"></h3>
-            <p id="artist-res" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 22px;"></p>
+            <h3 id="song-title-res" style="font-size: 1.3rem; font-weight: 700;"></h3>
+            <p id="artist-res" style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 24px;"></p>
             
             <button class="btn btn-submit" id="btn-next" style="width: 100%;">Lagu Selanjutnya ➔</button>
         </div>
@@ -396,7 +411,6 @@
     <audio id="audio-player"></audio>
 
     <script>
-        // Sesuai permintaan: 0.5s, 1s, 3s, 5s, 8s (Total 5 step)
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
         let trackPool = [];
@@ -408,16 +422,17 @@
         let isGameOver = false;
         let audioTimeout = null;
 
-        // Database ribuan keyword artis/band/boygirlband lintas era Indonesia
+        // Bank database keyword super lengkap dari semua era & genre musik Indonesia
         const categoryKeywords = {
-            'all': ['dewa 19', 'peterpan', 'sheila on 7', 'slank', 'ungu', 'kangen band', 'smsh', 'jkt48', 'cherrybelle', 'tulus', 'raisa', 'mahalini', 'noah', 'gigi', 'padi', 'kahitna', 'radja', 'st12', 'nidji', 'dmasiv', 'coboy junior', 'chrisye', 'glenn fredly', 'rossa', 'afgan'],
-            'band': ['dewa 19', 'peterpan', 'sheila on 7', 'slank', 'ungu', 'kangen band', 'nidji', 'dmasiv', 'noah', 'geisha', 'gigi', 'padi', 'kahitna', 'radja', 'st12', 'armada', 'kotak', 'fourtwnty', 'barasuara', 'element', 'netral'],
-            'boygirl': ['sm*sh', 'jkt48', 'cherrybelle', 'coboy junior', 'cjr', '7icons', 'blink', 's/m/s/h', 'super seven', 'vierra', 'project pop'],
-            '90s': ['dewa 19', 'chrisye', 'slank', 'krisdayanti', 'kahitna', 'naif', 'jamrud', 'element', 'oppie andaresta', 'slank', 'iesty', 'armand', 'pas band', 'retro'],
-            '2000s': ['peterpan', 'sheila on 7', 'ungu', 'radja', 'kangen band', 'nidji', 'dmasiv', 'st12', 'ada band', 'samsons', 'geisha', 'cokelat', 'gigi', 'project pop', 'anang krisdayanti'],
-            '2010s': ['tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'judika', 'payung teduh', 'bcl', 'virgoun', 'armada', 'jaz', 'barasuara'],
-            '2020s': ['mahalini', 'tiara andini', 'ziva magnolya', 'fabio ashley', 'keisya levronka', 'lyodra', 'brisia jodie', 'nadin amizah', 'hindia', 'pamungkas', 'fiersa besari', 'sal priadi', 'maliq essentials'],
-            'solo': ['tulus', 'raisa', 'afgan', 'glenn fredly', 'rossa', 'judika', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'chrisye', 'krisdayanti', 'mahalini', 'tiara andini', 'pamungkas', 'virgoun', 'bcl']
+            'all': ['dewa 19', 'peterpan', 'sheila on 7', 'slank', 'iwan fals', 'chrisye', 'koes plus', 'tulus', 'raisa', 'mahalini', 'jkt48', 'smsh', 'ungu', 'padi', 'noah', 'gigi', 'rossa', 'afgan', 'judika', 'kangen band'],
+            'legend': ['koes plus', 'panbers', 'iwan fals', 'chrisye', 'ebiet g ade', 'bimbo', 'titiek puspa', 'gombloh', 'vina panduwinata', 'broery marantika', 'rinto harahap', 'deddy dores'],
+            'band': ['dewa 19', 'peterpan', 'sheila on 7', 'slank', 'ungu', 'kangen band', 'nidji', 'dmasiv', 'noah', 'geisha', 'gigi', 'padi', 'kahitna', 'radja', 'st12', 'armada', 'kotak', 'fourtwnty', 'barasuara', 'element', 'netral', 'wali', 'the changcuters'],
+            'boygirl': ['sm*sh', 'jkt48', 'cherrybelle', 'coboy junior', 'cjr', '7icons', 'blink', 's/m/s/h', 'super seven', 'un1ty', 'vierra', 'project pop', 'tulus'],
+            '90s': ['dewa 19', 'chrisye', 'slank', 'krisdayanti', 'kahitna', 'naif', 'jamrud', 'element', 'iwa k', 'oppie andaresta', 'pas band', 'edane', 'slank', 'tohpati', 'rangga'],
+            '2000s': ['peterpan', 'sheila on 7', 'ungu', 'radja', 'kangen band', 'nidji', 'dmasiv', 'st12', 'ada band', 'samsons', 'geisha', 'cokelat', 'gigi', 'project pop', 'anang krisdayanti', 'melly goeslaw'],
+            '2010s': ['tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'judika', 'payung teduh', 'bcl', 'virgoun', 'armada', 'jaz', 'barasuara', 'geisha'],
+            '2020s': ['mahalini', 'tiara andini', 'ziva magnolya', 'fabio asher', 'keisya levronka', 'lyodra', 'brisia jodie', 'nadin amizah', 'hindia', 'pamungkas', 'fiersa besari', 'sal priadi', 'maliq essentials', 'idgitaf', 'rizky febian'],
+            'solo': ['chrisye', 'iwan fals', 'ebiet g ade', 'glenn fredly', 'rossa', 'tulus', 'raisa', 'afgan', 'judika', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'mahalini', 'tiara andini', 'pamungkas', 'virgoun', 'bcl', 'melly goeslaw']
         };
 
         const loadingScreen = document.getElementById('loading-screen');
@@ -450,7 +465,6 @@
             });
         }
 
-        // Fetch ribuan lagu secara paralel dari iTunes API untuk memastikan database sangat besar
         async function fetchTracks(category) {
             loadingScreen.style.opacity = '1';
             loadingScreen.classList.remove('hidden');
@@ -460,11 +474,11 @@
             trackPool = [];
             const keywords = categoryKeywords[category] || categoryKeywords['all'];
             
-            // Ambil acak 6-8 keyword secara bersamaan agar menghasilkan ratusan hingga ribuan lagu instan
-            const shuffled = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 7);
+            // Ambil acak 8 keyword sekaligus untuk memastikan ratusan hingga ribuan lagu terkumpul instan
+            const shuffled = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 8);
 
             try {
-                loadingText.textContent = `Mengumpulkan ribuan lagu hits kategori ${category.toUpperCase()}...`;
+                loadingText.textContent = `Memuat database musik ${category.toUpperCase()} dari seluruh era...`;
                 
                 const fetchPromises = shuffled.map(kw => 
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=50`)
@@ -538,12 +552,11 @@
             btnSkip.textContent = currentStep === 4 ? 'Menyerah' : `Lewati (+${STEPS[currentStep + 1] - dur}s)`;
         }
 
-        // Mulai dari INTRO asli lagu (currentTime = 0) dengan durasi spesifik
         btnPlay.addEventListener('click', () => {
             if (!audioPlayer.src) return;
             if (audioTimeout) clearTimeout(audioTimeout);
 
-            audioPlayer.currentTime = 0; // Pastikan dimulai dari intro awal lagu
+            audioPlayer.currentTime = 0; // Mulai dari intro lagu
             audioPlayer.play().catch(()=>{});
 
             audioTimeout = setTimeout(() => {
@@ -551,7 +564,6 @@
             }, STEPS[currentStep] * 1000);
         });
 
-        // Autocomplete Pencarian Cerdas
         guessInput.addEventListener('input', () => {
             const val = guessInput.value.toLowerCase().trim();
             if (!val) {
@@ -641,7 +653,6 @@
                     titleEl.textContent = "LUAR BIASA! BENAR! 🎉";
                     titleEl.style.color = "var(--success)";
                     
-                    // Poin berdasarkan kecepatan (Step 0 = 50pts, Step 4 = 10pts)
                     const earned = (5 - currentStep) * 10;
                     score += earned;
                     streak += 1;
