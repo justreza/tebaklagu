@@ -251,19 +251,19 @@
             letter-spacing: 0.4px;
         }
 
-        /* Search Autocomplete */
+        /* Search Autocomplete & Input Field */
         .search-box { position: relative; }
         
         .search-results {
             position: absolute;
             bottom: calc(100% + 8px); left: 0; right: 0;
             background: var(--bg-elevated);
-            border: 1px solid var(--border);
+            border: 1px solid var(--accent-primary);
             border-radius: var(--radius-lg);
             max-height: 230px;
             overflow-y: auto;
             z-index: 100;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
             display: none;
         }
 
@@ -274,23 +274,30 @@
             font-size: 0.88rem;
             transition: background 0.15s;
         }
-        .search-item:hover { background: rgba(255,255,255,0.06); color: var(--accent-secondary); }
+        .search-item:hover { background: rgba(139, 92, 246, 0.15); color: var(--accent-secondary); }
 
         .guess-input-field {
             width: 100%;
-            padding: 15px 20px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
+            padding: 16px 22px;
+            background: rgba(22, 22, 34, 0.85);
+            border: 2px solid rgba(139, 92, 246, 0.4);
             border-radius: var(--radius-lg);
             color: var(--text-main);
-            font-size: 0.92rem;
+            font-size: 0.95rem;
+            font-weight: 500;
             outline: none;
-            transition: all 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.4);
         }
+
+        .guess-input-field::placeholder {
+            color: #64748b;
+        }
+
         .guess-input-field:focus { 
-            border-color: var(--accent-primary); 
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), inset 0 2px 4px rgba(0,0,0,0.2);
+            border-color: var(--accent-secondary); 
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+            background: var(--bg-surface);
         }
 
         /* Action Buttons */
@@ -332,12 +339,12 @@
     <!-- Loading Screen -->
     <div id="loading-screen">
         <div class="loader-spinner"></div>
-        <p id="loading-text">Menyinkronkan ribuan lagu hits lintas generasi Indonesia...</p>
+        <p id="loading-text">Menyinkronkan ribuan lagu hits Indonesia...</p>
     </div>
 
     <div class="header">
         <h1>GUESS LAGU</h1>
-        <p>Tebak intro lagu legendaris, band, soloist, & group dari semua era!</p>
+        <p>Tebak intro lagu hits Indonesia dari era 90an sampai sekarang!</p>
     </div>
 
     <div class="container">
@@ -349,7 +356,7 @@
                 <div>Streak: <span id="streak-count">0 🔥</span></div>
             </div>
 
-            <!-- Kategori Terstruktur -->
+            <!-- Kategori Menu -->
             <div class="category-scroller">
                 <button class="cat-btn active" data-cat="alltime">All Time Hits</button>
                 <button class="cat-btn" data-cat="90s">90an</button>
@@ -359,7 +366,7 @@
                 <button class="cat-btn" data-cat="random">Random</button>
             </div>
 
-            <!-- Timeline (5 Langkah: 0.5s, 1s, 3s, 5s, 8s) -->
+            <!-- Timeline (5 Langkah) -->
             <div class="timeline-container" id="timeline"></div>
 
             <!-- Slot Tebakan (5 Baris) -->
@@ -411,6 +418,8 @@
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
         let trackPool = [];
+        let availableTracks = [];
+        let lastArtistName = "";
         let currentTrack = null;
         let currentStep = 0;
         let currentCategory = "alltime";
@@ -419,50 +428,44 @@
         let isGameOver = false;
         let audioTimeout = null;
 
-        // Bank database keyword super komprehensif (Band, Boyband, Girlband, Soloist hits tiap era)
+        // Keyword tiap era
         const categoryKeywords = {
-            'alltime': [
-                'dewa 19', 'peterpan', 'sheila on 7', 'slank', 'iwan fals', 'chrisye', 'koes plus', 
-                'tulus', 'raisa', 'mahalini', 'jkt48', 'smsh', 'cherrybelle', 'letto', 'hijau daun', 
-                'radja', 'kangen band', 'kerispatih', 'j-rocks', 'hivi', 'ungu', 'padi', 'noah', 
-                'gigi', 'rossa', 'afgan', 'judika', 'nidji', 'dmasiv', 'samsons', 'st12', 'vierra', 
-                'maliq essentials', 'kahitna', 'glenn fredly', 'naif', 'jamrud', 'seventeen'
-            ],
             '90s': [
-                'dewa 19', 'chrisye', 'slank', 'krisdayanti', 'kahitna', 'naif', 'jamrud', 'element', 
-                'iwa k', 'oppie andaresta', 'pas band', 'edane', 'tohpati', 'potret', 'base jam', 
-                'kla project', 'nike ardilla', 'poppy mercury', 'inka christie', 'protonema', 'wayang', 
-                'java jive', 'stinky', 'gigi', 'padi', 'anang', 'rita effendy', 'melly goeslaw'
+                'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
+                'Element', 'Iwa K', 'Pas Band', 'Potret', 'Base Jam', 'KLA Project', 
+                'Nike Ardilla', 'Poppy Mercury', 'Java Jive', 'Stinky', 'Gigi', 'Padi'
             ],
             '2000s': [
-                'peterpan', 'sheila on 7', 'ungu', 'radja', 'kangen band', 'kerispatih', 'letto', 
-                'hijau daun', 'j-rocks', 'nidji', 'dmasiv', 'st12', 'ada band', 'samsons', 'geisha', 
-                'cokelat', 'gigi', 'project pop', 'melly goeslaw', 'repvblik', 'wali', 'the titans', 
-                'seventeen', 'naff', 'matta band', 'drive', 'utopia', 'garasi', 'ten2five', 'ello', 
-                'glenn fredly', 'rossa', 'marcell', 'audy', 'astrid', 'vierra', 'd bagindas', 'zivilia'
+                'Peterpan', 'Sheila On 7', 'Ungu', 'Radja', 'Kangen Band', 'Kerispatih', 
+                'Letto', 'Hijau Daun', 'J-Rocks', 'Nidji', 'dMasiv', 'ST12', 'ADA Band', 
+                'Samsons', 'Geisha', 'Cokelat', 'Repvblik', 'Wali', 'The Titans', 
+                'Seventeen', 'Naff', 'Drive', 'Vierra', 'D Bagindas'
             ],
             '2010s': [
-                'hivi', 'smsh', 'cherrybelle', 'jkt48', 'coboy junior', 'cjr', '7icons', 'blink', 
-                'tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 
-                'judika', 'payung teduh', 'fourtwnty', 'barasuara', 'armada', 'last child', 'virgoun', 
-                'ran', 'jaz', 'anji', 'fiersa besari', 'marion jola', 'brisia jodie', 'gac', 'papinka', 'dadali'
+                'HIVI!', 'Cherrybelle', 'SM*SH', 'JKT48', 'Coboy Junior', 'CJR', '7Icons', 
+                'Blink Sendiri Lagi', 'Blink Percayalah', 'Blink Dag Dig Dug', 'Blink Seindah Biasa',
+                'Tulus', 'Raisa', 'Afgan', 'NOAH', 'Isyana Sarasvati', 'Rizky Febian', 
+                'Yura Yunita', 'Judika', 'Payung Teduh', 'Fourtwnty', 'Armada', 'Last Child', 
+                'Virgoun', 'RAN', 'Jaz', 'Anji', 'Fiersa Besari', 'GAC'
             ],
             '2020s': [
-                'mahalini', 'tiara andini', 'ziva magnolya', 'fabio asher', 'keisya levronka', 'lyodra', 
-                'brisia jodie', 'nadin amizah', 'hindia', 'pamungkas', 'fiersa besari', 'sal priadi', 
-                'maliq essentials', 'idgitaf', 'rizky febian', 'juicy luicy', 'bernadya', 'feby putri', 
-                'dere', 'raim laode', 'nyoman paul', 'ronny parulian', 'nabila taqiyyah', 'batas senja'
+                'Mahalini', 'Tiara Andini', 'Ziva Magnolya', 'Fabio Asher', 'Keisya Levronka', 
+                'Lyodra', 'Nadin Amizah', 'Hindia', 'Pamungkas', 'Sal Priadi', 'Juicy Luicy', 
+                'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf'
             ],
-            'random': [] // Akan di-generate otomatis dari penggabungan semua era
+            'alltime': [],
+            'random': []
         };
 
-        // Buat keyword untuk kategori Random dari gabungan semua era
-        categoryKeywords['random'] = [
+        // All Time Hits menggabungkan SELURUH era (90s, 2000s, 2010s, 2020s)
+        categoryKeywords['alltime'] = [
             ...categoryKeywords['90s'],
             ...categoryKeywords['2000s'],
             ...categoryKeywords['2010s'],
             ...categoryKeywords['2020s']
         ];
+
+        categoryKeywords['random'] = [...categoryKeywords['alltime']];
 
         const loadingScreen = document.getElementById('loading-screen');
         const loadingText = document.getElementById('loading-text');
@@ -481,6 +484,29 @@
         const catBtns = document.querySelectorAll('.cat-btn');
         const totalScoreEl = document.getElementById('total-score');
         const streakCountEl = document.getElementById('streak-count');
+
+        // Pembersihan variasi judul ganda
+        function cleanSongTitle(title) {
+            return title
+                .replace(/\(.*?version.*?\)/gi, '')
+                .replace(/\(.*?remaster.*?\)/gi, '')
+                .replace(/\(.*?live.*?\)/gi, '')
+                .replace(/\(.*?acoustic.*?\)/gi, '')
+                .replace(/ - live.*/gi, '')
+                .replace(/ - remastered.*/gi, '')
+                .replace(/ - acoustic.*/gi, '')
+                .replace(/ - new version.*/gi, '')
+                .replace(/ - stereo.*/gi, '')
+                .trim();
+        }
+
+        // Fisher-Yates Shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
 
         function renderTimeline() {
             timeline.innerHTML = '';
@@ -502,33 +528,46 @@
             
             trackPool = [];
             const keywords = categoryKeywords[category] || categoryKeywords['alltime'];
-            
-            // Ambil acak 10 keyword sekaligus untuk variasi lagu masif
-            const shuffled = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 10);
+            const shuffledKeywords = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 14);
 
             try {
-                loadingText.textContent = `Mengambil lagu hits pilihan kategori ${category.toUpperCase()}...`;
+                loadingText.textContent = `Menyinkronkan lagu pilihan kategori ${category.toUpperCase()}...`;
                 
-                const fetchPromises = shuffled.map(kw => 
+                const fetchPromises = shuffledKeywords.map(kw => 
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=50`)
                     .then(res => res.json())
                 );
 
                 const results = await Promise.all(fetchPromises);
-                
+                const trackMap = new Map();
+
                 results.forEach(data => {
                     if (data.results) {
-                        const validTracks = data.results.filter(t => t.previewUrl);
-                        trackPool = trackPool.concat(validTracks);
+                        data.results.forEach(t => {
+                            if (!t.previewUrl) return;
+                            
+                            // Filter Blink-182 otomatis agar tak keliru
+                            if (t.artistName.toLowerCase().includes('blink-182')) return;
+
+                            const cleanedTitle = cleanSongTitle(t.trackName);
+                            const uniqueKey = `${cleanedTitle.toLowerCase()} - ${t.artistName.toLowerCase()}`;
+                            
+                            if (!trackMap.has(uniqueKey)) {
+                                trackMap.set(uniqueKey, {
+                                    ...t,
+                                    cleanedTitle: cleanedTitle
+                                });
+                            }
+                        });
                     }
                 });
 
-                // Hapus duplikat ID lagu
-                trackPool = trackPool.filter((track, index, self) =>
-                    index === self.findIndex((t) => (t.trackId === track.trackId))
-                );
+                trackPool = Array.from(trackMap.values());
 
                 if (trackPool.length === 0) throw new Error("Kosong");
+
+                availableTracks = [...trackPool];
+                shuffleArray(availableTracks);
 
                 loadingScreen.style.opacity = '0';
                 setTimeout(() => {
@@ -551,13 +590,27 @@
             });
         });
 
+        function getNextTrack() {
+            if (availableTracks.length === 0) {
+                availableTracks = [...trackPool];
+                shuffleArray(availableTracks);
+            }
+
+            let index = availableTracks.findIndex(t => t.artistName.toLowerCase() !== lastArtistName.toLowerCase());
+            if (index === -1) index = 0;
+
+            const selected = availableTracks.splice(index, 1)[0];
+            lastArtistName = selected.artistName;
+            return selected;
+        }
+
         function startNewRound() {
             isGameOver = false;
             currentStep = 0;
             resultCard.classList.add('hidden');
             gameArea.classList.remove('hidden');
 
-            currentTrack = trackPool[Math.floor(Math.random() * trackPool.length)];
+            currentTrack = getNextTrack();
             audioPlayer.src = currentTrack.previewUrl;
 
             const slots = attemptsList.querySelectorAll('.attempt-slot');
@@ -601,7 +654,7 @@
             }
 
             const matches = trackPool.filter(t => 
-                t.trackName.toLowerCase().includes(val) || 
+                t.cleanedTitle.toLowerCase().includes(val) || 
                 t.artistName.toLowerCase().includes(val)
             ).slice(0, 5);
 
@@ -610,7 +663,7 @@
                 matches.forEach(t => {
                     const div = document.createElement('div');
                     div.className = 'search-item';
-                    div.textContent = `${t.trackName} - ${t.artistName}`;
+                    div.textContent = `${t.cleanedTitle} - ${t.artistName}`;
                     div.addEventListener('click', () => {
                         guessInput.value = div.textContent;
                         searchResults.style.display = 'none';
@@ -636,10 +689,10 @@
 
             const slots = attemptsList.querySelectorAll('.attempt-slot');
             const currentSlot = slots[currentStep];
-            const fullName = `${currentTrack.trackName} - ${currentTrack.artistName}`;
+            const fullName = `${currentTrack.cleanedTitle} - ${currentTrack.artistName}`;
 
             if (guessText.toLowerCase() === fullName.toLowerCase() || 
-               (guessText.length > 3 && currentTrack.trackName.toLowerCase().includes(guessText.toLowerCase()))) {
+               (guessText.length > 3 && currentTrack.cleanedTitle.toLowerCase().includes(guessText.toLowerCase()))) {
                 
                 currentSlot.classList.add('correct');
                 currentSlot.textContent = `✓ ${fullName}`;
@@ -699,7 +752,7 @@
                 const artworkUrl = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb', '400x400bb') : '';
                 
                 document.getElementById('album-cover').src = artworkUrl;
-                document.getElementById('song-title-res').textContent = currentTrack.trackName;
+                document.getElementById('song-title-res').textContent = currentTrack.cleanedTitle;
                 document.getElementById('artist-res').textContent = currentTrack.artistName;
 
                 audioPlayer.currentTime = 0;
