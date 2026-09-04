@@ -349,17 +349,14 @@
                 <div>Streak: <span id="streak-count">0 🔥</span></div>
             </div>
 
-            <!-- Kategori / Era / Genre Komprehensif -->
+            <!-- Kategori Terstruktur -->
             <div class="category-scroller">
-                <button class="cat-btn active" data-cat="all">Semua Era & Genre</button>
-                <button class="cat-btn" data-cat="legend">Legend 70-80an</button>
-                <button class="cat-btn" data-cat="band">Band Legendaris</button>
-                <button class="cat-btn" data-cat="boygirl">Boy/Girlband</button>
-                <button class="cat-btn" data-cat="90s">Era 90-an</button>
-                <button class="cat-btn" data-cat="2000s">Era 2000-an</button>
-                <button class="cat-btn" data-cat="2010s">Era 2010-an</button>
-                <button class="cat-btn" data-cat="2020s">Era 2020-an</button>
-                <button class="cat-btn" data-cat="solo">Soloist Hits</button>
+                <button class="cat-btn active" data-cat="alltime">All Time Hits</button>
+                <button class="cat-btn" data-cat="90s">90an</button>
+                <button class="cat-btn" data-cat="2000s">2000an</button>
+                <button class="cat-btn" data-cat="2010s">2010an</button>
+                <button class="cat-btn" data-cat="2020s">2020an</button>
+                <button class="cat-btn" data-cat="random">Random</button>
             </div>
 
             <!-- Timeline (5 Langkah: 0.5s, 1s, 3s, 5s, 8s) -->
@@ -416,24 +413,56 @@
         let trackPool = [];
         let currentTrack = null;
         let currentStep = 0;
-        let currentCategory = "all";
+        let currentCategory = "alltime";
         let score = 0;
         let streak = 0;
         let isGameOver = false;
         let audioTimeout = null;
 
-        // Bank database keyword super lengkap dari semua era & genre musik Indonesia
+        // Bank database keyword super komprehensif (Band, Boyband, Girlband, Soloist hits tiap era)
         const categoryKeywords = {
-            'all': ['dewa 19', 'peterpan', 'sheila on 7', 'slank', 'iwan fals', 'chrisye', 'koes plus', 'tulus', 'raisa', 'mahalini', 'jkt48', 'smsh', 'ungu', 'padi', 'noah', 'gigi', 'rossa', 'afgan', 'judika', 'kangen band'],
-            'legend': ['koes plus', 'panbers', 'iwan fals', 'chrisye', 'ebiet g ade', 'bimbo', 'titiek puspa', 'gombloh', 'vina panduwinata', 'broery marantika', 'rinto harahap', 'deddy dores'],
-            'band': ['dewa 19', 'peterpan', 'sheila on 7', 'slank', 'ungu', 'kangen band', 'nidji', 'dmasiv', 'noah', 'geisha', 'gigi', 'padi', 'kahitna', 'radja', 'st12', 'armada', 'kotak', 'fourtwnty', 'barasuara', 'element', 'netral', 'wali', 'the changcuters'],
-            'boygirl': ['sm*sh', 'jkt48', 'cherrybelle', 'coboy junior', 'cjr', '7icons', 'blink', 's/m/s/h', 'super seven', 'un1ty', 'vierra', 'project pop', 'tulus'],
-            '90s': ['dewa 19', 'chrisye', 'slank', 'krisdayanti', 'kahitna', 'naif', 'jamrud', 'element', 'iwa k', 'oppie andaresta', 'pas band', 'edane', 'slank', 'tohpati', 'rangga'],
-            '2000s': ['peterpan', 'sheila on 7', 'ungu', 'radja', 'kangen band', 'nidji', 'dmasiv', 'st12', 'ada band', 'samsons', 'geisha', 'cokelat', 'gigi', 'project pop', 'anang krisdayanti', 'melly goeslaw'],
-            '2010s': ['tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'judika', 'payung teduh', 'bcl', 'virgoun', 'armada', 'jaz', 'barasuara', 'geisha'],
-            '2020s': ['mahalini', 'tiara andini', 'ziva magnolya', 'fabio asher', 'keisya levronka', 'lyodra', 'brisia jodie', 'nadin amizah', 'hindia', 'pamungkas', 'fiersa besari', 'sal priadi', 'maliq essentials', 'idgitaf', 'rizky febian'],
-            'solo': ['chrisye', 'iwan fals', 'ebiet g ade', 'glenn fredly', 'rossa', 'tulus', 'raisa', 'afgan', 'judika', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'mahalini', 'tiara andini', 'pamungkas', 'virgoun', 'bcl', 'melly goeslaw']
+            'alltime': [
+                'dewa 19', 'peterpan', 'sheila on 7', 'slank', 'iwan fals', 'chrisye', 'koes plus', 
+                'tulus', 'raisa', 'mahalini', 'jkt48', 'smsh', 'cherrybelle', 'letto', 'hijau daun', 
+                'radja', 'kangen band', 'kerispatih', 'j-rocks', 'hivi', 'ungu', 'padi', 'noah', 
+                'gigi', 'rossa', 'afgan', 'judika', 'nidji', 'dmasiv', 'samsons', 'st12', 'vierra', 
+                'maliq essentials', 'kahitna', 'glenn fredly', 'naif', 'jamrud', 'seventeen'
+            ],
+            '90s': [
+                'dewa 19', 'chrisye', 'slank', 'krisdayanti', 'kahitna', 'naif', 'jamrud', 'element', 
+                'iwa k', 'oppie andaresta', 'pas band', 'edane', 'tohpati', 'potret', 'base jam', 
+                'kla project', 'nike ardilla', 'poppy mercury', 'inka christie', 'protonema', 'wayang', 
+                'java jive', 'stinky', 'gigi', 'padi', 'anang', 'rita effendy', 'melly goeslaw'
+            ],
+            '2000s': [
+                'peterpan', 'sheila on 7', 'ungu', 'radja', 'kangen band', 'kerispatih', 'letto', 
+                'hijau daun', 'j-rocks', 'nidji', 'dmasiv', 'st12', 'ada band', 'samsons', 'geisha', 
+                'cokelat', 'gigi', 'project pop', 'melly goeslaw', 'repvblik', 'wali', 'the titans', 
+                'seventeen', 'naff', 'matta band', 'drive', 'utopia', 'garasi', 'ten2five', 'ello', 
+                'glenn fredly', 'rossa', 'marcell', 'audy', 'astrid', 'vierra', 'd bagindas', 'zivilia'
+            ],
+            '2010s': [
+                'hivi', 'smsh', 'cherrybelle', 'jkt48', 'coboy junior', 'cjr', '7icons', 'blink', 
+                'tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 
+                'judika', 'payung teduh', 'fourtwnty', 'barasuara', 'armada', 'last child', 'virgoun', 
+                'ran', 'jaz', 'anji', 'fiersa besari', 'marion jola', 'brisia jodie', 'gac', 'papinka', 'dadali'
+            ],
+            '2020s': [
+                'mahalini', 'tiara andini', 'ziva magnolya', 'fabio asher', 'keisya levronka', 'lyodra', 
+                'brisia jodie', 'nadin amizah', 'hindia', 'pamungkas', 'fiersa besari', 'sal priadi', 
+                'maliq essentials', 'idgitaf', 'rizky febian', 'juicy luicy', 'bernadya', 'feby putri', 
+                'dere', 'raim laode', 'nyoman paul', 'ronny parulian', 'nabila taqiyyah', 'batas senja'
+            ],
+            'random': [] // Akan di-generate otomatis dari penggabungan semua era
         };
+
+        // Buat keyword untuk kategori Random dari gabungan semua era
+        categoryKeywords['random'] = [
+            ...categoryKeywords['90s'],
+            ...categoryKeywords['2000s'],
+            ...categoryKeywords['2010s'],
+            ...categoryKeywords['2020s']
+        ];
 
         const loadingScreen = document.getElementById('loading-screen');
         const loadingText = document.getElementById('loading-text');
@@ -472,13 +501,13 @@
             resultCard.classList.add('hidden');
             
             trackPool = [];
-            const keywords = categoryKeywords[category] || categoryKeywords['all'];
+            const keywords = categoryKeywords[category] || categoryKeywords['alltime'];
             
-            // Ambil acak 8 keyword sekaligus untuk memastikan ratusan hingga ribuan lagu terkumpul instan
-            const shuffled = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 8);
+            // Ambil acak 10 keyword sekaligus untuk variasi lagu masif
+            const shuffled = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 10);
 
             try {
-                loadingText.textContent = `Memuat database musik ${category.toUpperCase()} dari seluruh era...`;
+                loadingText.textContent = `Mengambil lagu hits pilihan kategori ${category.toUpperCase()}...`;
                 
                 const fetchPromises = shuffled.map(kw => 
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=50`)
@@ -509,7 +538,7 @@
 
             } catch (err) {
                 loadingText.textContent = "Menghubungkan ulang ke server database lagu...";
-                setTimeout(() => fetchTracks('all'), 1000);
+                setTimeout(() => fetchTracks('alltime'), 1000);
             }
         }
 
@@ -556,7 +585,7 @@
             if (!audioPlayer.src) return;
             if (audioTimeout) clearTimeout(audioTimeout);
 
-            audioPlayer.currentTime = 0; // Mulai dari intro lagu
+            audioPlayer.currentTime = 0;
             audioPlayer.play().catch(()=>{});
 
             audioTimeout = setTimeout(() => {
@@ -681,7 +710,7 @@
         btnNext.addEventListener('click', startNewRound);
 
         window.onload = () => {
-            fetchTracks('all');
+            fetchTracks('alltime');
         };
     </script>
 </body>
