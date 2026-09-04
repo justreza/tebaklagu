@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess Indo - Tebak Lagu Bertahap</title>
+    <title>GuessLagu - Langsung Main</title>
     <style>
         :root {
             --bg-dark: #121212;
             --card-bg: #1e1e1e;
-            --accent-color: #f12711; /* Tema Merah untuk membedakan */
+            --accent-color: #f12711; 
             --accent-gradient: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
             --accent-red: #e74c3c;
             --text-main: #ffffff;
@@ -64,7 +64,7 @@
             gap: 15px;
         }
 
-        /* Loading Overlay */
+        /* Loading Screen */
         #loading-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -227,6 +227,7 @@
 </head>
 <body>
 
+    <!-- Layar Loading Awal Otomatis -->
     <div id="loading-screen">
         <div class="spinner"></div>
         <p id="loading-text">Menyiapkan daftar lagu...</p>
@@ -238,7 +239,7 @@
     </div>
 
     <div class="container">
-        <!-- Area Game Utama -->
+        <!-- Area Game Utama (Langsung Tampil Tanpa Login) -->
         <div id="game-area" class="hidden">
             
             <div class="era-selector">
@@ -290,9 +291,11 @@
         </div>
     </div>
 
+    <!-- Audio Player (Tersembunyi) -->
     <audio id="audio-player"></audio>
 
     <script>
+        // Setingan Durasi (0.5 detik, 1 detik, 2 detik, 4 detik, 7 detik, 16 detik)
         const STEPS = [0.5, 1.0, 2.0, 4.0, 7.0, 16.0];
         
         let trackPool = [];
@@ -302,11 +305,10 @@
         let isGameOver = false;
         let audioTimeout = null;
 
-        // Kumpulan kata kunci pencarian (Artis-artis ikonik Indonesia per era)
-        // iTunes API merespons pencarian spesifik lebih baik daripada pencarian genre umum
+        // Kumpulan kata kunci penyanyi/band ikonik Indonesia untuk ditarik datanya
         const eraKeywords = {
-            'all': ['peterpan', 'dewa 19', 'sheila on 7', 'tulus', 'mahalini', 'raisa', 'glenn fredly', 'rossa', 'afgan', 'judika', 'tiara andini'],
-            '90s': ['dewa 19', 'gigi band', 'padi', 'kahitna', 'slank', 'krisdayanti', 'naif', 'jamrud'],
+            'all': ['peterpan', 'dewa 19', 'sheila on 7', 'tulus', 'mahalini', 'raisa', 'glenn fredly', 'rossa', 'afgan', 'judika', 'tiara andini', 'chrisye'],
+            '90s': ['dewa 19', 'gigi band', 'padi', 'kahitna', 'slank', 'krisdayanti', 'naif', 'jamrud', 'chrisye'],
             '2000s': ['peterpan', 'sheila on 7', 'ungu band', 'radja', 'kangen band', 'nidji', 'dmasiv', 'ST12', 'ada band', 'samsons'],
             '2010s': ['tulus', 'raisa', 'afgan', 'noah', 'isyana sarasvati', 'rizky febian', 'yura yunita', 'judika', 'payung teduh']
         };
@@ -338,7 +340,7 @@
             });
         }
 
-        // Ambil Data dari iTunes Search API (Gratis, No Token)
+        // Ambil Data Lagu Langsung Tanpa Login (via iTunes API Terbuka)
         async function fetchTracks(era) {
             loadingScreen.classList.remove('hidden');
             gameArea.classList.add('hidden');
@@ -347,11 +349,10 @@
             trackPool = [];
             const keywords = eraKeywords[era];
             
-            // Ambil secara acak 3 artis dari daftar era untuk dimuat agar lebih cepat
+            // Acak 3 artis dari daftar untuk ditarik lagunya
             const shuffledKeywords = keywords.sort(() => 0.5 - Math.random()).slice(0, 3);
 
             try {
-                // Fetch paralel untuk beberapa artis
                 const fetchPromises = shuffledKeywords.map(kw => 
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=25`)
                     .then(res => res.json())
@@ -359,7 +360,6 @@
 
                 const results = await Promise.all(fetchPromises);
                 
-                // Gabungkan hasil dan filter lagu yang punya preview MP3
                 results.forEach(data => {
                     if (data.results) {
                         const validTracks = data.results.filter(t => t.previewUrl);
@@ -367,18 +367,17 @@
                     }
                 });
 
-                // Hapus duplikat
                 trackPool = trackPool.filter((track, index, self) =>
                     index === self.findIndex((t) => (t.trackId === track.trackId))
                 );
 
-                if (trackPool.length === 0) throw new Error("Gagal menemukan lagu");
+                if (trackPool.length === 0) throw new Error("Gagal");
 
                 loadingScreen.classList.add('hidden');
                 startNewRound();
 
             } catch (err) {
-                alert("Koneksi bermasalah saat mengambil lagu. Memuat ulang...");
+                alert("Koneksi bermasalah saat mengambil lagu. Memuat ulang otomatis...");
                 fetchTracks('all');
             }
         }
@@ -398,11 +397,9 @@
             resultCard.classList.add('hidden');
             gameArea.classList.remove('hidden');
 
-            // Acak 1 lagu
             currentTrack = trackPool[Math.floor(Math.random() * trackPool.length)];
             audioPlayer.src = currentTrack.previewUrl;
 
-            // Reset Slot
             const slots = attemptsList.querySelectorAll('.attempt-slot');
             slots.forEach((s, i) => {
                 s.className = 'attempt-slot';
@@ -436,7 +433,7 @@
             }, STEPS[currentStep] * 1000);
         });
 
-        // Autocomplete berdasakan pool lagu yang sudah diambil
+        // Autocomplete Prediksi Judul Lagu
         guessInput.addEventListener('input', () => {
             const val = guessInput.value.toLowerCase().trim();
             if (!val) {
@@ -528,13 +525,13 @@
                     titleEl.style.color = "var(--accent-red)";
                 }
 
-                // Ambil gambar cover album resolusi lebih tinggi (mengganti 100x100 jadi 300x300)
                 const artworkUrl = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb', '300x300bb') : '';
                 
                 document.getElementById('album-cover').src = artworkUrl;
                 document.getElementById('song-title-res').textContent = currentTrack.trackName;
                 document.getElementById('artist-res').textContent = currentTrack.artistName;
 
+                // Mainkan full preview 30 detik di akhir
                 audioPlayer.currentTime = 0;
                 audioPlayer.play().catch(() => {});
             }, 1000);
@@ -542,8 +539,10 @@
 
         btnNext.addEventListener('click', startNewRound);
 
-        // Mulai pertama kali otomatis
-        fetchTracks('all');
+        // LANGSUNG MULAI otomatis begitu halaman dibuka
+        window.onload = () => {
+            fetchTracks('all');
+        };
     </script>
 </body>
 </html>
