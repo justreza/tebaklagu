@@ -112,7 +112,7 @@
             border: 1px solid var(--border);
             padding: 14px 22px;
             border-radius: var(--radius-lg);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             font-size: 0.9rem;
             font-weight: 600;
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
@@ -128,36 +128,45 @@
             gap: 16px;
         }
 
-        /* Kategori Scroller */
-        .category-scroller {
+        /* Level Scroller */
+        .level-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .level-scroller {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             overflow-x: auto;
             padding-bottom: 6px;
             scrollbar-width: none;
         }
-        .category-scroller::-webkit-scrollbar { display: none; }
+        .level-scroller::-webkit-scrollbar { display: none; }
 
-        .cat-btn {
+        .level-btn {
             background: var(--bg-surface);
             color: var(--text-muted);
             border: 1px solid var(--border);
-            padding: 10px 18px;
+            padding: 9px 16px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             white-space: nowrap;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .cat-btn:hover {
+        .level-btn:hover {
             border-color: rgba(255, 255, 255, 0.25);
             color: var(--text-main);
             background: var(--bg-elevated);
         }
 
-        .cat-btn.active {
+        .level-btn.active {
             background: var(--accent-gradient);
             color: #fff;
             border-color: transparent;
@@ -339,7 +348,7 @@
     <!-- Loading Screen -->
     <div id="loading-screen">
         <div class="loader-spinner"></div>
-        <p id="loading-text">Menyinkronkan ribuan lagu hits Indonesia...</p>
+        <p id="loading-text">Menyinkronkan lagu pilihan level...</p>
     </div>
 
     <div class="header">
@@ -356,14 +365,16 @@
                 <div>Streak: <span id="streak-count">0 🔥</span></div>
             </div>
 
-            <!-- Kategori Menu -->
-            <div class="category-scroller">
-                <button class="cat-btn active" data-cat="alltime">All Time Hits</button>
-                <button class="cat-btn" data-cat="90s">90an</button>
-                <button class="cat-btn" data-cat="2000s">2000an</button>
-                <button class="cat-btn" data-cat="2010s">2010an</button>
-                <button class="cat-btn" data-cat="2020s">2020an</button>
-                <button class="cat-btn" data-cat="random">Random</button>
+            <!-- Level Kesulitan (5 Tingkat) -->
+            <div>
+                <div class="level-label">Tingkat Kesulitan:</div>
+                <div class="level-scroller">
+                    <button class="level-btn active" data-level="super_easy">🔥 Super Gampang</button>
+                    <button class="level-btn" data-level="easy">⭐ Gampang</button>
+                    <button class="level-btn" data-level="medium">⚡ Sedang</button>
+                    <button class="level-btn" data-level="hard">🎯 Susah</button>
+                    <button class="level-btn" data-level="very_hard">💀 Susah Banget</button>
+                </div>
             </div>
 
             <!-- Timeline (5 Langkah) -->
@@ -422,50 +433,45 @@
         let lastArtistName = "";
         let currentTrack = null;
         let currentStep = 0;
-        let currentCategory = "alltime";
+        let currentLevel = "super_easy";
         let score = 0;
         let streak = 0;
         let isGameOver = false;
         let audioTimeout = null;
 
-        // Keyword tiap era
-        const categoryKeywords = {
-            '90s': [
-                'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
-                'Element', 'Iwa K', 'Pas Band', 'Potret', 'Base Jam', 'KLA Project', 
-                'Nike Ardilla', 'Poppy Mercury', 'Java Jive', 'Stinky', 'Gigi', 'Padi'
+        // Query berdasarkan tingkat kesulitan hits
+        const levelKeywords = {
+            'super_easy': [
+                'Sheila On 7 Dan', 'Dewa 19 Kangen', 'Peterpan Ada Apa Denganmu', 'Ungu Demi Waktu', 
+                'Mahalini Sial', 'Tulus Hati Hati di Jalan', 'JKT48 Heavy Rotation', 'Blink Sendiri Lagi', 
+                'Cherrybelle Dilema', 'Armada Asal Kau Bahagia', 'Kangen Band Pujaan Hati', 
+                'Jamrud Pelangi Di Matamu', 'Slank Ku Tak Bisa', 'Radja Jujur', 'dMasiv Cinta Ini Membunuhku'
             ],
-            '2000s': [
-                'Peterpan', 'Sheila On 7', 'Ungu', 'Radja', 'Kangen Band', 'Kerispatih', 
-                'Letto', 'Hijau Daun', 'J-Rocks', 'Nidji', 'dMasiv', 'ST12', 'ADA Band', 
-                'Samsons', 'Geisha', 'Cokelat', 'Repvblik', 'Wali', 'The Titans', 
-                'Seventeen', 'Naff', 'Drive', 'Vierra', 'D Bagindas'
+            'easy': [
+                'Sheila On 7 Sephia', 'Dewa 19 Separuh Nafas', 'Peterpan Mungkin Nanti', 'NOAH Separuh Aku', 
+                'Ungu Kekasih Gelapku', 'Vierra Jadi Yang Kuinginkan', 'Judika Putus Atau Terus', 
+                'Lyodra Pesan Terakhir', 'Tiara Andini Merasa Indah', 'Nidji Hapus Aku', 'Kahitna Cantik', 
+                'Kerispatih Tapi Bukan Aku', 'Rossa Hati Yang Kau Sakiti', 'Geisha Jika Cinta Dia'
             ],
-            '2010s': [
-                'HIVI!', 'Cherrybelle', 'SM*SH', 'JKT48', 'Coboy Junior', 'CJR', '7Icons', 
-                'Blink Sendiri Lagi', 'Blink Percayalah', 'Blink Dag Dig Dug', 'Blink Seindah Biasa',
-                'Tulus', 'Raisa', 'Afgan', 'NOAH', 'Isyana Sarasvati', 'Rizky Febian', 
-                'Yura Yunita', 'Judika', 'Payung Teduh', 'Fourtwnty', 'Armada', 'Last Child', 
-                'Virgoun', 'RAN', 'Jaz', 'Anji', 'Fiersa Besari', 'GAC'
+            'medium': [
+                'Sheila On 7 Pemuja Rahasia', 'Dewa 19 Roman Picisan', 'Peterpan Yang Terdalam', 'Gigi Nakal', 
+                'Padi Sang Penghibur', 'Letto Ruang Rindu', 'Hijau Daun Suara', 'J-Rocks Kau Curi Lagi', 
+                'Blink Percayalah', 'Raisa Kali Kedua', 'Hindia Evaluasi', 'Fourtwnty Zona Nyaman', 
+                'Seventeen Selalu Mengalah', 'Naff Akhirnya Ku Menemukanmu'
             ],
-            '2020s': [
-                'Mahalini', 'Tiara Andini', 'Ziva Magnolya', 'Fabio Asher', 'Keisya Levronka', 
-                'Lyodra', 'Nadin Amizah', 'Hindia', 'Pamungkas', 'Sal Priadi', 'Juicy Luicy', 
-                'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf'
+            'hard': [
+                'Sheila On 7 Tunggu Aku Di Jakarta', 'Dewa 19 Restoe Boemi', 'Peterpan Sahabat', 
+                'Slank Terlalu Manis', 'Ungu Bayang Semu', 'Drive Bersama Bintang', 'Ada Band Manusia Bodoh', 
+                'Samsons Kenangan Terindah', 'Juicy Luicy Lantas', 'Sal Priadi Kita Usahakan Rumah Itu', 
+                'Bernadya Kata Mereka Ini Berlebihan', 'Isyana Sarasvati Tetap Dalam Jiwa'
             ],
-            'alltime': [],
-            'random': []
+            'very_hard': [
+                'Dewa 19 Swear', 'Dewa 19 Still I Am Guiting', 'Dewa 19 Cinta Adalah Misteri', 
+                'Sheila On 7 Terlintas 2 Tipe', 'Sheila On 7 Pagi Yang Cerah', 'Peterpan Taman Langit', 
+                'Peterpan Satu Hati', 'Slank Pintaku Untukmu', 'Ungu Laguku', 'Gigi Kuingin', 
+                'Padi Mahadewi', 'dMasiv Ilham Tanpa Alasan', 'Kahitna Seribu Tahun Cukup', 'Nidji Disco Lazy Time'
+            ]
         };
-
-        // All Time Hits menggabungkan SELURUH era (90s, 2000s, 2010s, 2020s)
-        categoryKeywords['alltime'] = [
-            ...categoryKeywords['90s'],
-            ...categoryKeywords['2000s'],
-            ...categoryKeywords['2010s'],
-            ...categoryKeywords['2020s']
-        ];
-
-        categoryKeywords['random'] = [...categoryKeywords['alltime']];
 
         const loadingScreen = document.getElementById('loading-screen');
         const loadingText = document.getElementById('loading-text');
@@ -481,11 +487,22 @@
         const btnSubmit = document.getElementById('btn-submit');
         const btnNext = document.getElementById('btn-next');
         const audioPlayer = document.getElementById('audio-player');
-        const catBtns = document.querySelectorAll('.cat-btn');
+        const levelBtns = document.querySelectorAll('.level-btn');
         const totalScoreEl = document.getElementById('total-score');
         const streakCountEl = document.getElementById('streak-count');
 
-        // Pembersihan variasi judul ganda
+        // Cek ketat agar HANYA lagu versi original yang masuk (buang remix, acoustic, live, cover, dsb)
+        function isOriginalTrack(trackName) {
+            const lower = trackName.toLowerCase();
+            const forbiddenKeywords = [
+                'remix', 'acoustic', 'akustik', 'live', 'instrumental', 
+                'karaoke', 'cover', 'orchestra', 'version', 'ver.', 
+                'demo', 'edit', 're-record', 'rerecorded', 'tribute', 'piano'
+            ];
+            return !forbiddenKeywords.some(kw => lower.includes(kw));
+        }
+
+        // Pembersihan variasi tag judul
         function cleanSongTitle(title) {
             return title
                 .replace(/\(.*?version.*?\)/gi, '')
@@ -520,21 +537,21 @@
             });
         }
 
-        async function fetchTracks(category) {
+        async function fetchTracks(level) {
             loadingScreen.style.opacity = '1';
             loadingScreen.classList.remove('hidden');
             gameArea.classList.add('hidden');
             resultCard.classList.add('hidden');
             
             trackPool = [];
-            const keywords = categoryKeywords[category] || categoryKeywords['alltime'];
-            const shuffledKeywords = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 14);
+            const keywords = levelKeywords[level] || levelKeywords['super_easy'];
+            const shuffledKeywords = [...keywords].sort(() => 0.5 - Math.random()).slice(0, 12);
 
             try {
-                loadingText.textContent = `Menyinkronkan lagu pilihan kategori ${category.toUpperCase()}...`;
+                loadingText.textContent = `Menyinkronkan lagu pilihan level ${level.replace('_', ' ').toUpperCase()}...`;
                 
                 const fetchPromises = shuffledKeywords.map(kw => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=50`)
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=40`)
                     .then(res => res.json())
                 );
 
@@ -546,8 +563,11 @@
                         data.results.forEach(t => {
                             if (!t.previewUrl) return;
                             
-                            // Filter Blink-182 otomatis agar tak keliru
+                            // Filter Blink-182 otomatis
                             if (t.artistName.toLowerCase().includes('blink-182')) return;
+
+                            // HANYA ambil versi original (buang remix, acoustic, live, dll)
+                            if (!isOriginalTrack(t.trackName)) return;
 
                             const cleanedTitle = cleanSongTitle(t.trackName);
                             const uniqueKey = `${cleanedTitle.toLowerCase()} - ${t.artistName.toLowerCase()}`;
@@ -577,16 +597,16 @@
 
             } catch (err) {
                 loadingText.textContent = "Menghubungkan ulang ke server database lagu...";
-                setTimeout(() => fetchTracks('alltime'), 1000);
+                setTimeout(() => fetchTracks('super_easy'), 1000);
             }
         }
 
-        catBtns.forEach(btn => {
+        levelBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                catBtns.forEach(b => b.classList.remove('active'));
+                levelBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentCategory = btn.dataset.cat;
-                fetchTracks(currentCategory);
+                currentLevel = btn.dataset.level;
+                fetchTracks(currentLevel);
             });
         });
 
@@ -646,6 +666,7 @@
             }, STEPS[currentStep] * 1000);
         });
 
+        // Autocomplete Tanpa Duplikat Judul/Penyanyi
         guessInput.addEventListener('input', () => {
             const val = guessInput.value.toLowerCase().trim();
             if (!val) {
@@ -653,10 +674,21 @@
                 return;
             }
 
-            const matches = trackPool.filter(t => 
-                t.cleanedTitle.toLowerCase().includes(val) || 
-                t.artistName.toLowerCase().includes(val)
-            ).slice(0, 5);
+            const seenTitles = new Set();
+            const matches = [];
+
+            for (const t of trackPool) {
+                const fullName = `${t.cleanedTitle} - ${t.artistName}`;
+                const key = fullName.toLowerCase();
+
+                if (seenTitles.has(key)) continue;
+
+                if (t.cleanedTitle.toLowerCase().includes(val) || t.artistName.toLowerCase().includes(val)) {
+                    seenTitles.add(key);
+                    matches.push(t);
+                    if (matches.length >= 5) break;
+                }
+            }
 
             if (matches.length > 0) {
                 searchResults.innerHTML = '';
@@ -763,7 +795,7 @@
         btnNext.addEventListener('click', startNewRound);
 
         window.onload = () => {
-            fetchTracks('alltime');
+            fetchTracks('super_easy');
         };
     </script>
 </body>
