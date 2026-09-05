@@ -228,7 +228,7 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- DATABASE ARTIS LENGKAP (Kombinasi Legendaris Aktif, Era Emas, & Hits Terbaru) ---
+        // --- DATABASE ARTIS INDONESIA TERKURASI (100% LOKAL & HITS) ---
         const categoryKeywords = {
             '90s': [
                 'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
@@ -236,25 +236,32 @@
                 'Nike Ardilla', 'Poppy Mercury', 'Java Jive', 'Stinky', 'Gigi', 'Padi'
             ],
             '2000s': [
-                'Peterpan', 'Sheila On 7', 'Ungu', 'Radja', 'Kangen Band', 'Kerispatih', 
+                'Peterpan', 'Noah', 'Sheila On 7', 'Ungu', 'Radja', 'Kangen Band', 'Kerispatih', 
                 'Letto', 'Hijau Daun', 'J-Rocks', 'Nidji', 'dMasiv', 'ST12', 'ADA Band', 
                 'Samsons', 'Geisha', 'Cokelat', 'Repvblik', 'Wali', 'The Titans', 
                 'Seventeen', 'Naff', 'Drive', 'Vierra', 'D Bagindas'
             ],
             '2010s': [
                 'HIVI!', 'Cherrybelle', 'SM*SH', 'JKT48', 'Coboy Junior', 'CJR', '7Icons', 
-                'Tulus', 'Raisa', 'Afgan', 'NOAH', 'Isyana Sarasvati', 'Rizky Febian', 
+                'Tulus', 'Raisa', 'Afgan', 'Isyana Sarasvati', 'Rizky Febian', 
                 'Yura Yunita', 'Judika', 'Payung Teduh', 'Fourtwnty', 'Armada', 'Last Child', 
                 'Virgoun', 'RAN', 'Jaz', 'Anji', 'Fiersa Besari', 'GAC'
             ],
             '2020s': [
                 'Mahalini', 'Tiara Andini', 'Ziva Magnolya', 'Fabio Asher', 'Keisya Levronka', 
                 'Lyodra', 'Nadin Amizah', 'Hindia', 'Pamungkas', 'Sal Priadi', 'Juicy Luicy', 
-                'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf', 'Dewa 19', 'JKT48', 'Sheila On 7'
+                'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf'
             ],
             'alltime': [],
             'random': []
         };
+
+        const allKnownArtists = [
+            'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 'Element', 'Iwa K', 'Pas Band', 'Potret', 'Base Jam', 'KLA Project', 'Nike Ardilla', 'Poppy Mercury', 'Java Jive', 'Stinky', 'Gigi', 'Padi',
+            'Peterpan', 'Noah', 'Sheila On 7', 'Ungu', 'Radja', 'Kangen Band', 'Kerispatih', 'Letto', 'Hijau Daun', 'J-Rocks', 'Nidji', 'dMasiv', 'ST12', 'ADA Band', 'Samsons', 'Geisha', 'Cokelat', 'Repvblik', 'Wali', 'The Titans', 'Seventeen', 'Naff', 'Drive', 'Vierra', 'D Bagindas',
+            'HIVI!', 'Cherrybelle', 'SM*SH', 'JKT48', 'Coboy Junior', 'CJR', '7Icons', 'Tulus', 'Raisa', 'Afgan', 'Isyana Sarasvati', 'Rizky Febian', 'Yura Yunita', 'Judika', 'Payung Teduh', 'Fourtwnty', 'Armada', 'Last Child', 'Virgoun', 'RAN', 'Jaz', 'Anji', 'Fiersa Besari', 'GAC',
+            'Mahalini', 'Tiara Andini', 'Ziva Magnolya', 'Fabio Asher', 'Keisya Levronka', 'Lyodra', 'Nadin Amizah', 'Hindia', 'Pamungkas', 'Sal Priadi', 'Juicy Luicy', 'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf'
+        ];
 
         const LEVEL_SEQUENCE = ['se', 'e', 'm', 'h', 'sh'];
         const LEVEL_NAMES = ['Super Gampang', 'Gampang', 'Sedang', 'Susah', 'Susah Banget'];
@@ -367,20 +374,37 @@
 
                 results.forEach(data => {
                     if (data.results && data.results.length > 0) {
+                        // Strict filter: Hanya ambil lagu Indonesia dari database artis resmi & buang versi remix/live/dll
                         const validTracks = data.results.filter(t => {
                             if (!t.previewUrl) return false;
                             const lowerName = t.trackName.toLowerCase();
-                            return !/remix|acoustic|live|instrumental|karaoke|version|remaster/i.test(lowerName);
+                            if (/remix|acoustic|live|instrumental|karaoke|version|remaster|edm|club/i.test(lowerName)) return false;
+                            
+                            const artistLower = t.artistName.toLowerCase();
+                            const isIndonesian = allKnownArtists.some(ka => artistLower.includes(ka.toLowerCase()));
+                            return isIndonesian;
                         });
 
+                        // Distribusi tingkat popularitas berdasarkan urutan dari iTunes API (index teratas adalah mega hits paling populer)
                         let slicedTracks = [];
-                        if (activeLevelCode === 'se') slicedTracks = validTracks.slice(0, 4);
-                        else if (activeLevelCode === 'e') slicedTracks = validTracks.slice(4, 11);
-                        else if (activeLevelCode === 'm') slicedTracks = validTracks.slice(11, 21);
-                        else if (activeLevelCode === 'h') slicedTracks = validTracks.slice(21, 33);
-                        else if (activeLevelCode === 'sh') slicedTracks = validTracks.slice(33);
+                        if (activeLevelCode === 'se') {
+                            // Super Gampang: Top 2 lagu teratas (Mega Hits Mutlak)
+                            slicedTracks = validTracks.slice(0, 2);
+                        } else if (activeLevelCode === 'e') {
+                            // Gampang: Peringkat 2 - 5 (Hits Populer Umum)
+                            slicedTracks = validTracks.slice(2, 6);
+                        } else if (activeLevelCode === 'm') {
+                            // Sedang: Peringkat 6 - 12 (Lagu Populer / Singel Menengah)
+                            slicedTracks = validTracks.slice(6, 13);
+                        } else if (activeLevelCode === 'h') {
+                            // Susah: Peringkat 13 - 22 (Lagu Album / Kurang Familiar)
+                            slicedTracks = validTracks.slice(13, 23);
+                        } else if (activeLevelCode === 'sh') {
+                            // Susah Banget: Peringkat 23 ke atas (Deep Cuts / Lagu Tantangan)
+                            slicedTracks = validTracks.slice(23);
+                        }
 
-                        if (slicedTracks.length === 0) slicedTracks = validTracks.slice(0, 10);
+                        if (slicedTracks.length === 0) slicedTracks = validTracks.slice(0, 5);
 
                         slicedTracks.forEach(t => {
                             const cleanedTitle = cleanSongTitle(t.trackName);
