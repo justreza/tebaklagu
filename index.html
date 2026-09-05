@@ -67,12 +67,27 @@
         .header h1 { font-size: 2.6rem; font-weight: 900; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
         .header p { font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; }
 
+        .welcome-card {
+            text-align: center; background: var(--bg-surface); padding: 40px 24px;
+            border-radius: var(--radius-xl); border: 1px solid var(--border); width: 100%; max-width: 540px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        .welcome-card h2 { font-size: 2rem; font-weight: 800; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+        .welcome-card p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 24px; }
+
         .stats-bar {
-            display: flex; justify-content: space-between; background: var(--bg-surface);
-            border: 1px solid var(--border); padding: 14px 22px; border-radius: var(--radius-lg);
-            margin-bottom: 16px; font-size: 0.9rem; font-weight: 600;
+            display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);
+            border: 1px solid var(--border); padding: 12px 18px; border-radius: var(--radius-lg);
+            margin-bottom: 16px; font-size: 0.88rem; font-weight: 600;
         }
         .stats-bar span { color: var(--accent-secondary); }
+
+        .btn-home {
+            background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border);
+            padding: 6px 12px; border-radius: var(--radius-md); font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-home:hover { border-color: var(--accent-primary); color: var(--accent-secondary); }
 
         .container { width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 12px; }
 
@@ -149,20 +164,28 @@
 </head>
 <body>
 
-    <div id="loading-screen">
+    <div id="loading-screen" class="hidden">
         <div class="loader-spinner"></div>
         <p id="loading-text">Menyiapkan database lagu...</p>
     </div>
 
     <div class="header">
         <h1>GUESS LAGU</h1>
-        <p>Uji pengetahuan musikmu secara beruntun dari Super Gampang ke Susah Banget!</p>
+        <p>Uji pengetahuan musik Indonesiamu!</p>
     </div>
 
     <div class="container">
+        <!-- WELCOME SCREEN (HALAMAN UTAMA) -->
+        <div id="welcome-screen" class="welcome-card">
+            <h2>SELAMAT DATANG!</h2>
+            <p>Tebak judul lagu dan musisi Indonesia lintas era. Nikmati tantangan bertahap dari tiap level dan buktikan kalo kamu jago di musik Indonesia!</p>
+            <button class="btn btn-submit" id="btn-start-game">Mulai Bermain 🎵</button>
+        </div>
+
+        <!-- GAME AREA -->
         <div id="game-area" class="hidden">
-            
             <div class="stats-bar">
+                <button class="btn-home" id="btn-home">🏠 Menu</button>
                 <div>Skor: <span id="total-score">0</span></div>
                 <div>Streak: <span id="streak-count">0 🔥</span></div>
             </div>
@@ -211,6 +234,7 @@
             </div>
         </div>
 
+        <!-- RESULT CARD -->
         <div id="result-card" class="result-card hidden">
             <h2 id="result-title" style="margin-bottom: 5px; font-size: 1.6rem;"></h2>
             <p id="points-earned" style="color: var(--success); font-weight: 700; font-size: 0.95rem; margin-bottom: 12px;"></p>
@@ -226,7 +250,7 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- BLACKLIST ARTIS BARAT / LUAR NEGERI UTK MENCEGAH NYASAR ---
+        // --- BLACKLIST ARTIS BARAT / LUAR NEGERI ---
         const foreignBlacklist = [
             'ed sheeran', 'taylor swift', 'justin bieber', 'bts', 'blackpink', 'coldplay', 
             'shawn mendes', 'billie eilish', 'ariana grande', 'bruno mars', 'the weeknd', 
@@ -286,6 +310,7 @@
         let isGameOver = false;
         let audioTimeout = null;
 
+        const welcomeScreen = document.getElementById('welcome-screen');
         const loadingScreen = document.getElementById('loading-screen');
         const loadingText = document.getElementById('loading-text');
         const gameArea = document.getElementById('game-area');
@@ -296,6 +321,19 @@
         const searchResults = document.getElementById('search-results');
         const audioPlayer = document.getElementById('audio-player');
         
+        // Navigasi Utama / Welcome Screen
+        document.getElementById('btn-start-game').addEventListener('click', () => {
+            welcomeScreen.classList.add('hidden');
+            fetchTracks();
+        });
+
+        document.getElementById('btn-home').addEventListener('click', () => {
+            audioPlayer.pause();
+            gameArea.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+        });
+
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -345,7 +383,7 @@
                     }
                 }
                 shuffleArray(all);
-                keys = all.slice(0, 12);
+                keys = all.slice(0, 14);
             } else {
                 keys = categoryKeywords[currentCategory] || [];
             }
@@ -353,6 +391,7 @@
         }
 
         async function fetchTracks() {
+            welcomeScreen.classList.add('hidden');
             loadingScreen.style.opacity = '1';
             loadingScreen.classList.remove('hidden');
             gameArea.classList.add('hidden');
@@ -372,7 +411,7 @@
                 loadingText.textContent = `Memuat Tahap ${currentLevelIndex + 1}: ${LEVEL_NAMES[currentLevelIndex]}...`;
                 
                 const fetchPromises = selectedKeywords.map(kw => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=50`)
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=40`)
                     .then(res => res.json())
                 );
 
@@ -387,8 +426,6 @@
                             if (/remix|acoustic|live|instrumental|karaoke|version|remaster|edm|club|sped up|slowed/i.test(lowerName)) return false;
                             
                             const artistLower = t.artistName.toLowerCase();
-                            
-                            // Validasi anti lagu barat / luar negeri
                             const isBlacklisted = foreignBlacklist.some(f => artistLower.includes(f));
                             if (isBlacklisted) return false;
                             
@@ -396,23 +433,20 @@
                             return isIndonesian;
                         });
 
-                        // Distribusi tingkat popularitas & familiaritas per level
+                        // Acak terlebih dahulu agar variasi lagu selalu segar tiap round
+                        shuffleArray(validTracks);
+
                         let slicedTracks = [];
                         if (activeLevelCode === 'se') {
-                            // Super Gampang: Lagu paling mega-hits & populer mutlak (Top 2 teratas)
-                            slicedTracks = validTracks.slice(0, 2);
+                            slicedTracks = validTracks.slice(0, 3);
                         } else if (activeLevelCode === 'e') {
-                            // Gampang: Lagu hits umum yang sangat familiar (Peringkat 2 - 5)
-                            slicedTracks = validTracks.slice(2, 6);
+                            slicedTracks = validTracks.slice(3, 8);
                         } else if (activeLevelCode === 'm') {
-                            // Sedang: Singel menengah / populer standar (Peringkat 6 - 12)
-                            slicedTracks = validTracks.slice(6, 13);
+                            slicedTracks = validTracks.slice(8, 15);
                         } else if (activeLevelCode === 'h') {
-                            // Susah: Lagu album / kurang familiar (Peringkat 13 - 22)
-                            slicedTracks = validTracks.slice(13, 23);
+                            slicedTracks = validTracks.slice(15, 24);
                         } else if (activeLevelCode === 'sh') {
-                            // Susah Banget: Deep cuts / lagu tantangan / jarang denger (Peringkat 23+)
-                            slicedTracks = validTracks.slice(23);
+                            slicedTracks = validTracks.slice(24);
                         }
 
                         if (slicedTracks.length === 0) slicedTracks = validTracks.slice(0, 5);
@@ -421,14 +455,12 @@
                             const cleanedTitle = cleanSongTitle(t.trackName);
                             const uniqueKey = `${cleanedTitle.toLowerCase()} - ${t.artistName.toLowerCase()}`;
                             
-                            // Tentukan titik potong iconic (0s untuk intro ikonik, 4s/8s untuk verse/reff awal)
-                            let stringHash = 0;
-                            for (let i = 0; i < cleanedTitle.length; i++) stringHash += cleanedTitle.charCodeAt(i);
-                            const iconicOffsets = [0, 4, 8, 12];
-                            const clipOffset = iconicOffsets[stringHash % iconicOffsets.length];
+                            // Penentuan bagian iconic yang dinamis & bervariasi (0s: intro, 6s: verse, 12s: reff)
+                            const iconicOffsets = [0, 6, 12];
+                            const randomOffset = iconicOffsets[Math.floor(Math.random() * iconicOffsets.length)];
 
                             if (!trackMap.has(uniqueKey)) {
-                                trackMap.set(uniqueKey, { ...t, cleanedTitle: cleanedTitle, clipOffset: clipOffset });
+                                trackMap.set(uniqueKey, { ...t, cleanedTitle: cleanedTitle, clipOffset: randomOffset });
                             }
                         });
                     }
@@ -491,7 +523,7 @@
             btnSkip.textContent = currentStep === 4 ? 'Menyerah' : `Lewati (+${STEPS[currentStep + 1] - dur}s)`;
         }
 
-        // --- PEMUTARAN AUDIO & EARPHONE STABIL DENGAN TITIK IKONIK ---
+        // Pemutaran Audio & Earphone Stabil dengan Offset Ikonik
         document.getElementById('btn-play').addEventListener('click', () => {
             if (!currentTrack || !currentTrack.previewUrl) return;
             if (audioTimeout) clearTimeout(audioTimeout);
@@ -506,7 +538,7 @@
                         audioPlayer.pause();
                     }, STEPS[currentStep] * 1000);
                 }).catch(error => {
-                    console.log("Audio routing / Play restriction:", error);
+                    console.log("Audio routing restriction:", error);
                 });
             }
         });
@@ -573,14 +605,11 @@
                 const titleEl = document.getElementById('result-title');
                 const pointsEl = document.getElementById('points-earned');
 
-                // Penyesuaian Skor (Super Gampang lebih kecil, naik bertahap ke Susah Banget)
                 const levelMultipliers = [0.8, 1.0, 1.5, 2.2, 3.5];
                 const multiplier = levelMultipliers[currentLevelIndex];
 
                 if (isWin) {
                     titleEl.textContent = "LUAR BIASA! BENAR! 🎉"; titleEl.style.color = "var(--success)";
-                    
-                    // Poin dasar lebih besar jika menebak di awal (detik 0.5 = 50pt, detik 8 = 10pt)
                     const baseEarned = (5 - currentStep) * 10;
                     const earned = Math.floor(baseEarned * multiplier);
                     score += earned; streak += 1;
@@ -610,8 +639,6 @@
                 fetchTracks();
             }
         });
-
-        window.onload = () => fetchTracks();
     </script>
 </body>
 </html>
