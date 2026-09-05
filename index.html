@@ -171,14 +171,14 @@
 
     <div class="header">
         <h1>GUESS LAGU</h1>
-        <p>Uji pengetahuan musik Indonesiamu!</p>
+        <p>Uji pengetahuan musikmu secara beruntun dari Super Gampang ke Susah Banget!</p>
     </div>
 
     <div class="container">
         <!-- WELCOME SCREEN (HALAMAN UTAMA) -->
         <div id="welcome-screen" class="welcome-card">
             <h2>SELAMAT DATANG!</h2>
-            <p>Tebak judul lagu dan musisi Indonesia lintas era. Nikmati tantangan bertahap dari tiap level dan buktikan kalo kamu jago di musik Indonesia!</p>
+            <p>Tebak judul lagu dan musisi Indonesia legendaris lintas era. Nikmati tantangan bertahap dari level Super Gampang hingga Susah Banget dengan sistem poin dinamis!</p>
             <button class="btn btn-submit" id="btn-start-game">Mulai Bermain 🎵</button>
         </div>
 
@@ -250,16 +250,32 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- BLACKLIST ARTIS BARAT / LUAR NEGERI ---
+        // --- BLACKLIST KETAT ARTIS/LAGU ASING (MENCEGAH LAGU NYASAR) ---
         const foreignBlacklist = [
             'ed sheeran', 'taylor swift', 'justin bieber', 'bts', 'blackpink', 'coldplay', 
             'shawn mendes', 'billie eilish', 'ariana grande', 'bruno mars', 'the weeknd', 
             'dua lipa', 'charlie puth', 'maroon 5', 'one direction', 'halsey', 'selena gomez',
             'katy perry', 'rihanna', 'beyonce', 'adele', 'sam smith', 'post malone', 'imagine dragons',
-            'joji', 'keshi', 'pink sweat$', 'lauv', 'niki', 'rich brian', 'stephanie poetri'
+            'joji', 'keshi', 'pink sweat$', 'lauv', 'niki', 'rich brian', 'stephanie poetri', 'frank apollo'
         ];
 
-        // --- DATABASE LENGKAP ARTIS LOKAL INDONESIA ---
+        // --- QUERY KHUSUS MEGA-HITS UNTUK TAHAP SUPER GAMPANG ---
+        const superGampangQueries = [
+            "Dewa 19 Kangen",
+            "Peterpan Menghapus Jejakmu",
+            "Sheila On 7 Dan",
+            "Noah Separuh Aku",
+            "Tulus Hati Hati Di Jalan",
+            "Mahalini Sial",
+            "Armada Asal Kau Bahagia",
+            "Virgoun Surat Cinta Untuk Starla",
+            "Ungu Demi Waktu",
+            "Judika Cinta Karena Cinta",
+            "Raim Laode Komang",
+            "Bernadya Kata Mereka Ini Berlebihan"
+        ];
+
+        // --- DATABASE ARTIS LOKAL INDONESIA ---
         const categoryKeywords = {
             '90s': [
                 'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
@@ -369,6 +385,11 @@
 
         function getKeywords() {
             let keys = [];
+            if (currentLevelIndex === 0) {
+                // Tahap Super Gampang selalu menggunakan query mega-hits terjamin
+                return superGampangQueries;
+            }
+
             if (currentCategory === 'alltime') {
                 for (let era in categoryKeywords) {
                     if (era !== 'alltime' && era !== 'random') {
@@ -401,7 +422,7 @@
             let keywords = getKeywords();
             
             shuffleArray(keywords);
-            const selectedKeywords = keywords.slice(0, 10); 
+            const selectedKeywords = currentLevelIndex === 0 ? keywords : keywords.slice(0, 10); 
             const activeLevelCode = LEVEL_SEQUENCE[currentLevelIndex];
 
             document.getElementById('current-level-name').textContent = LEVEL_NAMES[currentLevelIndex];
@@ -411,7 +432,7 @@
                 loadingText.textContent = `Memuat Tahap ${currentLevelIndex + 1}: ${LEVEL_NAMES[currentLevelIndex]}...`;
                 
                 const fetchPromises = selectedKeywords.map(kw => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=40`)
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=30`)
                     .then(res => res.json())
                 );
 
@@ -426,36 +447,38 @@
                             if (/remix|acoustic|live|instrumental|karaoke|version|remaster|edm|club|sped up|slowed/i.test(lowerName)) return false;
                             
                             const artistLower = t.artistName.toLowerCase();
+                            
+                            // 1. Cek blacklist ketat (menolak musisi luar/asing)
                             const isBlacklisted = foreignBlacklist.some(f => artistLower.includes(f));
                             if (isBlacklisted) return false;
                             
+                            // 2. Pastikan artis terdaftar dalam whitelist musisi Indonesia
                             const isIndonesian = allKnownArtists.some(ka => artistLower.includes(ka.toLowerCase()));
                             return isIndonesian;
                         });
 
-                        // Acak terlebih dahulu agar variasi lagu selalu segar tiap round
                         shuffleArray(validTracks);
 
                         let slicedTracks = [];
                         if (activeLevelCode === 'se') {
-                            slicedTracks = validTracks.slice(0, 3);
+                            slicedTracks = validTracks.slice(0, 5);
                         } else if (activeLevelCode === 'e') {
-                            slicedTracks = validTracks.slice(3, 8);
+                            slicedTracks = validTracks.slice(0, 5);
                         } else if (activeLevelCode === 'm') {
-                            slicedTracks = validTracks.slice(8, 15);
+                            slicedTracks = validTracks.slice(0, 5);
                         } else if (activeLevelCode === 'h') {
-                            slicedTracks = validTracks.slice(15, 24);
+                            slicedTracks = validTracks.slice(0, 5);
                         } else if (activeLevelCode === 'sh') {
-                            slicedTracks = validTracks.slice(24);
+                            slicedTracks = validTracks.slice(0, 5);
                         }
 
-                        if (slicedTracks.length === 0) slicedTracks = validTracks.slice(0, 5);
+                        if (slicedTracks.length === 0) slicedTracks = validTracks.slice(0, 3);
 
                         slicedTracks.forEach(t => {
                             const cleanedTitle = cleanSongTitle(t.trackName);
                             const uniqueKey = `${cleanedTitle.toLowerCase()} - ${t.artistName.toLowerCase()}`;
                             
-                            // Penentuan bagian iconic yang dinamis & bervariasi (0s: intro, 6s: verse, 12s: reff)
+                            // Titik potong ikonik dinamis (0s: intro, 6s: verse, 12s: reff)
                             const iconicOffsets = [0, 6, 12];
                             const randomOffset = iconicOffsets[Math.floor(Math.random() * iconicOffsets.length)];
 
@@ -523,7 +546,7 @@
             btnSkip.textContent = currentStep === 4 ? 'Menyerah' : `Lewati (+${STEPS[currentStep + 1] - dur}s)`;
         }
 
-        // Pemutaran Audio & Earphone Stabil dengan Offset Ikonik
+        // Pemutaran Audio Stabil dengan Offset Ikonik
         document.getElementById('btn-play').addEventListener('click', () => {
             if (!currentTrack || !currentTrack.previewUrl) return;
             if (audioTimeout) clearTimeout(audioTimeout);
