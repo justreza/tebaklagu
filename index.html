@@ -250,32 +250,29 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- BLACKLIST KETAT ARTIS/LAGU ASING (MENCEGAH LAGU NYASAR) ---
+        // --- BLACKLIST KETAT & MUTLAK ARTIS ASING (MENCEGAH FRANK SINATRA / ARTIS NYASAR) ---
         const foreignBlacklist = [
-            'ed sheeran', 'taylor swift', 'justin bieber', 'bts', 'blackpink', 'coldplay', 
-            'shawn mendes', 'billie eilish', 'ariana grande', 'bruno mars', 'the weeknd', 
-            'dua lipa', 'charlie puth', 'maroon 5', 'one direction', 'halsey', 'selena gomez',
-            'katy perry', 'rihanna', 'beyonce', 'adele', 'sam smith', 'post malone', 'imagine dragons',
-            'joji', 'keshi', 'pink sweat$', 'lauv', 'niki', 'rich brian', 'stephanie poetri', 'frank apollo'
+            'frank sinatra', 'frank apollo', 'ed sheeran', 'taylor swift', 'justin bieber', 'bts', 'blackpink', 'coldplay', 
+            'shawn mendes', 'billie eilish', 'ariana grande', 'bruno mars', 'the weeknd', 'dua lipa', 'charlie puth', 
+            'maroon 5', 'one direction', 'halsey', 'selena gomez', 'katy perry', 'rihanna', 'beyonce', 'adele', 
+            'sam smith', 'post malone', 'imagine dragons', 'joji', 'keshi', 'pink sweat$', 'lauv', 'niki', 
+            'rich brian', 'stephanie poetri', 'elvis', 'the beatles', 'queen', 'michael jackson', 'bobby caldwell'
         ];
 
-        // --- QUERY KHUSUS MEGA-HITS UNTUK TAHAP SUPER GAMPANG ---
+        // --- DAFTAR QUERY MEGA-HITS SUPER FAMILIAR (TINGKAT SUPER GAMPANG & GAMPANG) ---
         const superGampangQueries = [
-            "Dewa 19 Kangen",
-            "Peterpan Menghapus Jejakmu",
-            "Sheila On 7 Dan",
-            "Noah Separuh Aku",
-            "Tulus Hati Hati Di Jalan",
-            "Mahalini Sial",
-            "Armada Asal Kau Bahagia",
-            "Virgoun Surat Cinta Untuk Starla",
-            "Ungu Demi Waktu",
-            "Judika Cinta Karena Cinta",
-            "Raim Laode Komang",
-            "Bernadya Kata Mereka Ini Berlebihan"
+            "Dewa 19 Kangen", "Peterpan Menghapus Jejakmu", "Sheila On 7 Dan", 
+            "Noah Separuh Aku", "Tulus Hati Hati Di Jalan", "Mahalini Sial", 
+            "Armada Asal Kau Bahagia", "Virgoun Surat Cinta Untuk Starla", "Ungu Demi Waktu"
         ];
 
-        // --- DATABASE ARTIS LOKAL INDONESIA ---
+        const gampangQueries = [
+            "Judika Cinta Karena Cinta", "Raim Laode Komang", "Bernadya Kata Mereka Ini Berlebihan",
+            "Radja Cinderella", "Kangen Band Yolanda", "Kerispatih Kejujuran Hati", 
+            "Letto Sebelum Cahaya", "Nidji Laskar Pelangi", "dMasiv Jangan Menyerah"
+        ];
+
+        // --- DATABASE WHITELIST ARTIS LOKAL INDONESIA UTAMA ---
         const categoryKeywords = {
             '90s': [
                 'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
@@ -337,7 +334,6 @@
         const searchResults = document.getElementById('search-results');
         const audioPlayer = document.getElementById('audio-player');
         
-        // Navigasi Utama / Welcome Screen
         document.getElementById('btn-start-game').addEventListener('click', () => {
             welcomeScreen.classList.add('hidden');
             fetchTracks();
@@ -384,12 +380,10 @@
         }
 
         function getKeywords() {
-            let keys = [];
-            if (currentLevelIndex === 0) {
-                // Tahap Super Gampang selalu menggunakan query mega-hits terjamin
-                return superGampangQueries;
-            }
+            if (currentLevelIndex === 0) return superGampangQueries;
+            if (currentLevelIndex === 1) return gampangQueries;
 
+            let keys = [];
             if (currentCategory === 'alltime') {
                 for (let era in categoryKeywords) {
                     if (era !== 'alltime' && era !== 'random') {
@@ -422,7 +416,7 @@
             let keywords = getKeywords();
             
             shuffleArray(keywords);
-            const selectedKeywords = currentLevelIndex === 0 ? keywords : keywords.slice(0, 10); 
+            const selectedKeywords = (currentLevelIndex === 0 || currentLevelIndex === 1) ? keywords : keywords.slice(0, 10); 
             const activeLevelCode = LEVEL_SEQUENCE[currentLevelIndex];
 
             document.getElementById('current-level-name').textContent = LEVEL_NAMES[currentLevelIndex];
@@ -432,7 +426,7 @@
                 loadingText.textContent = `Memuat Tahap ${currentLevelIndex + 1}: ${LEVEL_NAMES[currentLevelIndex]}...`;
                 
                 const fetchPromises = selectedKeywords.map(kw => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=30`)
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=25`)
                     .then(res => res.json())
                 );
 
@@ -448,31 +442,17 @@
                             
                             const artistLower = t.artistName.toLowerCase();
                             
-                            // 1. Cek blacklist ketat (menolak musisi luar/asing)
+                            // 1. Cek Blacklist Mutlak (Menolak artis luar seperti Frank Sinatra, dll.)
                             const isBlacklisted = foreignBlacklist.some(f => artistLower.includes(f));
                             if (isBlacklisted) return false;
                             
-                            // 2. Pastikan artis terdaftar dalam whitelist musisi Indonesia
+                            // 2. Wajib terdaftar dalam whitelist artis lokal Indonesia
                             const isIndonesian = allKnownArtists.some(ka => artistLower.includes(ka.toLowerCase()));
                             return isIndonesian;
                         });
 
                         shuffleArray(validTracks);
-
-                        let slicedTracks = [];
-                        if (activeLevelCode === 'se') {
-                            slicedTracks = validTracks.slice(0, 5);
-                        } else if (activeLevelCode === 'e') {
-                            slicedTracks = validTracks.slice(0, 5);
-                        } else if (activeLevelCode === 'm') {
-                            slicedTracks = validTracks.slice(0, 5);
-                        } else if (activeLevelCode === 'h') {
-                            slicedTracks = validTracks.slice(0, 5);
-                        } else if (activeLevelCode === 'sh') {
-                            slicedTracks = validTracks.slice(0, 5);
-                        }
-
-                        if (slicedTracks.length === 0) slicedTracks = validTracks.slice(0, 3);
+                        let slicedTracks = validTracks.slice(0, 5);
 
                         slicedTracks.forEach(t => {
                             const cleanedTitle = cleanSongTitle(t.trackName);
