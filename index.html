@@ -86,7 +86,13 @@
         }
         .filter-btn:hover { border-color: rgba(255, 255, 255, 0.25); color: var(--text-main); }
         .cat-btn.active { background: var(--accent-gradient); color: #fff; border-color: transparent; }
-        .lvl-btn.active { background: var(--level-gradient); color: #fff; border-color: transparent; }
+
+        .level-badge {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--level-gradient); padding: 10px 18px; border-radius: var(--radius-md);
+            font-size: 0.88rem; font-weight: 700; color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+            margin-top: 4px;
+        }
 
         .filter-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; margin-top: 8px; }
 
@@ -150,7 +156,7 @@
 
     <div class="header">
         <h1>GUESS LAGU</h1>
-        <p>Uji pengetahuan musikmu dari berbagai era & level kesulitan!</p>
+        <p>Uji pengetahuan musikmu secara beruntun dari Super Gampang ke Susah Banget!</p>
     </div>
 
     <div class="container">
@@ -172,14 +178,11 @@
                 <button class="filter-btn cat-btn" data-cat="random">Random</button>
             </div>
 
-            <!-- Level Filter -->
-            <div class="filter-label">Pilih Tingkat Kesulitan</div>
-            <div class="scroll-container level-scroller">
-                <button class="filter-btn lvl-btn" data-lvl="se">Super Gampang</button>
-                <button class="filter-btn lvl-btn" data-lvl="e">Gampang</button>
-                <button class="filter-btn lvl-btn active" data-lvl="m">Sedang</button>
-                <button class="filter-btn lvl-btn" data-lvl="h">Susah</button>
-                <button class="filter-btn lvl-btn" data-lvl="sh">Susah Banget</button>
+            <!-- Progressive Level Indicator (Otomatis Naik) -->
+            <div class="filter-label">Tingkat Kesulitan Saat Ini</div>
+            <div class="level-badge">
+                <span id="current-level-name">Super Gampang</span>
+                <span id="level-counter" style="font-size: 0.78rem; opacity: 0.9;">Tahap 1 / 5</span>
             </div>
 
             <div class="timeline-container" id="timeline"></div>
@@ -225,7 +228,7 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- DATABASE KELENGKAPAN ARTIS BERDASARKAN KODE USER ---
+        // --- DATABASE ARTIS LENGKAP (Kombinasi Legendaris Aktif, Era Emas, & Hits Terbaru) ---
         const categoryKeywords = {
             '90s': [
                 'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
@@ -240,7 +243,6 @@
             ],
             '2010s': [
                 'HIVI!', 'Cherrybelle', 'SM*SH', 'JKT48', 'Coboy Junior', 'CJR', '7Icons', 
-                'Blink Sendiri Lagi', 'Blink Percayalah', 'Blink Dag Dig Dug', 'Blink Seindah Biasa',
                 'Tulus', 'Raisa', 'Afgan', 'NOAH', 'Isyana Sarasvati', 'Rizky Febian', 
                 'Yura Yunita', 'Judika', 'Payung Teduh', 'Fourtwnty', 'Armada', 'Last Child', 
                 'Virgoun', 'RAN', 'Jaz', 'Anji', 'Fiersa Besari', 'GAC'
@@ -248,14 +250,17 @@
             '2020s': [
                 'Mahalini', 'Tiara Andini', 'Ziva Magnolya', 'Fabio Asher', 'Keisya Levronka', 
                 'Lyodra', 'Nadin Amizah', 'Hindia', 'Pamungkas', 'Sal Priadi', 'Juicy Luicy', 
-                'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf'
+                'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf', 'Dewa 19', 'JKT48', 'Sheila On 7'
             ],
             'alltime': [],
             'random': []
         };
 
+        const LEVEL_SEQUENCE = ['se', 'e', 'm', 'h', 'sh'];
+        const LEVEL_NAMES = ['Super Gampang', 'Gampang', 'Sedang', 'Susah', 'Susah Banget'];
+
         let currentCategory = "alltime";
-        let currentLevel = "m"; // Default: Sedang
+        let currentLevelIndex = 0; 
         
         let trackPool = [];
         let availableTracks = [];
@@ -282,15 +287,7 @@
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentCategory = btn.dataset.cat;
-                fetchTracks();
-            });
-        });
-
-        document.querySelectorAll('.lvl-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentLevel = btn.dataset.lvl;
+                currentLevelIndex = 0; 
                 fetchTracks();
             });
         });
@@ -351,12 +348,15 @@
             let keywords = getKeywords();
             
             shuffleArray(keywords);
-            const selectedKeywords = keywords.slice(0, 8); // Ambil 8 artis acak untuk efisiensi request API
+            const selectedKeywords = keywords.slice(0, 10); 
+            const activeLevelCode = LEVEL_SEQUENCE[currentLevelIndex];
+
+            document.getElementById('current-level-name').textContent = LEVEL_NAMES[currentLevelIndex];
+            document.getElementById('level-counter').textContent = `Tahap ${currentLevelIndex + 1} / 5`;
 
             try {
-                loadingText.textContent = `Menyinkronkan lagu dari database artis...`;
+                loadingText.textContent = `Memuat Tahap ${currentLevelIndex + 1}: ${LEVEL_NAMES[currentLevelIndex]}...`;
                 
-                // Minta limit 50 agar bisa memfilter berdasarkan level (hits vs album tracks)
                 const fetchPromises = selectedKeywords.map(kw => 
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=50`)
                     .then(res => res.json())
@@ -367,23 +367,20 @@
 
                 results.forEach(data => {
                     if (data.results && data.results.length > 0) {
-                        // Saring versi non-original
                         const validTracks = data.results.filter(t => {
                             if (!t.previewUrl) return false;
                             const lowerName = t.trackName.toLowerCase();
                             return !/remix|acoustic|live|instrumental|karaoke|version|remaster/i.test(lowerName);
                         });
 
-                        // Terapkan level berdasarkan urutan popularitas dari iTunes API
-                        // Super Gampang: Top hits (0-3), Susah Banget: Album tracks/dalam (index > 20)
                         let slicedTracks = [];
-                        if (currentLevel === 'se') slicedTracks = validTracks.slice(0, 4);
-                        else if (currentLevel === 'e') slicedTracks = validTracks.slice(3, 10);
-                        else if (currentLevel === 'm') slicedTracks = validTracks.slice(8, 20);
-                        else if (currentLevel === 'h') slicedTracks = validTracks.slice(18, 32);
-                        else if (currentLevel === 'sh') slicedTracks = validTracks.slice(30);
+                        if (activeLevelCode === 'se') slicedTracks = validTracks.slice(0, 4);
+                        else if (activeLevelCode === 'e') slicedTracks = validTracks.slice(4, 11);
+                        else if (activeLevelCode === 'm') slicedTracks = validTracks.slice(11, 21);
+                        else if (activeLevelCode === 'h') slicedTracks = validTracks.slice(21, 33);
+                        else if (activeLevelCode === 'sh') slicedTracks = validTracks.slice(33);
 
-                        if (slicedTracks.length === 0) slicedTracks = validTracks; // Fallback jika list sedikit
+                        if (slicedTracks.length === 0) slicedTracks = validTracks.slice(0, 10);
 
                         slicedTracks.forEach(t => {
                             const cleanedTitle = cleanSongTitle(t.trackName);
@@ -522,17 +519,17 @@
                 const pointsEl = document.getElementById('points-earned');
 
                 let multiplier = 1;
-                if(currentLevel === 'e') multiplier = 1.2;
-                if(currentLevel === 'm') multiplier = 1.5;
-                if(currentLevel === 'h') multiplier = 2;
-                if(currentLevel === 'sh') multiplier = 3;
+                if(currentLevelIndex === 1) multiplier = 1.2;
+                if(currentLevelIndex === 2) multiplier = 1.5;
+                if(currentLevelIndex === 3) multiplier = 2;
+                if(currentLevelIndex === 4) multiplier = 3;
 
                 if (isWin) {
                     titleEl.textContent = "LUAR BIASA! BENAR! 🎉"; titleEl.style.color = "var(--success)";
                     const baseEarned = (5 - currentStep) * 10;
                     const earned = Math.floor(baseEarned * multiplier);
                     score += earned; streak += 1;
-                    pointsEl.textContent = `+${earned} Poin Berhasil Ditambahkan!`;
+                    pointsEl.textContent = `+${earned} Poin (Tahap: ${LEVEL_NAMES[currentLevelIndex]})`;
                 } else {
                     titleEl.textContent = "JAWABAN SALAH, COBA LAGI! 😅"; titleEl.style.color = "var(--danger)";
                     streak = 0; pointsEl.textContent = `Poin ditambah 0`;
@@ -549,7 +546,16 @@
             }, 800);
         }
 
-        document.getElementById('btn-next').addEventListener('click', startNewRound);
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if (currentLevelIndex < LEVEL_SEQUENCE.length - 1) {
+                currentLevelIndex++;
+                fetchTracks();
+            } else {
+                currentLevelIndex = 0;
+                fetchTracks();
+            }
+        });
+
         window.onload = () => fetchTracks();
     </script>
 </body>
