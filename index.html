@@ -194,7 +194,7 @@
             </div>
 
             <div class="play-section">
-                <button class="btn-play-pulse" id="btn-play" title="Putar Intro Lagu">
+                <button class="btn-play-pulse" id="btn-play" title="Putar Bagian Lagu">
                     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </button>
                 <div class="duration-label" id="duration-info">Dengarkan Bagian Musik: 0.5 Detik</div>
@@ -235,7 +235,7 @@
             'joji', 'keshi', 'pink sweat$', 'lauv', 'niki', 'rich brian', 'stephanie poetri'
         ];
 
-        // --- DATABASE ARTIS LOKAL INDONESIA TERKURASI ---
+        // --- DATABASE LENGKAP ARTIS LOKAL INDONESIA ---
         const categoryKeywords = {
             '90s': [
                 'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
@@ -388,26 +388,30 @@
                             
                             const artistLower = t.artistName.toLowerCase();
                             
-                            // Cek Blacklist Artis Luar Negeri
+                            // Validasi anti lagu barat / luar negeri
                             const isBlacklisted = foreignBlacklist.some(f => artistLower.includes(f));
                             if (isBlacklisted) return false;
                             
-                            // Pastikan artis ada di database lokal Indonesia
                             const isIndonesian = allKnownArtists.some(ka => artistLower.includes(ka.toLowerCase()));
                             return isIndonesian;
                         });
 
-                        // Penyesuaian Popularitas per Level (Berdasarkan urutan indeks API)
+                        // Distribusi tingkat popularitas & familiaritas per level
                         let slicedTracks = [];
                         if (activeLevelCode === 'se') {
+                            // Super Gampang: Lagu paling mega-hits & populer mutlak (Top 2 teratas)
                             slicedTracks = validTracks.slice(0, 2);
                         } else if (activeLevelCode === 'e') {
+                            // Gampang: Lagu hits umum yang sangat familiar (Peringkat 2 - 5)
                             slicedTracks = validTracks.slice(2, 6);
                         } else if (activeLevelCode === 'm') {
+                            // Sedang: Singel menengah / populer standar (Peringkat 6 - 12)
                             slicedTracks = validTracks.slice(6, 13);
                         } else if (activeLevelCode === 'h') {
+                            // Susah: Lagu album / kurang familiar (Peringkat 13 - 22)
                             slicedTracks = validTracks.slice(13, 23);
                         } else if (activeLevelCode === 'sh') {
+                            // Susah Banget: Deep cuts / lagu tantangan / jarang denger (Peringkat 23+)
                             slicedTracks = validTracks.slice(23);
                         }
 
@@ -417,8 +421,14 @@
                             const cleanedTitle = cleanSongTitle(t.trackName);
                             const uniqueKey = `${cleanedTitle.toLowerCase()} - ${t.artistName.toLowerCase()}`;
                             
+                            // Tentukan titik potong iconic (0s untuk intro ikonik, 4s/8s untuk verse/reff awal)
+                            let stringHash = 0;
+                            for (let i = 0; i < cleanedTitle.length; i++) stringHash += cleanedTitle.charCodeAt(i);
+                            const iconicOffsets = [0, 4, 8, 12];
+                            const clipOffset = iconicOffsets[stringHash % iconicOffsets.length];
+
                             if (!trackMap.has(uniqueKey)) {
-                                trackMap.set(uniqueKey, { ...t, cleanedTitle: cleanedTitle });
+                                trackMap.set(uniqueKey, { ...t, cleanedTitle: cleanedTitle, clipOffset: clipOffset });
                             }
                         });
                     }
@@ -481,13 +491,13 @@
             btnSkip.textContent = currentStep === 4 ? 'Menyerah' : `Lewati (+${STEPS[currentStep + 1] - dur}s)`;
         }
 
-        // --- FIX BUG AUDIO & EARPHONE (ROBUST PLAYBACK HANDLING) ---
+        // --- PEMUTARAN AUDIO & EARPHONE STABIL DENGAN TITIK IKONIK ---
         document.getElementById('btn-play').addEventListener('click', () => {
             if (!currentTrack || !currentTrack.previewUrl) return;
             if (audioTimeout) clearTimeout(audioTimeout);
 
-            audioPlayer.currentTime = 0; 
-            audioPlayer.load(); // Paksa sinkronisasi audio stream untuk mengatasi lag earphone/bluetooth
+            audioPlayer.currentTime = currentTrack.clipOffset || 0; 
+            audioPlayer.load();
 
             const playPromise = audioPlayer.play();
             if (playPromise !== undefined) {
@@ -496,7 +506,7 @@
                         audioPlayer.pause();
                     }, STEPS[currentStep] * 1000);
                 }).catch(error => {
-                    console.log("Autoplay / Audio routing restriction:", error);
+                    console.log("Audio routing / Play restriction:", error);
                 });
             }
         });
@@ -563,14 +573,14 @@
                 const titleEl = document.getElementById('result-title');
                 const pointsEl = document.getElementById('points-earned');
 
-                let multiplier = 1;
-                if(currentLevelIndex === 1) multiplier = 1.2;
-                if(currentLevelIndex === 2) multiplier = 1.5;
-                if(currentLevelIndex === 3) multiplier = 2;
-                if(currentLevelIndex === 4) multiplier = 3;
+                // Penyesuaian Skor (Super Gampang lebih kecil, naik bertahap ke Susah Banget)
+                const levelMultipliers = [0.8, 1.0, 1.5, 2.2, 3.5];
+                const multiplier = levelMultipliers[currentLevelIndex];
 
                 if (isWin) {
                     titleEl.textContent = "LUAR BIASA! BENAR! 🎉"; titleEl.style.color = "var(--success)";
+                    
+                    // Poin dasar lebih besar jika menebak di awal (detik 0.5 = 50pt, detik 8 = 10pt)
                     const baseEarned = (5 - currentStep) * 10;
                     const earned = Math.floor(baseEarned * multiplier);
                     score += earned; streak += 1;
