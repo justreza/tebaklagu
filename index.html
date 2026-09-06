@@ -250,16 +250,16 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- BLACKLIST KETAT & MUTLAK ARTIS ASING (MENCEGAH FRANK SINATRA / ARTIS NYASAR) ---
+        // --- BLACKLIST MUTLAK ARTIS ASING & K-POP (MENANGKAL SEVENTEEN KOREA, FRANK SINATRA, DLL.) ---
         const foreignBlacklist = [
-            'frank sinatra', 'frank apollo', 'ed sheeran', 'taylor swift', 'justin bieber', 'bts', 'blackpink', 'coldplay', 
-            'shawn mendes', 'billie eilish', 'ariana grande', 'bruno mars', 'the weeknd', 'dua lipa', 'charlie puth', 
-            'maroon 5', 'one direction', 'halsey', 'selena gomez', 'katy perry', 'rihanna', 'beyonce', 'adele', 
-            'sam smith', 'post malone', 'imagine dragons', 'joji', 'keshi', 'pink sweat$', 'lauv', 'niki', 
-            'rich brian', 'stephanie poetri', 'elvis', 'the beatles', 'queen', 'michael jackson', 'bobby caldwell'
+            'seventeen kpop', 'seventeen (k-pop)', 'pledis', 'bts', 'blackpink', 'exo', 'nct', 'stray kids', 'twice', 
+            'frank sinatra', 'ed sheeran', 'taylor swift', 'justin bieber', 'coldplay', 'shawn mendes', 'billie eilish', 
+            'ariana grande', 'bruno mars', 'the weeknd', 'dua lipa', 'charlie puth', 'maroon 5', 'one direction', 
+            'halsey', 'selena gomez', 'katy perry', 'rihanna', 'beyonce', 'adele', 'sam smith', 'post malone', 
+            'imagine dragons', 'joji', 'keshi', 'lauv', 'niki', 'rich brian', 'stephanie poetri', 'elvis', 'the beatles', 'queen', 'michael jackson'
         ];
 
-        // --- DAFTAR QUERY MEGA-HITS SUPER FAMILIAR (TINGKAT SUPER GAMPANG & GAMPANG) ---
+        // --- DAFTAR MEGA-HITS SUPER FAMILIAR (LEVEL 1: SUPER GAMPANG & LEVEL 2: GAMPANG) ---
         const superGampangQueries = [
             "Dewa 19 Kangen", "Peterpan Menghapus Jejakmu", "Sheila On 7 Dan", 
             "Noah Separuh Aku", "Tulus Hati Hati Di Jalan", "Mahalini Sial", 
@@ -272,7 +272,7 @@
             "Letto Sebelum Cahaya", "Nidji Laskar Pelangi", "dMasiv Jangan Menyerah"
         ];
 
-        // --- DATABASE WHITELIST ARTIS LOKAL INDONESIA UTAMA ---
+        // --- DATABASE WHITELIST ARTIS LOKAL INDONESIA ---
         const categoryKeywords = {
             '90s': [
                 'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
@@ -417,7 +417,6 @@
             
             shuffleArray(keywords);
             const selectedKeywords = (currentLevelIndex === 0 || currentLevelIndex === 1) ? keywords : keywords.slice(0, 10); 
-            const activeLevelCode = LEVEL_SEQUENCE[currentLevelIndex];
 
             document.getElementById('current-level-name').textContent = LEVEL_NAMES[currentLevelIndex];
             document.getElementById('level-counter').textContent = `Tahap ${currentLevelIndex + 1} / 5`;
@@ -442,11 +441,20 @@
                             
                             const artistLower = t.artistName.toLowerCase();
                             
-                            // 1. Cek Blacklist Mutlak (Menolak artis luar seperti Frank Sinatra, dll.)
+                            // 1. Cek Blacklist ketat terhadap artis K-Pop / Asing
                             const isBlacklisted = foreignBlacklist.some(f => artistLower.includes(f));
                             if (isBlacklisted) return false;
                             
-                            // 2. Wajib terdaftar dalam whitelist artis lokal Indonesia
+                            // 2. Filter khusus jika nama band adalah "Seventeen", pastikan bukan K-Pop
+                            if (artistLower === 'seventeen') {
+                                const countryAttr = (t.country || '').toLowerCase();
+                                if (countryAttr && countryAttr !== 'idn' && countryAttr !== 'id') {
+                                    // Deteksi tambahan jika bukan dari store Indonesia
+                                    return false;
+                                }
+                            }
+
+                            // 3. Wajib terdaftar dalam Whitelist musisi lokal Indonesia
                             const isIndonesian = allKnownArtists.some(ka => artistLower.includes(ka.toLowerCase()));
                             return isIndonesian;
                         });
@@ -457,13 +465,9 @@
                         slicedTracks.forEach(t => {
                             const cleanedTitle = cleanSongTitle(t.trackName);
                             const uniqueKey = `${cleanedTitle.toLowerCase()} - ${t.artistName.toLowerCase()}`;
-                            
-                            // Titik potong ikonik dinamis (0s: intro, 6s: verse, 12s: reff)
-                            const iconicOffsets = [0, 6, 12];
-                            const randomOffset = iconicOffsets[Math.floor(Math.random() * iconicOffsets.length)];
 
                             if (!trackMap.has(uniqueKey)) {
-                                trackMap.set(uniqueKey, { ...t, cleanedTitle: cleanedTitle, clipOffset: randomOffset });
+                                trackMap.set(uniqueKey, { ...t, cleanedTitle: cleanedTitle });
                             }
                         });
                     }
@@ -526,12 +530,12 @@
             btnSkip.textContent = currentStep === 4 ? 'Menyerah' : `Lewati (+${STEPS[currentStep + 1] - dur}s)`;
         }
 
-        // Pemutaran Audio Stabil dengan Offset Ikonik
+        // Pemutaran Audio Stabil dari awal klip preview resmi Apple (Hook/Reff optimal)
         document.getElementById('btn-play').addEventListener('click', () => {
             if (!currentTrack || !currentTrack.previewUrl) return;
             if (audioTimeout) clearTimeout(audioTimeout);
 
-            audioPlayer.currentTime = currentTrack.clipOffset || 0; 
+            audioPlayer.currentTime = 0; 
             audioPlayer.load();
 
             const playPromise = audioPlayer.play();
@@ -541,7 +545,7 @@
                         audioPlayer.pause();
                     }, STEPS[currentStep] * 1000);
                 }).catch(error => {
-                    console.log("Audio routing restriction:", error);
+                    console.log("Audio restriction:", error);
                 });
             }
         });
