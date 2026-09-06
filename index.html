@@ -175,7 +175,7 @@
     </div>
 
     <div class="container">
-        <!-- WELCOME SCREEN (HALAMAN UTAMA) -->
+        <!-- WELCOME SCREEN -->
         <div id="welcome-screen" class="welcome-card">
             <h2>SELAMAT DATANG!</h2>
             <p>Tebak judul lagu dan musisi Indonesia legendaris lintas era. Nikmati tantangan bertahap dari level Super Gampang hingga Susah Banget dengan sistem poin dinamis!</p>
@@ -250,7 +250,7 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- BLACKLIST MUTLAK ARTIS ASING & K-POP (MENANGKAL SEVENTEEN KOREA, FRANK SINATRA, DLL.) ---
+        // --- BLACKLIST MUTLAK ARTIS ASING & K-POP ---
         const foreignBlacklist = [
             'seventeen kpop', 'seventeen (k-pop)', 'pledis', 'bts', 'blackpink', 'exo', 'nct', 'stray kids', 'twice', 
             'frank sinatra', 'ed sheeran', 'taylor swift', 'justin bieber', 'coldplay', 'shawn mendes', 'billie eilish', 
@@ -259,7 +259,7 @@
             'imagine dragons', 'joji', 'keshi', 'lauv', 'niki', 'rich brian', 'stephanie poetri', 'elvis', 'the beatles', 'queen', 'michael jackson'
         ];
 
-        // --- DAFTAR MEGA-HITS SUPER FAMILIAR (LEVEL 1: SUPER GAMPANG & LEVEL 2: GAMPANG) ---
+        // --- LEVEL 1 & 2: MEGA HITS PALING FAMILIAR ---
         const superGampangQueries = [
             "Dewa 19 Kangen", "Peterpan Menghapus Jejakmu", "Sheila On 7 Dan", 
             "Noah Separuh Aku", "Tulus Hati Hati Di Jalan", "Mahalini Sial", 
@@ -269,39 +269,49 @@
         const gampangQueries = [
             "Judika Cinta Karena Cinta", "Raim Laode Komang", "Bernadya Kata Mereka Ini Berlebihan",
             "Radja Cinderella", "Kangen Band Yolanda", "Kerispatih Kejujuran Hati", 
-            "Letto Sebelum Cahaya", "Nidji Laskar Pelangi", "dMasiv Jangan Menyerah"
+            "Letto Sebelum Cahaya", "Nidji Laskar Pelangi", "dMasiv Jangan Menyerah",
+            "Pamungkas To The Bone", "Juicy Luicy Lantas", "Keisya Levronka Tak Ingin Usai"
         ];
 
-        // --- DATABASE WHITELIST ARTIS LOKAL INDONESIA ---
+        // --- DATABASE BERDASARKAN ERA YANG KETAT & BENAR ---
         const categoryKeywords = {
             '90s': [
-                'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 
-                'Element', 'Iwa K', 'Pas Band', 'Potret', 'Base Jam', 'KLA Project', 
-                'Nike Ardilla', 'Poppy Mercury', 'Java Jive', 'Stinky', 'Gigi', 'Padi'
+                'Dewa 19 Kangen', 'Dewa 19 Cinta Gila', 'Chrisye Kala Cinta Menggoda', 'Chrisye Pergilah Kasih',
+                'Slank Kamu Harus Pulang', 'Slank Mawar Merah', 'Slank Terlalu Manis', 'Kahitna Cantik',
+                'Kahitna Andai Dia Mengetahui', 'Naif Mobil Derek', 'Naif Jikalau', 'Jamrud Selamat Ulang Tahun',
+                'Jamrud Pelangi di Matamu', 'Nike Ardilla Seberkas Sinar', 'KLA Project Yogyakarta',
+                'Gigi Janji', 'Padi Mahadewi', 'Padi Sobat', 'Ari Lasso Hampa', 'Ari Lasso Rahasia Hati'
             ],
             '2000s': [
-                'Peterpan', 'Noah', 'Sheila On 7', 'Ungu', 'Radja', 'Kangen Band', 'Kerispatih', 
-                'Letto', 'Hijau Daun', 'J-Rocks', 'Nidji', 'dMasiv', 'ST12', 'ADA Band', 
-                'Samsons', 'Geisha', 'Cokelat', 'Repvblik', 'Wali', 'The Titans', 
-                'Seventeen', 'Naff', 'Drive', 'Vierra', 'D Bagindas'
+                'Peterpan Topeng', 'Peterpan Ku Katakan Dengan Indah', 'Peterpan Ada Apa Dengan Cinta',
+                'Sheila On 7 Seberapa Pantas', 'Sheila On 7 Anugerah Terindah', 'Ungu Tercipta Untukku',
+                'Radja Jujur', 'Kangen Band Tentang Aku Kau Dan Dia', 'Kerispatih Mengengenangmu',
+                'Kerispatih Bila Rasaku Ini Rasamu', 'Letto Ruang Rindu', 'Nidji Hapus Aku',
+                'dMasiv Cinta Ini Membunuhku', 'ST12 Puspa', 'ST12 Rasa Yang Tertinggal',
+                'Samsons Kenangan Terindah', 'Geisha Lumpuhkan Ingatanku', 'Cokelat Bendera',
+                'Cokelat Karma', 'Wali Cari Jodoh', 'Wali Yank'
             ],
             '2010s': [
-                'HIVI!', 'Cherrybelle', 'SM*SH', 'JKT48', 'Coboy Junior', 'CJR', '7Icons', 
-                'Tulus', 'Raisa', 'Afgan', 'Isyana Sarasvati', 'Rizky Febian', 
-                'Yura Yunita', 'Judika', 'Payung Teduh', 'Fourtwnty', 'Armada', 'Last Child', 
-                'Virgoun', 'RAN', 'Jaz', 'Anji', 'Fiersa Besari', 'GAC'
+                'Tulus Monokrom', 'Tulus Sewindu', 'Raisa Kali Kedua', 'Raisa Jatuh Hati',
+                'Afgan Sadis', 'Afgan Bukan Cinta Biasa', 'Noah Tak Lagi Sama', 'Armada Pemilik Hati',
+                'Payung Teduh Akad', 'Fourtwnty Zona Nyaman', 'Jaz Dari Mata', 'Anji Dia',
+                'Fiersa Besari Waktu Yang Salah', 'Fiersa Besari Celengan Rindu', 'Hivi! Mata Ke Hati',
+                'Rizky Febian Kesempurnaan Cinta', 'Yura Yunita Intuisi', 'Judika Bukan Dia Tapi Aku'
             ],
             '2020s': [
-                'Mahalini', 'Tiara Andini', 'Ziva Magnolya', 'Fabio Asher', 'Keisya Levronka', 
-                'Lyodra', 'Nadin Amizah', 'Hindia', 'Pamungkas', 'Sal Priadi', 'Juicy Luicy', 
-                'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf'
+                'Mahalini Sisa Rasa', 'Tiara Andini Merasa Indah', 'Ziva Magnolya Peri Cintaku',
+                'Fabio Asher Rumah Singgah', 'Keisya Levronka Tak Ingin Usai', 'Lyodra Pesan Terakhir',
+                'Lyodra Sang Dewi', 'Nadin Amizah Bertaut', 'Hindia Secukupnya', 'Pamungkas To The Bone',
+                'Sal Priadi Dari Planet Lain', 'Juicy Luicy Lantas', 'Juicy Luicy Tanpa Tergesa',
+                'Bernadya Kata Mereka Ini Berlebihan', 'Bernadya Satu Bulan', 'Feby Putri Runtuh',
+                'Raim Laode Komang', 'Idgitaf Takut'
             ],
             'alltime': [],
             'random': []
         };
 
         const allKnownArtists = [
-            'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 'Element', 'Iwa K', 'Pas Band', 'Potret', 'Base Jam', 'KLA Project', 'Nike Ardilla', 'Poppy Mercury', 'Java Jive', 'Stinky', 'Gigi', 'Padi',
+            'Dewa 19', 'Chrisye', 'Slank', 'Krisdayanti', 'Kahitna', 'Naif', 'Jamrud', 'Element', 'Iwa K', 'Pas Band', 'Potret', 'Base Jam', 'KLA Project', 'Nike Ardilla', 'Poppy Mercury', 'Java Jive', 'Stinky', 'Gigi', 'Padi', 'Ari Lasso',
             'Peterpan', 'Noah', 'Sheila On 7', 'Ungu', 'Radja', 'Kangen Band', 'Kerispatih', 'Letto', 'Hijau Daun', 'J-Rocks', 'Nidji', 'dMasiv', 'ST12', 'ADA Band', 'Samsons', 'Geisha', 'Cokelat', 'Repvblik', 'Wali', 'The Titans', 'Seventeen', 'Naff', 'Drive', 'Vierra', 'D Bagindas',
             'HIVI!', 'Cherrybelle', 'SM*SH', 'JKT48', 'Coboy Junior', 'CJR', '7Icons', 'Tulus', 'Raisa', 'Afgan', 'Isyana Sarasvati', 'Rizky Febian', 'Yura Yunita', 'Judika', 'Payung Teduh', 'Fourtwnty', 'Armada', 'Last Child', 'Virgoun', 'RAN', 'Jaz', 'Anji', 'Fiersa Besari', 'GAC',
             'Mahalini', 'Tiara Andini', 'Ziva Magnolya', 'Fabio Asher', 'Keisya Levronka', 'Lyodra', 'Nadin Amizah', 'Hindia', 'Pamungkas', 'Sal Priadi', 'Juicy Luicy', 'Bernadya', 'Feby Putri', 'Raim Laode', 'Idgitaf'
@@ -398,7 +408,7 @@
                     }
                 }
                 shuffleArray(all);
-                keys = all.slice(0, 14);
+                keys = all.slice(0, 15);
             } else {
                 keys = categoryKeywords[currentCategory] || [];
             }
@@ -416,7 +426,7 @@
             let keywords = getKeywords();
             
             shuffleArray(keywords);
-            const selectedKeywords = (currentLevelIndex === 0 || currentLevelIndex === 1) ? keywords : keywords.slice(0, 10); 
+            const selectedKeywords = (currentLevelIndex === 0 || currentLevelIndex === 1) ? keywords : keywords.slice(0, 12); 
 
             document.getElementById('current-level-name').textContent = LEVEL_NAMES[currentLevelIndex];
             document.getElementById('level-counter').textContent = `Tahap ${currentLevelIndex + 1} / 5`;
@@ -425,7 +435,7 @@
                 loadingText.textContent = `Memuat Tahap ${currentLevelIndex + 1}: ${LEVEL_NAMES[currentLevelIndex]}...`;
                 
                 const fetchPromises = selectedKeywords.map(kw => 
-                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=25`)
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(kw)}&country=id&entity=song&limit=15`)
                     .then(res => res.json())
                 );
 
@@ -437,32 +447,25 @@
                         const validTracks = data.results.filter(t => {
                             if (!t.previewUrl) return false;
                             const lowerName = t.trackName.toLowerCase();
-                            if (/remix|acoustic|live|instrumental|karaoke|version|remaster|edm|club|sped up|slowed/i.test(lowerName)) return false;
+                            if (/remix|acoustic|live|instrumental|karaoke|version|remaster|edm|club|sped up|slowed|cover/i.test(lowerName)) return false;
                             
                             const artistLower = t.artistName.toLowerCase();
                             
-                            // 1. Cek Blacklist ketat terhadap artis K-Pop / Asing
+                            // Blacklist ketat musisi luar & K-pop
                             const isBlacklisted = foreignBlacklist.some(f => artistLower.includes(f));
                             if (isBlacklisted) return false;
                             
-                            // 2. Filter khusus jika nama band adalah "Seventeen", pastikan bukan K-Pop
                             if (artistLower === 'seventeen') {
                                 const countryAttr = (t.country || '').toLowerCase();
-                                if (countryAttr && countryAttr !== 'idn' && countryAttr !== 'id') {
-                                    // Deteksi tambahan jika bukan dari store Indonesia
-                                    return false;
-                                }
+                                if (countryAttr && countryAttr !== 'idn' && countryAttr !== 'id') return false;
                             }
 
-                            // 3. Wajib terdaftar dalam Whitelist musisi lokal Indonesia
+                            // Wajib terdaftar di whitelist lokal Indonesia
                             const isIndonesian = allKnownArtists.some(ka => artistLower.includes(ka.toLowerCase()));
                             return isIndonesian;
                         });
 
-                        shuffleArray(validTracks);
-                        let slicedTracks = validTracks.slice(0, 5);
-
-                        slicedTracks.forEach(t => {
+                        validTracks.forEach(t => {
                             const cleanedTitle = cleanSongTitle(t.trackName);
                             const uniqueKey = `${cleanedTitle.toLowerCase()} - ${t.artistName.toLowerCase()}`;
 
@@ -530,7 +533,6 @@
             btnSkip.textContent = currentStep === 4 ? 'Menyerah' : `Lewati (+${STEPS[currentStep + 1] - dur}s)`;
         }
 
-        // Pemutaran Audio Stabil dari awal klip preview resmi Apple (Hook/Reff optimal)
         document.getElementById('btn-play').addEventListener('click', () => {
             if (!currentTrack || !currentTrack.previewUrl) return;
             if (audioTimeout) clearTimeout(audioTimeout);
