@@ -199,7 +199,7 @@
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
         // -------------------------------------------------------------------------
-        // DATABASE LOKAL (600 LAGU HITS INDONESIA FULL - 30 Lagu per Level per Era)
+        // DATABASE LOKAL (600 LAGU HITS INDONESIA FULL - Termasuk Vidi Aldiano - Nuansa Bening)
         // -------------------------------------------------------------------------
         const localSongsDatabase = [
             // ERA 90s - Super Gampang (30)
@@ -554,7 +554,7 @@
             { title: "Jikalau Kau Cinta", artist: "Judika", era: "2010s", difficulty: "Super Gampang" },
             { title: "Sampai Kau Jadi Milikku", artist: "Judika", era: "2010s", difficulty: "Super Gampang" },
 
-            // ERA 2010s - Gampang (30)
+            // ERA 2010s - Gampang (30) - Termasuk Nuansa Bening - Vidi Aldiano
             { title: "Diam Diam Suka", artist: "Cherrybelle", era: "2010s", difficulty: "Gampang" },
             { title: "Pamer Bojo", artist: "Didi Kempot", era: "2010s", difficulty: "Gampang" },
             { title: "Jodoh Pasti Bertemu", artist: "Afgan", era: "2010s", difficulty: "Gampang" },
@@ -1037,81 +1037,71 @@
                 currentSlot.classList.add('correct'); currentSlot.textContent = `✓ ${fullName}`; endRound(true); return;
             }
 
-            if (guessText === 'SKIPPED') { currentSlot.classList.add('skipped'); currentSlot.textContent = `🚫 Dilewati`; } 
-            else { currentSlot.classList.add('wrong'); currentSlot.textContent = `✗ ${guessText}`; }
+            if (guessText === 'SKIPPED') {
+                currentSlot.classList.add('skipped'); currentSlot.textContent = `- (Lewati)`;
+            } else {
+                currentSlot.classList.add('wrong'); currentSlot.textContent = `✗ ${guessText}`;
+            }
 
-            if (currentStep < 4) { currentStep++; updateStepUI(); guessInput.value = ''; } else { endRound(false); }
+            if (currentStep < 4) {
+                currentStep++; updateStepUI();
+            } else {
+                currentSlot.textContent = `✗ ${fullName}`; endRound(false);
+            }
         }
 
         function endRound(isWin) {
             isGameOver = true; audioPlayer.pause();
-            guessInput.disabled = true; document.getElementById('btn-skip').disabled = true; document.getElementById('btn-submit').disabled = true;
+            if (audioTimeout) clearTimeout(audioTimeout);
+            guessInput.disabled = true;
+            document.getElementById('btn-skip').disabled = true;
+            document.getElementById('btn-submit').disabled = true;
+
+            let earned = 0;
+            if (isWin) {
+                earned = Math.max(10, (5 - currentStep) * 20);
+                score += earned; streak++;
+            } else {
+                streak = 0;
+            }
+
+            document.getElementById('total-score').textContent = score;
+            document.getElementById('streak-count').textContent = `${streak} 🔥`;
 
             setTimeout(() => {
-                gameArea.classList.add('hidden'); resultCard.classList.remove('hidden');
-                const titleEl = document.getElementById('result-title');
-                const pointsEl = document.getElementById('points-earned');
-                const multiplier = [0.8, 1.0, 1.5, 2.2, 3.5][currentLevelIndex];
-
-                if (isWin) {
-                    titleEl.textContent = "LUAR BIASA! BENAR! 🎉"; titleEl.style.color = "var(--success)";
-                    const earned = Math.floor((5 - currentStep) * 10 * multiplier);
-                    score += earned; streak += 1;
-                    pointsEl.textContent = `+${earned} Poin (Tahap: ${LEVEL_NAMES[currentLevelIndex]})`;
-                } else {
-                    titleEl.textContent = "JAWABAN SALAH, COBA LAGI! 😅"; titleEl.style.color = "var(--danger)";
-                    streak = 0; pointsEl.textContent = `Poin ditambah 0`;
-                }
-
-                document.getElementById('total-score').textContent = score;
-                document.getElementById('streak-count').textContent = `${streak} 🔥`;
-                document.getElementById('album-cover').src = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb', '400x400bb') : '';
+                gameArea.classList.add('hidden');
+                resultCard.classList.remove('hidden');
+                document.getElementById('result-title').textContent = isWin ? 'JAWABAN BENAR! 🎉' : 'NYARIS / GAGAL ❌';
+                document.getElementById('points-earned').textContent = isWin ? `+${earned} Poin` : '0 Poin';
+                document.getElementById('album-cover').src = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb.jpg', '300x300bb.jpg') : '';
                 document.getElementById('song-title-res').textContent = currentTrack.cleanedTitle;
                 document.getElementById('artist-res').textContent = currentTrack.artistName;
-                audioPlayer.currentTime = 0; audioPlayer.play().catch(() => {});
             }, 800);
         }
 
         document.getElementById('btn-next').addEventListener('click', () => {
-            if (currentLevelIndex === LEVEL_SEQUENCE.length - 1) {
-                showCycleCompleteModal();
+            currentLevelIndex++;
+            if (currentLevelIndex >= LEVEL_NAMES.length) {
+                currentLevelIndex = 0;
+                document.getElementById('cycle-message').textContent = `Kamu telah menamatkan semua tahap dari Super Gampang hingga Susah Banget!`;
+                document.getElementById('cycle-final-score').textContent = score;
+                document.getElementById('cycle-complete-modal').classList.remove('hidden');
             } else {
-                currentLevelIndex++;
                 fetchTracks();
             }
         });
 
-        function showCycleCompleteModal() {
-            resultCard.classList.add('hidden');
-            const modal = document.getElementById('cycle-complete-modal');
-            modal.classList.remove('hidden');
-            
-            const scoreEl = document.getElementById('cycle-final-score');
-            scoreEl.textContent = score;
-            
-            let message = "";
-            if (score >= 2500) message = "Luar biasa! Pengetahuan musik Indonesia kamu level Dewa! 🔥";
-            else if (score >= 1500) message = "Keren banget! Kamu beneran penikmat musik sejati! 🎵";
-            else if (score >= 500) message = "Not bad! Terus asah tebakanmu dan dengarkan lebih banyak lagu! 🎧";
-            else message = "Yah, sepertinya kamu harus lebih sering dengerin lagu-lagu hits nih! 😅";
-            
-            document.getElementById('cycle-message').textContent = message;
-        }
-
         document.getElementById('btn-cycle-play').addEventListener('click', () => {
             document.getElementById('cycle-complete-modal').classList.add('hidden');
-            score = 0; streak = 0;
+            score = 0; streak = 0; currentLevelIndex = 0;
             document.getElementById('total-score').textContent = score;
             document.getElementById('streak-count').textContent = `${streak} 🔥`;
-            currentLevelIndex = 0;
             fetchTracks();
         });
 
         document.getElementById('btn-cycle-menu').addEventListener('click', () => {
             document.getElementById('cycle-complete-modal').classList.add('hidden');
-            score = 0; streak = 0;
-            document.getElementById('total-score').textContent = score;
-            document.getElementById('streak-count').textContent = `${streak} 🔥`;
+            resultCard.classList.add('hidden');
             welcomeScreen.classList.remove('hidden');
         });
     </script>
