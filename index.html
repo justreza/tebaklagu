@@ -64,8 +64,7 @@
 
         .attempts-list { display: flex; flex-direction: column; gap: 8px; }
         .attempt-slot { height: 44px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; align-items: center; padding: 0 18px; font-size: 0.88rem; color: var(--text-muted); font-weight: 500; }
-        .attempt-slot.wrong { border-color: var(--danger); color: var(--danger); background: rgba(244, 63, 94, 0.06); }
-        .attempt-slot.skipped { border-color: rgba(255,255,255,0.15); }
+        .attempt-slot.wrong, .attempt-slot.skipped { border-color: var(--danger); color: var(--danger); background: rgba(244, 63, 94, 0.06); }
         .attempt-slot.correct { border-color: var(--success); color: var(--success); font-weight: 700; background: rgba(16, 185, 129, 0.08); }
 
         .play-section { text-align: center; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px; position: relative; }
@@ -88,12 +87,18 @@
         .btn-skip { background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border); }
         .btn-submit { background: var(--accent-gradient); color: #fff; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); }
 
-        .result-card { text-align: center; background: var(--bg-surface); padding: 36px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); }
+        .result-card { text-align: center; background: var(--bg-surface); padding: 36px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); width: 100%; max-width: 540px; margin: 0 auto; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
         .result-card img { width: 160px; height: 160px; border-radius: var(--radius-lg); margin: 15px 0 20px 0; object-fit: cover; }
         .hidden { display: none !important; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3, 3, 7, 0.95); z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; transition: opacity 0.3s; }
         .modal-content { background: var(--bg-surface); padding: 40px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(139, 92, 246, 0.3); }
+
+        @media (max-width: 480px) {
+            body { padding: 16px 12px; }
+            .header h1 { font-size: 2.2rem; }
+            .welcome-card, .result-card { padding: 24px 16px; }
+        }
     </style>
 </head>
 <body>
@@ -199,7 +204,7 @@
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
         // -------------------------------------------------------------------------
-        // DATABASE LOKAL (600 LAGU HITS INDONESIA FULL - Termasuk Vidi Aldiano - Nuansa Bening)
+        // DATABASE LOKAL (600 LAGU HITS INDONESIA FULL)
         // -------------------------------------------------------------------------
         const localSongsDatabase = [
             // ERA 90s - Super Gampang (30)
@@ -1031,69 +1036,108 @@
             if (guessText === '' && guessText !== 'SKIPPED') return;
             const slots = attemptsList.querySelectorAll('.attempt-slot');
             const currentSlot = slots[currentStep];
-            const fullName = `${currentTrack.cleanedTitle} - ${currentTrack.artistName}`;
+            const fullName = `${currentTrack.cleanedTitle} - ${currentTrack.artistName}`.toLowerCase();
+            const userGuess = guessText.toLowerCase().trim();
 
-            if (guessText.toLowerCase() === fullName.toLowerCase() || (guessText.length > 3 && currentTrack.cleanedTitle.toLowerCase().includes(guessText.toLowerCase()))) {
-                currentSlot.classList.add('correct'); currentSlot.textContent = `✓ ${fullName}`; endRound(true); return;
-            }
+            const isCorrect = (guessText !== 'SKIPPED') && (
+                userGuess === currentTrack.cleanedTitle.toLowerCase() ||
+                userGuess === fullName ||
+                (currentTrack.cleanedTitle.toLowerCase().includes(userGuess) && userGuess.length > 3)
+            );
 
-            if (guessText === 'SKIPPED') {
-                currentSlot.classList.add('skipped'); currentSlot.textContent = `- (Lewati)`;
+            if (isCorrect) {
+                currentSlot.className = 'attempt-slot correct';
+                currentSlot.textContent = `${currentStep + 1}. ${currentTrack.cleanedTitle} - ${currentTrack.artistName} (Benar!)`;
+                const pts = [100, 80, 60, 40, 20][currentStep];
+                score += pts;
+                streak++;
+                document.getElementById('total-score').textContent = score;
+                document.getElementById('streak-count').textContent = `${streak} 🔥`;
+                
+                isGameOver = true;
+                setTimeout(() => showResult(true, pts), 600);
             } else {
-                currentSlot.classList.add('wrong'); currentSlot.textContent = `✗ ${guessText}`;
-            }
+                if (guessText === 'SKIPPED') {
+                    currentSlot.className = 'attempt-slot skipped';
+                    currentSlot.textContent = `${currentStep + 1}. Dilewati (${STEPS[currentStep]}s)`;
+                } else {
+                    currentSlot.className = 'attempt-slot wrong';
+                    currentSlot.textContent = `${currentStep + 1}. ${guessText} (Salah)`;
+                }
 
-            if (currentStep < 4) {
-                currentStep++; updateStepUI();
-            } else {
-                currentSlot.textContent = `✗ ${fullName}`; endRound(false);
+                if (currentStep < 4) {
+                    currentStep++;
+                    updateStepUI();
+                } else {
+                    streak = 0;
+                    document.getElementById('streak-count').textContent = `${streak} 🔥`;
+                    isGameOver = true;
+                    setTimeout(() => showResult(false, 0), 600);
+                }
             }
+            guessInput.value = '';
+            searchResults.style.display = 'none';
         }
 
-        function endRound(isWin) {
-            isGameOver = true; audioPlayer.pause();
-            if (audioTimeout) clearTimeout(audioTimeout);
-            guessInput.disabled = true;
-            document.getElementById('btn-skip').disabled = true;
-            document.getElementById('btn-submit').disabled = true;
+        function showResult(isWin, pts) {
+            audioPlayer.pause();
+            gameArea.classList.add('hidden');
+            resultCard.classList.remove('hidden');
 
-            let earned = 0;
+            const titleEl = document.getElementById('result-title');
+            const pointsEl = document.getElementById('points-earned');
+            const albumImg = document.getElementById('album-cover');
+            const songRes = document.getElementById('song-title-res');
+            const artistRes = document.getElementById('artist-res');
+
             if (isWin) {
-                earned = Math.max(10, (5 - currentStep) * 20);
-                score += earned; streak++;
+                titleEl.textContent = "TEBAKAN BENAR! 🎉";
+                pointsEl.textContent = `+${pts} Poin`;
             } else {
-                streak = 0;
+                titleEl.textContent = "KESEMPATAN HABIS! ❌";
+                pointsEl.textContent = "0 Poin";
             }
 
-            document.getElementById('total-score').textContent = score;
-            document.getElementById('streak-count').textContent = `${streak} 🔥`;
-
-            setTimeout(() => {
-                gameArea.classList.add('hidden');
-                resultCard.classList.remove('hidden');
-                document.getElementById('result-title').textContent = isWin ? 'JAWABAN BENAR! 🎉' : 'NYARIS / GAGAL ❌';
-                document.getElementById('points-earned').textContent = isWin ? `+${earned} Poin` : '0 Poin';
-                document.getElementById('album-cover').src = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb.jpg', '300x300bb.jpg') : '';
-                document.getElementById('song-title-res').textContent = currentTrack.cleanedTitle;
-                document.getElementById('artist-res').textContent = currentTrack.artistName;
-            }, 800);
+            albumImg.src = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb.jpg', '300x300bb.jpg') : 'https://via.placeholder.com/300';
+            songRes.textContent = currentTrack.cleanedTitle;
+            artistRes.textContent = currentTrack.artistName;
         }
 
         document.getElementById('btn-next').addEventListener('click', () => {
             currentLevelIndex++;
-            if (currentLevelIndex >= LEVEL_NAMES.length) {
-                currentLevelIndex = 0;
-                document.getElementById('cycle-message').textContent = `Kamu telah menamatkan semua tahap dari Super Gampang hingga Susah Banget!`;
-                document.getElementById('cycle-final-score').textContent = score;
-                document.getElementById('cycle-complete-modal').classList.remove('hidden');
+            if (currentLevelIndex >= LEVEL_SEQUENCE.length) {
+                showCycleCompleteModal();
             } else {
                 fetchTracks();
             }
         });
 
+        function showCycleCompleteModal() {
+            resultCard.classList.add('hidden');
+            const modal = document.getElementById('cycle-complete-modal');
+            const msgEl = document.getElementById('cycle-message');
+            const finalScoreEl = document.getElementById('cycle-final-score');
+            
+            finalScoreEl.textContent = score;
+
+            const levelName = LEVEL_NAMES[currentLevelIndex - 1] || "Susah Banget";
+            let customMsg = "";
+            if (score >= 400) {
+                customMsg = `Luar biasa! Kamu berhasil menaklukkan tantangan hingga level **${levelName}** dengan penguasaan musik Indonesia yang sangat tajam!`;
+            } else if (score >= 200) {
+                customMsg = `Permainan hebat! Kamu telah menyelesaikan rangkaian tahap sampai level **${levelName}**. Pertahankan terus telinga musikmu!`;
+            } else {
+                customMsg = `Sesi selesai di level **${levelName}**. Terus latihan tebak lagu Indonesia agar skor dan streak-mu makin tinggi di kesempatan berikutnya!`;
+            }
+            msgEl.innerHTML = customMsg;
+            modal.classList.remove('hidden');
+        }
+
         document.getElementById('btn-cycle-play').addEventListener('click', () => {
             document.getElementById('cycle-complete-modal').classList.add('hidden');
-            score = 0; streak = 0; currentLevelIndex = 0;
+            score = 0;
+            streak = 0;
+            currentLevelIndex = 0;
             document.getElementById('total-score').textContent = score;
             document.getElementById('streak-count').textContent = `${streak} 🔥`;
             fetchTracks();
@@ -1101,7 +1145,11 @@
 
         document.getElementById('btn-cycle-menu').addEventListener('click', () => {
             document.getElementById('cycle-complete-modal').classList.add('hidden');
-            resultCard.classList.add('hidden');
+            score = 0;
+            streak = 0;
+            currentLevelIndex = 0;
+            document.getElementById('total-score').textContent = score;
+            document.getElementById('streak-count').textContent = `${streak} 🔥`;
             welcomeScreen.classList.remove('hidden');
         });
     </script>
