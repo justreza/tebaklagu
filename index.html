@@ -120,13 +120,13 @@
 
     <div class="header">
         <h1>GUESS LAGU</h1>
-        <p>Uji pengetahuan musik Indonesia kamu!</p>
+        <p>Uji pengetahuan musikmu secara beruntun dari Super Gampang ke Susah Banget!</p>
     </div>
 
     <div class="container">
         <div id="welcome-screen" class="welcome-card">
             <h2>SIAP BERMAIN? 🎵</h2>
-            <p>Tebak judul lagu & musisi Indonesia lintas era secara interaktif yang dilengkapi koleksi lagu² pilihan dari era 90an hingga 2020an. Buktikan dirimu kalau kamu jagonya!</p>
+            <p>Tebak judul lagu & musisi Indonesia legendaris lintas era secara interaktif. Dilengkapi koleksi lagu pilihan dari era 90an hingga 2020an yang makin seru dan bervariasi dengan efek konfetti spektakuler!</p>
             <button class="btn btn-submit" id="btn-start-game">Mulai Bermain Sekarang 🚀</button>
         </div>
 
@@ -948,267 +948,255 @@
             }
             
             if (availableTracks.length === 0) {
-                alert("Tidak ada lagu untuk kategori ini.");
-                loadingScreen.classList.add('hidden');
+                alert("Tidak ada lagu ditemukan untuk kategori ini.");
                 welcomeScreen.classList.remove('hidden');
+                loadingScreen.classList.add('hidden');
                 return;
             }
 
-            currentLevelIndex = 0;
-            await loadTrack(currentLevelIndex);
+            await loadTrackData(0);
+            
+            loadingScreen.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            updateUI();
         }
 
-        async function loadTrack(index) {
-            if (index >= availableTracks.length || index >= 5) {
-                showCycleComplete();
-                return;
+        async function loadTrackData(index) {
+            currentTrack = availableTracks[index];
+            const query = `${currentTrack.title} ${currentTrack.artist} indonesia`;
+            try {
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`);
+                const data = await res.json();
+                if(data.results && data.results.length > 0) {
+                    currentTrack.previewUrl = data.results[0].previewUrl;
+                    currentTrack.artworkUrl = data.results[0].artworkUrl100.replace('100x100', '400x400');
+                    currentTrack.artistName = data.results[0].artistName;
+                    currentTrack.trackName = data.results[0].trackName;
+                } else {
+                    currentTrack.previewUrl = ""; 
+                    currentTrack.artworkUrl = "https://via.placeholder.com/400x400.png?text=No+Cover";
+                }
+            } catch(e) {
+                console.error(e);
+                currentTrack.previewUrl = "";
+                currentTrack.artworkUrl = "https://via.placeholder.com/400x400.png?text=No+Cover";
             }
             
-            loadingScreen.classList.remove('hidden');
-            gameArea.classList.add('hidden');
-            resultCard.classList.add('hidden');
-            
-            currentTrack = availableTracks[index];
+            if(currentTrack.previewUrl) {
+                audioPlayer.src = currentTrack.previewUrl;
+                audioPlayer.load();
+            }
+        }
+
+        function updateUI() {
             currentStep = 0;
             attemptsData = [];
-            
+            guessInput.value = '';
+            searchResults.style.display = 'none';
             document.getElementById('current-level-name').textContent = currentTrack.difficulty;
-            document.getElementById('level-counter').textContent = `Tahap ${index + 1} / 5`;
-            
-            try {
-                const query = encodeURIComponent(`${currentTrack.title} ${currentTrack.artist}`);
-                const response = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1&country=id`);
-                const data = await response.json();
-                
-                if (data.results && data.results.length > 0) {
-                    currentTrack.audioUrl = data.results[0].previewUrl;
-                    currentTrack.coverUrl = data.results[0].artworkUrl100.replace('100x100bb', '300x300bb');
-                } else {
-                    currentTrack.audioUrl = ''; 
-                    currentTrack.coverUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentTrack.title) + '&background=random&size=300';
-                }
-            } catch (e) {
-                currentTrack.audioUrl = ''; 
-                currentTrack.coverUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentTrack.title) + '&background=random&size=300';
-            }
-
-            audioPlayer.src = currentTrack.audioUrl;
-            audioPlayer.load();
+            document.getElementById('level-counter').textContent = `Tahap ${currentLevelIndex + 1} / 5`;
             
             renderTimeline();
             renderAttempts();
+            updateDurationInfo();
             
-            guessInput.value = '';
-            searchResults.style.display = 'none';
-            loadingScreen.classList.add('hidden');
-            gameArea.classList.remove('hidden');
+            document.getElementById('btn-skip').textContent = "Lewati (+1s)";
+            if (currentLevelIndex === 0) streak = 0; 
+            document.getElementById('streak-count').textContent = streak + " 🔥";
+            document.getElementById('total-score').textContent = score;
         }
 
         function renderTimeline() {
             timeline.innerHTML = '';
-            STEPS.forEach((step, idx) => {
-                const seg = document.createElement('div');
-                seg.className = 'timeline-segment' + (idx <= currentStep ? ' active' : '');
-                seg.style.flex = step;
+            for(let i=0; i<5; i++) {
+                let seg = document.createElement('div');
+                seg.className = 'timeline-segment';
+                seg.style.flex = (STEPS[i] / 8);
+                if(i <= currentStep) seg.classList.add('active');
                 timeline.appendChild(seg);
-            });
-            document.getElementById('duration-info').textContent = `Dengarkan Bagian Musik: ${STEPS[currentStep]} Detik`;
+            }
         }
 
         function renderAttempts() {
             attemptsList.innerHTML = '';
-            for (let i = 0; i < 5; i++) {
-                const slot = document.createElement('div');
+            for(let i=0; i<5; i++) {
+                let slot = document.createElement('div');
                 slot.className = 'attempt-slot';
-                if (i < attemptsData.length) {
-                    const data = attemptsData[i];
-                    slot.classList.add(data.status);
-                    slot.textContent = `${i + 1}. ${data.text}`;
+                if(i < attemptsData.length) {
+                    let att = attemptsData[i];
+                    slot.textContent = `${i+1}. ${att.text}`;
+                    slot.classList.add(att.status);
                 } else {
-                    slot.textContent = `${i + 1}.`;
+                    slot.textContent = `${i+1}.`;
                 }
                 attemptsList.appendChild(slot);
             }
         }
 
-        const btnPlay = document.getElementById('btn-play');
-        btnPlay.addEventListener('click', playSnippet);
+        function updateDurationInfo() {
+            document.getElementById('duration-info').textContent = `Dengarkan Bagian Musik: ${STEPS[currentStep]} Detik`;
+        }
 
-        function playSnippet() {
-            if (!currentTrack || !currentTrack.audioUrl) {
-                alert("Audio preview tidak tersedia untuk lagu ini.");
+        document.getElementById('btn-play').addEventListener('click', () => {
+            if(!currentTrack.previewUrl) {
+                alert("Maaf, audio tidak tersedia untuk lagu ini.");
                 return;
             }
-            if (audioTimeout) clearTimeout(audioTimeout);
             
             audioPlayer.currentTime = 0;
-            audioPlayer.play().then(() => {
-                const duration = STEPS[currentStep] * 1000;
-                audioTimeout = setTimeout(() => {
-                    audioPlayer.pause();
-                }, duration);
-            }).catch(e => {
-                console.error("Gagal memutar audio:", e);
-            });
-        }
-
-        guessInput.addEventListener('input', () => {
-            const query = guessInput.value.toLowerCase().trim();
-            if (query.length < 2) {
-                searchResults.style.display = 'none';
-                return;
-            }
-
-            const matches = localSongsDatabase.filter(s => 
-                s.title.toLowerCase().includes(query) || 
-                s.artist.toLowerCase().includes(query)
-            ).slice(0, 8);
-
-            if (matches.length === 0) {
-                searchResults.style.display = 'none';
-                return;
-            }
-
-            searchResults.innerHTML = '';
-            matches.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'search-item';
-                item.textContent = `${m.title} - ${m.artist}`;
-                item.addEventListener('click', () => {
-                    guessInput.value = `${m.title} - ${m.artist}`;
-                    searchResults.style.display = 'none';
-                });
-                searchResults.appendChild(item);
-            });
-            searchResults.style.display = 'block';
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-box')) {
-                searchResults.style.display = 'none';
+            let playPromise = audioPlayer.play();
+            if(playPromise !== undefined) {
+                playPromise.then(() => {
+                    clearTimeout(audioTimeout);
+                    audioTimeout = setTimeout(() => {
+                        audioPlayer.pause();
+                    }, STEPS[currentStep] * 1000);
+                }).catch(e => console.log(e));
             }
         });
-
-        document.getElementById('btn-submit').addEventListener('click', handleGuess);
-        guessInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleGuess();
-        });
-
-        function handleGuess() {
-            const userVal = guessInput.value.trim();
-            if (!userVal) return;
-
-            searchResults.style.display = 'none';
-            const cleanUserVal = userVal.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const cleanTitle = currentTrack.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const cleanArtist = currentTrack.artist.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-            const isCorrect = cleanUserVal.includes(cleanTitle) || cleanTitle.includes(cleanUserVal);
-
-            if (isCorrect) {
-                attemptsData.push({ text: userVal, status: 'correct' });
-                renderAttempts();
-                finishTurn(true);
-            } else {
-                attemptsData.push({ text: `${userVal} (Salah)`, status: 'wrong' });
-                if (currentStep < STEPS.length - 1) {
-                    currentStep++;
-                    renderTimeline();
-                    renderAttempts();
-                } else {
-                    renderAttempts();
-                    finishTurn(false);
-                }
-            }
-            guessInput.value = '';
-        }
 
         document.getElementById('btn-skip').addEventListener('click', () => {
-            attemptsData.push({ text: 'Dilewati', status: 'skipped' });
-            if (currentStep < STEPS.length - 1) {
-                currentStep++;
-                renderTimeline();
-                renderAttempts();
+            handleGuess("Lewati", "skipped");
+        });
+
+        document.getElementById('btn-submit').addEventListener('click', () => {
+            const val = guessInput.value.trim();
+            if(!val) return;
+            
+            const isCorrect = checkAnswer(val);
+            handleGuess(val, isCorrect ? "correct" : "wrong");
+        });
+        
+        guessInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            searchResults.innerHTML = '';
+            if(val.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            const matches = localSongsDatabase.filter(s => 
+                s.title.toLowerCase().includes(val) || s.artist.toLowerCase().includes(val)
+            ).slice(0, 5);
+            
+            if(matches.length > 0) {
+                searchResults.style.display = 'block';
+                matches.forEach(m => {
+                    let div = document.createElement('div');
+                    div.className = 'search-item';
+                    div.textContent = `${m.title} - ${m.artist}`;
+                    div.addEventListener('click', () => {
+                        guessInput.value = `${m.title} - ${m.artist}`;
+                        searchResults.style.display = 'none';
+                    });
+                    searchResults.appendChild(div);
+                });
             } else {
-                renderAttempts();
-                finishTurn(false);
+                searchResults.style.display = 'none';
             }
         });
 
-        function finishTurn(isCorrect) {
-            audioPlayer.pause();
-            if (audioTimeout) clearTimeout(audioTimeout);
-
-            let points = 0;
-            if (isCorrect) {
-                points = (5 - currentStep) * 20;
-                score += points;
-                streak++;
-                if (typeof confetti === 'function') {
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-                }
-            } else {
-                streak = 0;
-            }
-
-            document.getElementById('total-score').textContent = score;
-            document.getElementById('streak-count').textContent = streak + " 🔥";
-
-            setTimeout(() => {
-                showResultCard(isCorrect, points);
-            }, 500);
+        function checkAnswer(guess) {
+            const g = guess.toLowerCase();
+            const t = currentTrack.title.toLowerCase();
+            const a = currentTrack.artist.toLowerCase();
+            return g.includes(t) || t.includes(g) || g === `${t} - ${a}`;
         }
 
-        function showResultCard(isCorrect, points) {
+        function handleGuess(text, status) {
+            attemptsData.push({text, status});
+            
+            if(status === "correct") {
+                streak++;
+                let points = [100, 80, 60, 40, 20][currentStep] || 10;
+                score += points;
+                showResult(true, points);
+            } else {
+                if(currentStep < 4) {
+                    currentStep++;
+                    guessInput.value = '';
+                    renderTimeline();
+                    renderAttempts();
+                    updateDurationInfo();
+                    document.getElementById('btn-skip').textContent = currentStep === 4 ? "Nyerah" : "Lewati (+1s)";
+                } else {
+                    streak = 0;
+                    showResult(false, 0);
+                }
+            }
+        }
+
+        function showResult(isWin, points) {
             gameArea.classList.add('hidden');
             resultCard.classList.remove('hidden');
-
-            const resTitle = document.getElementById('result-title');
-            const ptsEarned = document.getElementById('points-earned');
-            const albumCover = document.getElementById('album-cover');
-            const songTitle = document.getElementById('song-title-res');
-            const artistRes = document.getElementById('artist-res');
-
-            if (isCorrect) {
-                resTitle.textContent = "TEBAKAN BENAR! 🎉";
-                resTitle.style.color = "var(--success)";
-                ptsEarned.textContent = `+${points} Poin`;
+            
+            const titleRes = document.getElementById('result-title');
+            const pointsRes = document.getElementById('points-earned');
+            
+            if(isWin) {
+                titleRes.textContent = "BENAR! 🎉";
+                titleRes.style.background = "var(--success)";
+                titleRes.style.webkitBackgroundClip = "text";
+                pointsRes.textContent = `+${points} Poin (Streak: ${streak})`;
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             } else {
-                resTitle.textContent = "SAYANG SEKALI... ❌";
-                resTitle.style.color = "var(--danger)";
-                ptsEarned.textContent = "+0 Poin";
+                titleRes.textContent = "SALAH! 😢";
+                titleRes.style.background = "var(--danger)";
+                titleRes.style.webkitBackgroundClip = "text";
+                pointsRes.textContent = "Tebakan habis.";
+            }
+            
+            document.getElementById('album-cover').src = currentTrack.artworkUrl || "https://via.placeholder.com/400x400.png?text=No+Cover";
+            document.getElementById('song-title-res').textContent = currentTrack.trackName || currentTrack.title;
+            document.getElementById('artist-res').textContent = currentTrack.artistName || currentTrack.artist;
+            
+            // FIX: Clearkan Timeout Play Section dan Handle Audio Reveal Promise
+            clearTimeout(audioTimeout);
+            if(currentTrack.previewUrl) {
+                audioPlayer.src = currentTrack.previewUrl;
+                audioPlayer.currentTime = 0;
+                let playPromise = audioPlayer.play();
+                if(playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Audio reveal diblokir atau diinterupsi oleh browser:", error);
+                    });
+                }
             }
 
-            albumCover.src = currentTrack.coverUrl;
-            songTitle.textContent = currentTrack.title;
-            artistRes.textContent = currentTrack.artist;
+            if(currentLevelIndex < availableTracks.length - 1) {
+                document.getElementById('btn-next').textContent = "Lanjut ke Tahap Berikutnya ➔";
+                loadTrackData(currentLevelIndex + 1);
+            } else {
+                document.getElementById('btn-next').textContent = "Selesaikan Siklus 🏁";
+            }
         }
 
         document.getElementById('btn-next').addEventListener('click', () => {
-            currentLevelIndex++;
-            loadTrack(currentLevelIndex);
+            audioPlayer.pause();
+            if(currentLevelIndex < availableTracks.length - 1) {
+                currentLevelIndex++;
+                resultCard.classList.add('hidden');
+                gameArea.classList.remove('hidden');
+                updateUI();
+            } else {
+                showCycleComplete();
+            }
         });
 
         function showCycleComplete() {
-            loadingScreen.classList.add('hidden');
-            gameArea.classList.add('hidden');
             resultCard.classList.add('hidden');
             cycleCompleteModal.classList.remove('hidden');
-
             document.getElementById('cycle-final-score').textContent = score;
-            const cycleMsg = document.getElementById('cycle-message');
-            if (score >= 400) {
-                cycleMsg.textContent = "Luar biasa! Kamu adalah ensiklopedia musik Indonesia sejati!";
-            } else if (score >= 200) {
-                cycleMsg.textContent = "Hebat! Pengetahuan musikmu sangat mantap!";
-            } else {
-                cycleMsg.textContent = "Permainan yang bagus! Asah lagi pengetahuan musikmu dan coba lagi!";
-            }
+            let msg = score > 300 ? "Kamu pantas dijuluki Master Musik Indonesia! 🏆" : "Boleh juga, tapi masih bisa lebih baik lagi! Semangat! 💪";
+            document.getElementById('cycle-message').textContent = msg;
         }
+
+        // Tutup hasil pencarian jika klik di luar box
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.search-box')) {
+                searchResults.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
