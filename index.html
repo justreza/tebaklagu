@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess Lagu - Ultimate Indonesian Music Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Harmoni - Tebak Lagu Indonesia Ultimate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            /* Tampilan Minimalis Profesional ala Web Music App */
-            --bg-base: #121212;
-            --bg-surface: #181818;
-            --bg-elevated: #242424;
-            --accent-primary: #1ed760; /* Spotify-like Green */
-            --accent-hover: #1db954;
-            --success: #1ed760;
-            --danger: #e22134;
-            --text-main: #ffffff;
-            --text-muted: #b3b3b3;
-            --border: #333333;
-            --radius-xl: 12px;
-            --radius-lg: 8px;
-            --radius-md: 4px;
+            /* Tema Profesional: Midnight Slate & Electric Indigo */
+            --bg-base: #090d16;
+            --bg-surface: #111827;
+            --bg-elevated: #1f2937;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --radius-xl: 16px;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --shadow-subtle: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
         
         body { 
             background-color: var(--bg-base); 
@@ -34,151 +42,161 @@
             align-items: center; 
             min-height: 100vh; 
             padding: 40px 20px; 
+            background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
         }
 
-        /* Loading Screen */
+        /* Loading & Modals */
         #loading-screen, .modal-overlay { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-            background: rgba(18, 18, 18, 0.95); 
+            background: rgba(9, 13, 22, 0.9); 
+            backdrop-filter: blur(8px);
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
             z-index: 2000; padding: 20px; text-align: center;
         }
         .loader-spinner { 
-            width: 40px; height: 40px; border: 3px solid var(--border); 
+            width: 44px; height: 44px; border: 3px solid var(--border); 
             border-top: 3px solid var(--accent-primary); border-radius: 50%; 
-            animation: spin 1s linear infinite; margin-bottom: 16px; 
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; margin-bottom: 16px; 
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Headers & Typography */
-        .header { text-align: center; margin-bottom: 32px; width: 100%; max-width: 500px; }
-        .header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); margin-bottom: 6px; }
-        .header p { font-size: 0.9rem; color: var(--text-muted); font-weight: 400; }
+        .header { text-align: center; margin-bottom: 32px; width: 100%; max-width: 480px; }
+        .header h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text-main); margin-bottom: 8px; }
+        .header p { font-size: 0.925rem; color: var(--text-muted); font-weight: 500; }
 
         /* Container & Cards */
-        .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 24px; }
+        .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 24px; }
         
         .card { 
-            background: var(--bg-surface); padding: 32px 24px; 
-            border-radius: var(--radius-xl); border: 1px solid var(--border); 
-            text-align: center; width: 100%;
+            background: var(--bg-surface); 
+            padding: 32px 24px; 
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--border); 
+            text-align: center; 
+            width: 100%;
+            box-shadow: var(--shadow-subtle);
         }
 
-        .welcome-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
-        .welcome-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 24px; }
+        .welcome-card h2 { font-size: 1.625rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.01em; }
+        .welcome-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 28px; }
 
-        /* Top Bar */
+        /* Top Bar & Stats */
         .stats-bar { 
             display: flex; justify-content: space-between; align-items: center; 
             padding-bottom: 16px; border-bottom: 1px solid var(--border);
             font-size: 0.9rem; font-weight: 600; color: var(--text-muted);
         }
-        .stats-bar span { color: var(--text-main); font-weight: 700; margin-left: 4px; }
+        .stats-bar span { color: var(--text-main); font-weight: 700; }
 
         .btn-home { 
-            background: transparent; color: var(--text-muted); border: none; 
-            font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: color 0.2s; 
-            display: flex; align-items: center; gap: 6px;
+            background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); 
+            font-size: 0.85rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: var(--radius-md);
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
         }
-        .btn-home:hover { color: var(--text-main); }
+        .btn-home:hover { color: var(--text-main); background: var(--border); }
+        .btn-home:active { transform: scale(0.96); }
 
-        /* Categories / Filters */
+        /* Categories Scroller */
         .scroll-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
         .scroll-container::-webkit-scrollbar { display: none; }
         
         .filter-btn { 
-            background: var(--bg-elevated); color: var(--text-main); border: 1px solid transparent; 
-            padding: 8px 16px; border-radius: 24px; cursor: pointer; font-size: 0.85rem; 
-            font-weight: 500; white-space: nowrap; transition: all 0.2s; 
+            background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); 
+            padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; 
+            font-weight: 600; white-space: nowrap; transition: all 0.2s ease; 
         }
-        .filter-btn:hover { background: #333; }
-        .cat-btn.active { background: var(--text-main); color: var(--bg-base); font-weight: 600; }
+        .filter-btn:hover { border-color: var(--text-muted); color: var(--text-main); }
+        .filter-btn.active { background: var(--accent-primary); color: #fff; border-color: var(--accent-primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
 
         /* Play Area & Timeline */
-        .level-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+        .level-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
         
         .timeline-container { 
             display: flex; height: 6px; background: transparent; 
-            gap: 4px; margin-bottom: 24px;
+            gap: 6px; margin-bottom: 28px;
         }
-        .timeline-segment { background: var(--border); height: 100%; border-radius: 2px; flex: 1; transition: background 0.3s ease; }
-        .timeline-segment.active { background: var(--accent-primary); }
+        .timeline-segment { background: var(--border); height: 100%; border-radius: 3px; flex: 1; transition: background 0.3s ease; }
+        .timeline-segment.active { background: var(--accent-primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); }
 
-        .play-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
+        .play-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 28px; }
         .btn-play { 
-            width: 72px; height: 72px; border-radius: 50%; background: var(--accent-primary); 
+            width: 80px; height: 80px; border-radius: 50%; background: var(--accent-primary); 
             border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            transition: transform 0.1s ease, background 0.2s; color: var(--bg-base);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); color: #fff;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
         }
-        .btn-play:hover { background: var(--accent-hover); transform: scale(1.05); }
-        .btn-play:active { transform: scale(0.95); }
-        .btn-play svg { width: 32px; height: 32px; fill: currentColor; margin-left: 4px; }
+        .btn-play:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 12px 24px rgba(99, 102, 241, 0.5); }
+        .btn-play:active { transform: scale(0.94); }
+        .btn-play svg { width: 34px; height: 34px; fill: currentColor; margin-left: 3px; }
         .btn-play.playing svg { display: none; }
-        .btn-play.playing::after { content: '||'; font-size: 24px; font-weight: 800; letter-spacing: -2px; margin-left: 0; }
+        .btn-play.playing::after { content: '❚❚'; font-size: 22px; font-weight: 800; letter-spacing: -2px; }
         
-        .duration-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 12px; font-weight: 500; }
+        .duration-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 14px; font-weight: 600; background: var(--bg-elevated); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
 
         /* Inputs & Search */
         .search-box { position: relative; margin-bottom: 16px; width: 100%; }
         .guess-input-field { 
-            width: 100%; padding: 16px; background: var(--bg-elevated); 
+            width: 100%; padding: 16px 18px; background: var(--bg-elevated); 
             border: 1px solid var(--border); border-radius: var(--radius-lg); 
-            color: var(--text-main); font-size: 1rem; outline: none; transition: border-color 0.2s; 
+            color: var(--text-main); font-size: 0.95rem; font-weight: 500; outline: none; transition: all 0.2s ease; 
         }
-        .guess-input-field:focus { border-color: var(--accent-primary); }
+        .guess-input-field:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
         
         .search-results { 
-            position: absolute; bottom: calc(100% + 8px); left: 0; right: 0; 
-            background: var(--bg-elevated); border: 1px solid var(--border); 
-            border-radius: var(--radius-lg); max-height: 200px; overflow-y: auto; 
-            z-index: 100; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            position: absolute; bottom: calc(100% + 6px); left: 0; right: 0; 
+            background: var(--bg-surface); border: 1px solid var(--border); 
+            border-radius: var(--radius-lg); max-height: 220px; overflow-y: auto; 
+            z-index: 100; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
         }
-        .search-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .search-item { padding: 12px 18px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.9rem; text-align: left; transition: background 0.15s; }
         .search-item:last-child { border-bottom: none; }
-        .search-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .search-item:hover { background: var(--bg-elevated); color: var(--accent-primary); font-weight: 600; }
 
         /* Action Buttons */
-        .action-row { display: flex; gap: 12px; }
+        .action-row { display: flex; gap: 12px; width: 100%; }
         .btn { 
-            padding: 16px; border-radius: var(--radius-lg); border: none; 
-            font-weight: 600; font-size: 0.95rem; cursor: pointer; flex: 1; 
-            transition: background 0.2s; text-align: center;
+            padding: 15px 20px; border-radius: var(--radius-lg); border: none; 
+            font-weight: 700; font-size: 0.95rem; cursor: pointer; flex: 1; 
+            transition: all 0.2s ease; text-align: center;
         }
-        .btn-skip { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
-        .btn-skip:hover { background: var(--bg-elevated); }
-        .btn-submit { background: var(--accent-primary); color: var(--bg-base); }
+        .btn:active { transform: scale(0.97); }
+        .btn-skip { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-skip:hover { background: var(--border); color: var(--text-main); }
+        .btn-submit { background: var(--accent-primary); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
         .btn-submit:hover { background: var(--accent-hover); }
 
         /* Result Card */
         .result-card img { 
-            width: 200px; height: 200px; border-radius: var(--radius-md); 
-            margin: 24px auto; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.4); 
-            display: block;
+            width: 180px; height: 180px; border-radius: var(--radius-lg); 
+            margin: 20px auto; object-fit: cover; box-shadow: 0 12px 30px rgba(0,0,0,0.5); 
+            display: block; border: 1px solid var(--border);
         }
-        .result-status { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-        .result-points { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
-        .result-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
-        .result-artist { color: var(--text-muted); font-size: 1rem; margin-bottom: 32px; }
+        .result-status { font-size: 1.35rem; font-weight: 800; letter-spacing: 0.025em; text-transform: uppercase; margin-bottom: 4px; }
+        .result-points { font-size: 0.95rem; font-weight: 700; color: var(--warning); margin-bottom: 16px; background: rgba(245, 158, 11, 0.1); padding: 4px 12px; border-radius: 20px; display: inline-block; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .result-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; color: var(--text-main); }
+        .result-artist { color: var(--text-muted); font-size: 0.95rem; font-weight: 500; margin-bottom: 28px; }
 
         .hidden { display: none !important; }
 
         /* Attempts List */
         .attempts-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
         .attempt-slot { 
-            height: 40px; background: transparent; border: 1px solid var(--border); 
+            height: 42px; background: var(--bg-elevated); border: 1px solid var(--border); 
             border-radius: var(--radius-md); display: flex; align-items: center; padding: 0 16px; 
-            font-size: 0.85rem; color: var(--text-muted); 
+            font-size: 0.85rem; font-weight: 500; color: var(--text-muted); 
         }
-        .attempt-slot.wrong, .attempt-slot.skipped { border-color: var(--danger); color: var(--danger); }
-        .attempt-slot.correct { border-color: var(--success); color: var(--success); background: rgba(30, 215, 96, 0.1); }
+        .attempt-slot.wrong { border-color: rgba(239, 68, 68, 0.5); color: var(--danger); background: rgba(239, 68, 68, 0.05); }
+        .attempt-slot.skipped { border-color: rgba(156, 163, 175, 0.4); color: var(--text-muted); background: rgba(156, 163, 175, 0.05); }
+        .attempt-slot.correct { border-color: var(--success); color: var(--success); background: rgba(16, 185, 129, 0.1); font-weight: 600; }
 
-        /* Cycle Modal */
-        .modal-content { background: var(--bg-surface); padding: 40px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; }
-        .score-box { background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 24px; margin: 24px 0; }
+        /* Modal Complete */
+        .modal-content { background: var(--bg-surface); padding: 36px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; box-shadow: var(--shadow-subtle); }
+        .score-box { background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 20px; margin: 24px 0; border: 1px solid var(--border); }
         
         @media (max-width: 480px) {
             body { padding: 20px 16px; }
-            .header h1 { font-size: 1.75rem; }
+            .header h1 { font-size: 1.85rem; }
         }
     </style>
 </head>
@@ -186,37 +204,37 @@
 
     <div id="loading-screen" class="hidden">
         <div class="loader-spinner"></div>
-        <p id="loading-text" style="color: var(--text-muted); font-size: 0.9rem;">Menyiapkan musik...</p>
+        <p id="loading-text" style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">Menyiapkan cuplikan musik...</p>
     </div>
 
     <div class="header">
-        <h1>Guess Lagu</h1>
-        <p>Uji pengetahuan musikmu dari era ke era.</p>
+        <h1>Harmoni</h1>
+        <p>Uji ketajaman telinga menebak lagu Indonesia lintas generasi.</p>
     </div>
 
     <div class="container">
         <!-- Welcome Screen -->
         <div id="welcome-screen" class="card welcome-card">
             <h2>Siap Bermain?</h2>
-            <p>Tebak judul lagu & musisi Indonesia legendaris secara interaktif. Dengarkan cuplikan intro dan tebak sebelum waktu habis.</p>
-            <button class="btn btn-submit" id="btn-start-game" style="width: 100%; border-radius: 24px;">Mulai Bermain</button>
+            <p>Dengarkan intro pendek, tebak judul atau penyanyi aslinya secepat mungkin sebelum durasi habis.</p>
+            <button class="btn btn-submit" id="btn-start-game" style="border-radius: var(--radius-lg);">Mulai Permainan</button>
         </div>
 
         <!-- Game Area -->
         <div id="game-area" class="hidden">
             <div class="stats-bar">
                 <button class="btn-home" id="btn-home">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     Menu
                 </button>
                 <div>
                     Skor: <span id="total-score">0</span>
-                    <span style="margin: 0 8px; color: var(--border);">|</span>
-                    Streak: <span id="streak-count" style="color: var(--accent-primary);">0</span>
+                    <span style="margin: 0 6px; color: var(--border);">|</span>
+                    Streak: <span id="streak-count" style="color: var(--warning);">0</span>
                 </div>
             </div>
 
-            <div style="margin: 20px 0;">
+            <div style="margin: 18px 0;">
                 <div class="scroll-container category-scroller">
                     <button class="filter-btn cat-btn active" data-cat="alltime">Semua Era</button>
                     <button class="filter-btn cat-btn" data-cat="90s">90an</button>
@@ -256,7 +274,7 @@
 
             <div class="search-box">
                 <div class="search-results" id="search-results"></div>
-                <input type="text" id="guess-input" class="guess-input-field" placeholder="Ketik judul atau musisi..." autocomplete="off">
+                <input type="text" id="guess-input" class="guess-input-field" placeholder="Ketik judul lagu atau musisi..." autocomplete="off">
             </div>
 
             <div class="action-row">
@@ -275,24 +293,24 @@
             <div id="song-title-res" class="result-title"></div>
             <div id="artist-res" class="result-artist"></div>
             
-            <button class="btn btn-submit" id="btn-next" style="width: 100%; border-radius: 24px;">Lanjut ➔</button>
+            <button class="btn btn-submit" id="btn-next" style="width: 100%; border-radius: var(--radius-lg);">Lanjut ➔</button>
         </div>
     </div>
     
     <!-- Complete Modal -->
     <div id="cycle-complete-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 8px;">Permainan Selesai</h2>
-            <p id="cycle-message" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+            <h2 style="font-size: 1.625rem; font-weight: 800; margin-bottom: 8px;">Sesi Selesai!</h2>
+            <p id="cycle-message" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;"></p>
             
             <div class="score-box">
-                <p style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Total Skor</p>
-                <div id="cycle-final-score" style="font-size: 3rem; font-weight: 800; color: var(--accent-primary);">0</div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700;">Total Skor Akhir</p>
+                <div id="cycle-final-score" style="font-size: 2.75rem; font-weight: 800; color: var(--accent-primary);">0</div>
             </div>
             
-            <div class="action-row" style="flex-direction: column; gap: 12px;">
-                <button class="btn btn-submit" id="btn-cycle-play" style="border-radius: 24px;">Main Lagi</button>
-                <button class="btn btn-skip" id="btn-cycle-menu" style="border-radius: 24px; border: none;">Menu Utama</button>
+            <div class="action-row" style="flex-direction: column; gap: 10px;">
+                <button class="btn btn-submit" id="btn-cycle-play" style="border-radius: var(--radius-lg);">Main Lagi</button>
+                <button class="btn btn-skip" id="btn-cycle-menu" style="border-radius: var(--radius-lg); border: none;">Menu Utama</button>
             </div>
         </div>
     </div>
@@ -302,7 +320,7 @@
     <script>
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         
-        // --- DATA LAGU (Tetap utuh 600+ lagu seperti aslinya) ---
+        // --- DATABASE LAGU (Lengkap 600+ lagu asli tanpa pengurangan) ---
         const localSongsDatabase = [
             // ERA 90s - Super Gampang (30)
             { title: "Dan", artist: "Sheila On 7", era: "90s", difficulty: "Super Gampang" },
@@ -926,7 +944,7 @@
             { title: "Muak", artist: "Aruma", era: "2020s", difficulty: "Susah Banget" }
         ];
 
-        // --- AUDIO / SFX (Tetap dipertahankan dengan nada minimalis) ---
+        // --- AUDIO & SFX ---
         let audioCtx = null;
         function initAudioContext() {
             if (!audioCtx) {
@@ -942,11 +960,11 @@
                 if (!audioCtx) return;
                 const now = audioCtx.currentTime;
                 if (type === 'start') {
-                    [261.63, 329.63].forEach((f, i) => playOscillator(f, now + i * 0.1, 0.2));
+                    [261.63, 329.63, 392.00].forEach((f, i) => playOscillator(f, now + i * 0.08, 0.15));
                 } else if (type === 'correct') {
-                    [659.25, 830.61, 1046.50].forEach((f, i) => playOscillator(f, now + i * 0.1, 0.3));
+                    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => playOscillator(f, now + i * 0.08, 0.25));
                 } else if (type === 'wrong') {
-                    playOscillator(150, now, 0.2, 'sawtooth');
+                    playOscillator(140, now, 0.2, 'sawtooth');
                 }
             } catch (e) { console.log(e); }
         }
@@ -956,13 +974,13 @@
             const gain = audioCtx.createGain();
             osc.type = type;
             osc.frequency.setValueAtTime(freq, time);
-            gain.gain.setValueAtTime(0.15, time);
+            gain.gain.setValueAtTime(0.1, time);
             gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.start(time); osc.stop(time + duration);
         }
 
-        // --- GAME LOGIC & COMPLETING THE CUT-OFF CODE ---
+        // --- GAME LOGIC ---
         let currentCategory = "alltime";
         let currentLevelIndex = 0; 
         let availableTracks = [];
@@ -983,7 +1001,7 @@
                 uniqueSearchDatabase.push({
                     title: song.title.trim(),
                     artist: song.artist.trim(),
-                    displayText: `${song.title.trim()} - ${song.artist.trim()}`
+                    displayText: `${song.title.trim()} — ${song.artist.trim()}`
                 });
             }
         });
@@ -1037,7 +1055,6 @@
             loadLevel();
         });
 
-        // Logic
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 let j = Math.floor(Math.random() * (i + 1));
@@ -1073,7 +1090,6 @@
             await loadLevel();
         }
 
-        // --- MELENGKAPI FUNGSI ITUNES FETCH YANG TERPOTONG ---
         async function fetchSongFromiTunes(title, artist) {
             try {
                 const query = `${title} ${artist}`;
@@ -1115,13 +1131,11 @@
                 audioPlayer.src = itunesData.previewUrl;
                 audioPlayer.load();
                 
-                // Gunakan canplaythrough agar yakin audio sudah siap
                 audioPlayer.oncanplaythrough = () => {
                     gameArea.classList.remove('hidden');
                     loadingScreen.classList.add('hidden');
                 };
                 
-                // Fallback timeout jika event gagal ter-trigger
                 setTimeout(() => {
                     if(!loadingScreen.classList.contains('hidden')) {
                         gameArea.classList.remove('hidden');
@@ -1130,7 +1144,6 @@
                 }, 1500);
 
             } else {
-                alert(`Lagu "${currentTrack.title}" tidak ditemukan di database online. Ganti lagu...`);
                 currentLevelIndex++;
                 loadLevel();
             }
@@ -1201,20 +1214,28 @@
             if (!guess) return;
 
             const isCorrect = guess.includes(currentTrack.title.toLowerCase()) || 
-                              `${currentTrack.title.toLowerCase()} - ${currentTrack.artist.toLowerCase()}` === guess;
+                              `${currentTrack.title.toLowerCase()} — ${currentTrack.artist.toLowerCase()}` === guess ||
+                              guess.includes(currentTrack.artist.toLowerCase());
 
             handleAttempt(isCorrect, guess);
         });
 
         document.getElementById('btn-skip').addEventListener('click', () => {
-            handleAttempt(false, "Lewati");
+            handleAttempt(false, "Dilewati (+1s)");
         });
 
         function handleAttempt(isCorrect, text) {
-            attemptsData[currentStepIndex] = { correct: isCorrect, text: text || 'Lewati' };
+            attemptsData[currentStepIndex] = { correct: isCorrect, text: text || 'Dilewati' };
             stopAudio();
             
             if (isCorrect) {
+                // Trigger confetti setiap kali benar menjawab
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#6366f1', '#10b981', '#f59e0b', '#ec4899']
+                });
                 revealAnswer(true);
             } else {
                 currentStepIndex++;
@@ -1226,7 +1247,7 @@
                     revealAnswer(false);
                 } else {
                     document.getElementById('duration-info').textContent = `Cuplikan: ${STEPS[currentStepIndex]} Detik`;
-                    playAudioSegment(); // Auto-play cuplikan selanjutnya
+                    playAudioSegment();
                 }
             }
         }
@@ -1244,7 +1265,7 @@
                 slot.className = 'attempt-slot';
                 if (attemptsData[idx]) {
                     slot.textContent = attemptsData[idx].text;
-                    slot.classList.add(attemptsData[idx].correct ? 'correct' : (attemptsData[idx].text === 'Lewati' ? 'skipped' : 'wrong'));
+                    slot.classList.add(attemptsData[idx].correct ? 'correct' : (attemptsData[idx].text.includes('Dilewati') ? 'skipped' : 'wrong'));
                 } else {
                     slot.textContent = '';
                 }
@@ -1257,7 +1278,7 @@
             resultCard.classList.remove('hidden');
             
             const resTitle = document.getElementById('result-title');
-            resTitle.textContent = isCorrect ? "BENAR!" : "SAYANG SEKALI";
+            resTitle.textContent = isCorrect ? "TEPAT SEKALI!" : "WAKTU HABIS";
             resTitle.style.color = isCorrect ? "var(--success)" : "var(--danger)";
             
             if (isCorrect) {
@@ -1276,16 +1297,14 @@
             
             document.getElementById('song-title-res').textContent = currentTrack.title;
             document.getElementById('artist-res').textContent = currentTrack.artist;
-            document.getElementById('album-cover').src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMjQyNDI0Ii8+PC9zdmc+'; // Placeholder abu-abu bersih
+            document.getElementById('album-cover').src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMWYyOTM3Ii8+PC9zdmc+';
             
-            // Fetch High-Res Artwork
             fetchSongFromiTunes(currentTrack.title, currentTrack.artist).then(data => {
                 if(data && data.artworkUrl100) {
-                    document.getElementById('album-cover').src = data.artworkUrl100.replace('100x100bb', '300x300bb');
+                    document.getElementById('album-cover').src = data.artworkUrl100.replace('100x100bb', '400x400bb');
                 }
             });
 
-            // Putar audio secara penuh pas reveal
             setTimeout(() => {
                 audioPlayer.currentTime = 0;
                 audioPlayer.play().catch(e => console.log("Autoplay blocked:", e));
@@ -1300,15 +1319,13 @@
             document.getElementById('cycle-final-score').textContent = score;
             
             let message = "";
-            if (score > 2000) message = "Luar biasa! Pengetahuan musikmu setingkat dewa.";
-            else if (score > 1000) message = "Hebat! Kamu cukup update dengan musik lintas generasi.";
-            else message = "Not bad. Tapi kamu butuh dengerin lebih banyak lagu lagi.";
+            if (score > 2000) message = "Luar biasa! Telinga musikal Anda sangat tajam dan berkelas.";
+            else if (score > 1000) message = "Hebat! Anda cukup menguasai khazanah musik Indonesia.";
+            else message = "Cukup baik! Terus latih kepekaan musik Anda.";
             
             document.getElementById('cycle-message').textContent = message;
             
-            if (score > 1500) {
-                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-            }
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
         }
     </script>
 </body>
