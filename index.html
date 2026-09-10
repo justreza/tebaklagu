@@ -105,6 +105,16 @@
             flex-direction: column;
             gap: 20px;
             position: relative;
+            overflow: hidden;
+        }
+
+        .main-card > div {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* WELCOME SCREEN */
@@ -125,16 +135,17 @@
             background: var(--bg-elevated);
             color: var(--text-muted);
             border: 1px solid var(--border);
-            padding: 7px 14px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .cat-chip:hover { border-color: var(--border-hover); color: var(--text-main); }
-        .cat-chip.active { background: var(--text-main); color: var(--bg-base); border-color: var(--text-main); font-weight: 700; }
+        .cat-chip:hover { border-color: var(--border-hover); color: var(--text-main); transform: translateY(-1px); }
+        .cat-chip:active { transform: translateY(0); }
+        .cat-chip.active { background: var(--text-main); color: var(--bg-base); border-color: var(--text-main); font-weight: 700; box-shadow: 0 4px 12px rgba(255,255,255,0.15); }
 
         /* GAME HEADERS & PROGRESS */
         .level-header {
@@ -158,9 +169,9 @@
             flex: 1;
             background: var(--bg-elevated);
             border-radius: 4px;
-            transition: background 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .timeline-step.active { background: var(--accent-cyan); box-shadow: 0 0 8px rgba(56, 189, 248, 0.4); }
+        .timeline-step.active { background: var(--accent-cyan); box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
         .timeline-step.passed { background: rgba(255, 255, 255, 0.25); }
 
         /* ATTEMPTS LIST */
@@ -176,9 +187,9 @@
             font-size: 0.88rem;
             color: var(--text-muted);
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .attempt-item.wrong { border-color: rgba(244, 63, 94, 0.4); color: var(--danger); background: rgba(244, 63, 94, 0.08); }
+        .attempt-item.wrong { border-color: rgba(244, 63, 94, 0.4); color: var(--danger); background: rgba(244, 63, 94, 0.08); transform: translateX(2px); }
         .attempt-item.skipped { border-color: rgba(148, 163, 184, 0.3); color: var(--text-muted); background: rgba(255, 255, 255, 0.03); }
         .attempt-item.correct { border-color: var(--accent-green); color: var(--accent-green); font-weight: 700; background: rgba(16, 185, 129, 0.1); }
 
@@ -196,8 +207,8 @@
             position: relative;
         }
         .btn-play-circle {
-            width: 64px;
-            height: 64px;
+            width: 68px;
+            height: 68px;
             border-radius: 50%;
             background: var(--accent-green);
             border: none;
@@ -206,11 +217,11 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 6px 20px var(--accent-green-glow);
-            transition: transform 0.15s ease, background 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .btn-play-circle:hover { transform: scale(1.05); }
-        .btn-play-circle:active { transform: scale(0.95); }
-        .btn-play-circle svg { width: 26px; height: 26px; fill: #0b0f19; margin-left: 3px; }
+        .btn-play-circle:hover { transform: scale(1.08); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); }
+        .btn-play-circle:active { transform: scale(0.92); }
+        .btn-play-circle svg { width: 28px; height: 28px; fill: #0b0f19; margin-left: 3px; transition: transform 0.2s; }
         .btn-play-circle.playing svg { margin-left: 0; }
 
         .audio-status {
@@ -234,23 +245,24 @@
             font-size: 0.95rem;
             font-weight: 500;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
-        .input-guess:focus { border-color: var(--accent-green); }
+        .input-guess:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
 
         .dropdown-results {
             position: absolute;
             bottom: calc(100% + 6px);
             left: 0;
             right: 0;
-            background: var(--bg-elevated);
+            background: var(--bg-surface);
             border: 1px solid var(--border-hover);
             border-radius: var(--radius-lg);
             max-height: 220px;
             overflow-y: auto;
             z-index: 100;
             display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
         }
         .dropdown-item {
             padding: 12px 16px;
@@ -258,9 +270,10 @@
             border-bottom: 1px solid var(--border);
             font-size: 0.88rem;
             color: var(--text-main);
-            transition: background 0.15s;
+            transition: background 0.15s ease;
         }
-        .dropdown-item:hover { background: rgba(255, 255, 255, 0.08); }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: rgba(255, 255, 255, 0.08); color: var(--accent-green); }
 
         /* BUTTONS */
         .action-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; }
@@ -271,17 +284,19 @@
             font-weight: 700;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
+            user-select: none;
         }
-        .btn:active { transform: scale(0.98); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        .btn:active { transform: translateY(1px) scale(0.98); box-shadow: none; }
         .btn-secondary { background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border); }
-        .btn-secondary:hover { border-color: var(--border-hover); }
+        .btn-secondary:hover { border-color: var(--border-hover); background: #26324d; }
         .btn-primary { background: var(--accent-green); color: #0b0f19; font-weight: 800; }
-        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:hover { background: #12cc8f; }
 
         /* RESULT CARD */
         .result-box { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
@@ -292,7 +307,9 @@
             object-fit: cover;
             border: 1px solid var(--border);
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .artwork-img:hover { transform: scale(1.04); }
         .song-info h2 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
         .song-info p { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
 
@@ -316,6 +333,7 @@
             max-width: 420px;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* LOADING OVERLAY */
@@ -429,7 +447,7 @@
             </div>
 
             <div class="action-grid">
-                <button class="btn btn-secondary" id="btn-skip">Lewati (+1s)</button>
+                <button class="btn btn-secondary" id="btn-skip">Lewati (+0.5s)</button>
                 <button class="btn btn-primary" id="btn-submit">Tebak Sekarang</button>
             </div>
         </div>
@@ -447,7 +465,7 @@
             </div>
 
             <button class="btn btn-secondary" id="btn-preview-audio" style="width: 100%; gap: 8px;">
-                <span id="preview-btn-icon">▶</span> Putar Sampel Lagu Penuh (30s)
+                <span id="preview-btn-icon">⏸</span> Hentikan Sampel Lagu (30s)
             </button>
 
             <button class="btn btn-primary" id="btn-next" style="width: 100%; margin-top: 8px;">Lanjut ke Tahap Berikutnya ➔</button>
@@ -480,7 +498,7 @@
         const LEVEL_NAMES = ["Super Gampang", "Gampang", "Sedang", "Susah", "Susah Banget"];
         
         // -------------------------------------------------------------------------
-        // DATABASE LOKAL LENGKAP (600+ LAGU UTUH)
+        // DATABASE LOKAL LENGKAP (600+ LAGU UTUH INDONESIA)
         // -------------------------------------------------------------------------
         const localSongsDatabase = [
             // ERA 90s - Super Gampang (30)
@@ -1245,6 +1263,8 @@
         const btnPlay = document.getElementById('btn-play');
         const playIcon = document.getElementById('play-icon');
         const btnPreviewAudio = document.getElementById('btn-preview-audio');
+        const btnSkip = document.getElementById('btn-skip');
+        const btnSubmit = document.getElementById('btn-submit');
 
         // Setup Event Listeners
         document.getElementById('btn-start-game').addEventListener('click', () => { 
@@ -1276,311 +1296,371 @@
         });
 
         btnPlay.addEventListener('click', togglePlaySnippet);
-        document.getElementById('btn-skip').addEventListener('click', handleSkip);
-        document.getElementById('btn-submit').addEventListener('click', handleSubmitGuess);
-        document.getElementById('btn-next').addEventListener('click', handleNextStage);
-        btnPreviewAudio.addEventListener('click', togglePreviewAudio);
+        btnSkip.addEventListener('click', handleSkip);
+        btnSubmit.addEventListener('click', () => handleSubmitGuess(guessInput.value));
 
-        // Auto-complete input search
         guessInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (query.length < 1) {
+            const val = e.target.value.trim().toLowerCase();
+            if (val.length < 1) {
                 searchResults.style.display = 'none';
                 return;
             }
-            const matches = uniqueSearchDatabase.filter(s => s.displayText.toLowerCase().includes(query)).slice(0, 6);
+
+            const matches = uniqueSearchDatabase.filter(item => 
+                item.title.toLowerCase().includes(val) || 
+                item.artist.toLowerCase().includes(val) ||
+                item.displayText.toLowerCase().includes(val)
+            ).slice(0, 8);
+
             if (matches.length > 0) {
-                searchResults.innerHTML = matches.map(m => `<div class="dropdown-item" data-val="${m.displayText}">${m.displayText}</div>`).join('');
+                searchResults.innerHTML = matches.map(m => `
+                    <div class="dropdown-item" data-val="${m.displayText}">${m.displayText}</div>
+                `).join('');
                 searchResults.style.display = 'block';
-                searchResults.querySelectorAll('.dropdown-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        guessInput.value = item.getAttribute('data-val');
-                        searchResults.style.display = 'none';
-                    });
-                });
             } else {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        searchResults.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dropdown-item')) {
+                guessInput.value = e.target.getAttribute('data-val');
                 searchResults.style.display = 'none';
             }
         });
 
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-wrapper')) searchResults.style.display = 'none';
+            if (!e.target.closest('.search-wrapper')) {
+                searchResults.style.display = 'none';
+            }
         });
+
+        guessInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                searchResults.style.display = 'none';
+                handleSubmitGuess(guessInput.value);
+            }
+        });
+
+        btnPreviewAudio.addEventListener('click', togglePreviewAudio);
+        document.getElementById('btn-next').addEventListener('click', () => {
+            stopAudio();
+            currentLevelIndex++;
+            if (currentLevelIndex < 5) {
+                loadLevel(currentLevelIndex);
+            } else {
+                showCycleCompleteModal();
+            }
+        });
+
+        // Functions Implementation
+        function updateHeaderUI() {
+            document.getElementById('total-score').textContent = score;
+            document.getElementById('streak-count').textContent = `${streak} 🔥`;
+        }
 
         function resetToMenu() {
             stopAudio();
+            cycleCompleteModal.classList.add('hidden');
             gameArea.classList.add('hidden');
             resultCard.classList.add('hidden');
-            cycleCompleteModal.classList.add('hidden');
             welcomeScreen.classList.remove('hidden');
-        }
-
-        function updateHeaderUI() {
-            document.getElementById('total-score').innerText = score;
-            document.getElementById('streak-count').innerText = `${streak} 🔥`;
+            score = 0;
+            streak = 0;
+            updateHeaderUI();
         }
 
         function startGameSession() {
             currentLevelIndex = 0;
-            loadLevelTrack();
+            loadLevel(currentLevelIndex);
         }
 
-        // FETCH ITUNES PREVIEW WITH RETRY & FALLBACK
-        async function fetchiTunesPreview(title, artist) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 6000);
-
+        // Kunci Pencarian Murni iTunes Indonesia
+        async function fetchTrackFromItunes(title, artist) {
             try {
                 const query = encodeURIComponent(`${title} ${artist}`);
-                const url = `https://itunes.apple.com/search?term=${query}&country=ID&media=music&limit=1`;
-                const res = await fetch(url, { signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                if (!res.ok) return null;
+                const url = `https://itunes.apple.com/search?term=${query}&media=music&entity=song&country=ID&limit=10`;
+                const res = await fetch(url);
                 const data = await res.json();
-                if (data.results && data.results.length > 0 && data.results[0].previewUrl) {
-                    const item = data.results[0];
-                    return {
-                        previewUrl: item.previewUrl,
-                        artwork: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '600x600bb') : 'https://via.placeholder.com/300?text=No+Cover',
-                        title: item.trackName || title,
-                        artist: item.artistName || artist
-                    };
+                
+                if (data.results && data.results.length > 0) {
+                    const match = data.results.find(r => r.previewUrl && r.previewUrl.length > 0);
+                    if (match) return match;
+                    return data.results[0];
                 }
             } catch (e) {
-                console.log("Fetch iTunes error:", e);
+                console.error("iTunes fetch error:", e);
             }
             return null;
         }
 
-        async function loadLevelTrack(retryCount = 0) {
-            stopAudio();
-            showLoading(true, retryCount > 0 ? "Mencari lagu sampel berikutnya..." : "Menyiapkan lagu...");
+        async function loadLevel(levelIdx) {
+            resultCard.classList.add('hidden');
+            loadingScreen.classList.remove('hidden');
+            gameArea.classList.add('hidden');
 
-            const targetDifficulty = LEVEL_NAMES[currentLevelIndex];
-            let pool = localSongsDatabase.filter(s => s.difficulty === targetDifficulty);
+            const diffName = LEVEL_NAMES[levelIdx];
+            document.getElementById('current-level-name').textContent = diffName;
+            document.getElementById('level-counter').textContent = `Tahap ${levelIdx + 1} / 5`;
 
+            let candidates = localSongsDatabase.filter(s => s.difficulty === diffName);
             if (currentCategory !== "alltime" && currentCategory !== "random") {
-                const catFiltered = pool.filter(s => s.era === currentCategory);
-                if (catFiltered.length > 0) pool = catFiltered;
+                const filtered = candidates.filter(s => s.era === currentCategory);
+                if (filtered.length > 0) candidates = filtered;
             }
 
-            if (pool.length === 0) pool = localSongsDatabase;
+            let foundTrack = null;
+            let selectedLocalSong = null;
+            let attempts = 0;
 
-            // Pick random track
-            const randomPick = pool[Math.floor(Math.random() * pool.length)];
-            let previewData = await fetchiTunesPreview(randomPick.title, randomPick.artist);
-
-            // Retry logic if previewUrl missing (max 3 retries)
-            if (!previewData && retryCount < 3) {
-                return loadLevelTrack(retryCount + 1);
+            while (!foundTrack && attempts < 8) {
+                attempts++;
+                const randomIndex = Math.floor(Math.random() * candidates.length);
+                selectedLocalSong = candidates[randomIndex];
+                const trackData = await fetchTrackFromItunes(selectedLocalSong.title, selectedLocalSong.artist);
+                if (trackData && trackData.previewUrl) {
+                    foundTrack = {
+                        title: selectedLocalSong.title,
+                        artist: selectedLocalSong.artist,
+                        artworkUrl100: trackData.artworkUrl100,
+                        previewUrl: trackData.previewUrl
+                    };
+                }
             }
 
-            // Fallback if still null
-            if (!previewData) {
-                previewData = {
-                    previewUrl: "",
-                    artwork: "https://via.placeholder.com/300?text=Music",
-                    title: randomPick.title,
-                    artist: randomPick.artist
+            if (!foundTrack) {
+                foundTrack = {
+                    title: selectedLocalSong ? selectedLocalSong.title : "Dan",
+                    artist: selectedLocalSong ? selectedLocalSong.artist : "Sheila On 7",
+                    artworkUrl100: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/bf/2d/4e/bf2d4e8c-8be9-c3d3-7d24-34063624e5ef/mzi.xbfgllyq.jpg/100x100bb.jpg",
+                    previewUrl: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/8f/33/2d/8f332d73-2e21-0d32-23b6-d24933a39eef/mzaf_16238833890251786523.plus.aac.p.m4a"
                 };
             }
 
-            currentTrack = { ...randomPick, ...previewData };
+            currentTrack = foundTrack;
             currentStepIndex = 0;
             attemptsData = [];
+            
+            resetGameUI();
+            loadingScreen.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            audioPlayer.src = currentTrack.previewUrl;
+            audioPlayer.load();
+        }
 
-            // Update UI
-            document.getElementById('current-level-name').innerText = targetDifficulty;
-            document.getElementById('level-counter').innerText = `Tahap ${currentLevelIndex + 1} / 5`;
+        function resetGameUI() {
             guessInput.value = '';
             searchResults.style.display = 'none';
-
-            renderTimeline();
-            renderAttempts();
-            updateDurationLabel();
-
-            // Set audio source
-            if (currentTrack.previewUrl) {
-                audioPlayer.src = currentTrack.previewUrl;
-                audioPlayer.load();
-            }
-
-            showLoading(false);
-            resultCard.classList.add('hidden');
-            gameArea.classList.remove('hidden');
+            updateTimelineUI();
+            updateAttemptsUI();
+            updateSkipButtonText();
+            updateDurationInfoText();
+            btnPlay.classList.remove('playing');
+            playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
         }
 
-        function showLoading(show, text = "Memuat...") {
-            document.getElementById('loading-text').innerText = text;
-            if (show) loadingScreen.classList.remove('hidden');
-            else loadingScreen.classList.add('hidden');
-        }
-
-        function renderTimeline() {
+        function updateTimelineUI() {
             const steps = timeline.querySelectorAll('.timeline-step');
             steps.forEach((step, idx) => {
                 step.className = 'timeline-step';
-                if (idx < currentStepIndex) step.classList.add('passed');
-                else if (idx === currentStepIndex) step.classList.add('active');
-            });
-        }
-
-        function renderAttempts() {
-            const items = attemptsList.querySelectorAll('.attempt-item');
-            items.forEach((item, idx) => {
-                if (idx < attemptsData.length) {
-                    const data = attemptsData[idx];
-                    item.innerText = `${idx + 1}. ${data.text}`;
-                    item.className = `attempt-item ${data.type}`;
+                if (idx < currentStepIndex) {
+                    step.classList.add('passed');
                 } else if (idx === currentStepIndex) {
-                    item.innerText = `${idx + 1}. ...`;
-                    item.className = 'attempt-item';
-                    item.style.borderColor = 'var(--accent-cyan)';
-                } else {
-                    item.innerText = `${idx + 1}.`;
-                    item.className = 'attempt-item';
-                    item.style.borderColor = 'var(--border)';
+                    step.classList.add('active');
                 }
             });
         }
 
-        function updateDurationLabel() {
-            durationInfo.innerText = `Dengarkan Musik: ${STEPS[currentStepIndex]} Detik`;
+        function updateAttemptsUI() {
+            const items = attemptsList.querySelectorAll('.attempt-item');
+            items.forEach((item, idx) => {
+                if (idx < attemptsData.length) {
+                    const data = attemptsData[idx];
+                    item.className = `attempt-item ${data.type}`;
+                    item.textContent = `${idx + 1}. ${data.text}`;
+                } else {
+                    item.className = 'attempt-item';
+                    item.textContent = `${idx + 1}.`;
+                }
+            });
         }
 
-        function togglePlaySnippet() {
-            if (isSnippetPlaying) {
-                stopAudio();
+        function updateSkipButtonText() {
+            if (currentStepIndex < STEPS.length - 1) {
+                const nextStep = STEPS[currentStepIndex + 1];
+                const currentStep = STEPS[currentStepIndex];
+                const diff = Math.round((nextStep - currentStep) * 10) / 10;
+                btnSkip.textContent = `Lewati (+${diff}s)`;
             } else {
-                playSnippet();
+                btnSkip.textContent = `Buka Jawaban`;
             }
         }
 
-        function playSnippet() {
-            if (!currentTrack || !currentTrack.previewUrl) return;
-            initAudioContext();
-            stopAudio();
-
-            audioPlayer.currentTime = 0;
-            audioPlayer.play().then(() => {
-                isSnippetPlaying = true;
-                btnPlay.style.background = 'var(--accent-cyan)';
-                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // pause icon
-                
-                audioTimeout = setTimeout(() => {
-                    stopAudio();
-                }, STEPS[currentStepIndex] * 1000);
-            }).catch(e => {
-                console.log("Audio playback error:", e);
-                stopAudio();
-            });
+        function updateDurationInfoText() {
+            durationInfo.textContent = `Dengarkan Musik: ${STEPS[currentStepIndex]} Detik`;
         }
 
         function stopAudio() {
             if (audioTimeout) clearTimeout(audioTimeout);
             audioPlayer.pause();
+            audioPlayer.currentTime = 0;
             isSnippetPlaying = false;
             isPreviewPlaying = false;
-            btnPlay.style.background = 'var(--accent-green)';
-            playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // play icon
-            btnPreviewAudio.innerText = "▶ Putar Sampel Lagu Penuh (30s)";
+            btnPlay.classList.remove('playing');
+            playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
         }
 
-        function togglePreviewAudio() {
-            if (isPreviewPlaying) {
+        function togglePlaySnippet() {
+            initAudioContext();
+            if (isSnippetPlaying) {
                 stopAudio();
             } else {
-                if (!currentTrack || !currentTrack.previewUrl) return;
-                initAudioContext();
-                stopAudio();
                 audioPlayer.currentTime = 0;
                 audioPlayer.play().then(() => {
-                    isPreviewPlaying = true;
-                    btnPreviewAudio.innerText = "⏸ Hentikan Pemutaran Lagu";
-                }).catch(e => console.log("Preview error:", e));
+                    isSnippetPlaying = true;
+                    btnPlay.classList.add('playing');
+                    playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                    
+                    const durationMs = STEPS[currentStepIndex] * 1000;
+                    audioTimeout = setTimeout(() => {
+                        audioPlayer.pause();
+                        isSnippetPlaying = false;
+                        btnPlay.classList.remove('playing');
+                        playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                    }, durationMs);
+                }).catch(e => console.log("Play blocked:", e));
             }
         }
 
         function handleSkip() {
-            playSfx('wrong');
+            stopAudio();
             attemptsData.push({ type: 'skipped', text: 'Dilewati' });
-            advanceStep();
-        }
+            updateAttemptsUI();
 
-        function handleSubmitGuess() {
-            const val = guessInput.value.trim();
-            if (!val) return;
-
-            const cleanVal = val.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const cleanTitle = currentTrack.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const cleanArtist = currentTrack.artist.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-            const isTitleMatch = cleanVal.includes(cleanTitle) || cleanTitle.includes(cleanVal);
-            const isArtistMatch = cleanVal.includes(cleanArtist);
-
-            if (isTitleMatch || (cleanVal.length > 3 && isArtistMatch)) {
-                // CORRECT GUESS
-                playSfx('correct');
-                const points = (5 - currentStepIndex) * 20;
-                score += points;
-                streak++;
-                updateHeaderUI();
-                
-                attemptsData.push({ type: 'correct', text: `${currentTrack.title} - ${currentTrack.artist}` });
-                confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
-                revealResult(true, points);
+            if (currentStepIndex < STEPS.length - 1) {
+                currentStepIndex++;
+                updateTimelineUI();
+                updateSkipButtonText();
+                updateDurationInfoText();
             } else {
-                // WRONG GUESS
-                playSfx('wrong');
-                attemptsData.push({ type: 'wrong', text: val });
-                guessInput.value = '';
-                advanceStep();
-            }
-        }
-
-        function advanceStep() {
-            currentStepIndex++;
-            if (currentStepIndex >= STEPS.length) {
-                // Game Over for this round
                 streak = 0;
                 updateHeaderUI();
-                revealResult(false, 0);
-            } else {
-                renderTimeline();
-                renderAttempts();
-                updateDurationLabel();
+                showResultCard(false, 0);
             }
         }
 
-        function revealResult(isCorrect, pointsEarned) {
+        function handleSubmitGuess(text) {
+            const userInput = text.trim();
+            if (!userInput) return;
+
             stopAudio();
+            const cleanUser = userInput.toLowerCase();
+            const cleanTitle = currentTrack.title.toLowerCase();
+            const cleanArtist = currentTrack.artist.toLowerCase();
+
+            const isCorrect = cleanUser.includes(cleanTitle) || 
+                              cleanTitle.includes(cleanUser) || 
+                              (cleanUser.includes(cleanArtist) && cleanUser.length > 3);
+
+            if (isCorrect) {
+                playSfx('correct');
+                attemptsData.push({ type: 'correct', text: userInput });
+                updateAttemptsUI();
+
+                const pointsMap = [100, 80, 60, 40, 20];
+                const earned = pointsMap[currentStepIndex] || 20;
+                score += earned;
+                streak++;
+                updateHeaderUI();
+
+                try {
+                    confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+                } catch(e){}
+
+                showResultCard(true, earned);
+            } else {
+                playSfx('wrong');
+                attemptsData.push({ type: 'wrong', text: userInput });
+                updateAttemptsUI();
+                guessInput.value = '';
+
+                if (currentStepIndex < STEPS.length - 1) {
+                    currentStepIndex++;
+                    updateTimelineUI();
+                    updateSkipButtonText();
+                    updateDurationInfoText();
+                } else {
+                    streak = 0;
+                    updateHeaderUI();
+                    showResultCard(false, 0);
+                }
+            }
+        }
+
+        // Fitur Reveal Auto-play Musik Langsung Putar
+        function showResultCard(isCorrect, points) {
             gameArea.classList.add('hidden');
             resultCard.classList.remove('hidden');
 
-            document.getElementById('result-title').innerText = isCorrect ? "TEBAKAN BENAR! 🎉" : "SAYANG SEKALI! 😢";
-            document.getElementById('result-title').style.color = isCorrect ? "var(--accent-green)" : "var(--danger)";
-            document.getElementById('points-earned').innerText = isCorrect ? `+${pointsEarned} Poin Didapatkan` : "+0 Poin";
+            const resTitle = document.getElementById('result-title');
+            const pointsEarned = document.getElementById('points-earned');
+            
+            if (isCorrect) {
+                resTitle.textContent = "Jawabanmu Benar! 🎉";
+                resTitle.style.color = "var(--accent-green)";
+                pointsEarned.textContent = `+${points} Poin Berhasil Didapatkan!`;
+            } else {
+                resTitle.textContent = "Sayang Sekali! 😢";
+                resTitle.style.color = "var(--danger)";
+                pointsEarned.textContent = "Kesempatan habis! Lagu ini gagal ditebak.";
+            }
 
-            document.getElementById('album-cover').src = currentTrack.artwork;
-            document.getElementById('song-title-res').innerText = currentTrack.title;
-            document.getElementById('artist-res').innerText = currentTrack.artist;
+            document.getElementById('song-title-res').textContent = currentTrack.title;
+            document.getElementById('artist-res').textContent = currentTrack.artist;
+            
+            const highResArt = currentTrack.artworkUrl100 ? currentTrack.artworkUrl100.replace('100x100bb', '300x300bb') : '';
+            document.getElementById('album-cover').src = highResArt;
+
+            // OTOMATIS AUTO-PLAY REVEAL SAMPLE LAGU 30 DETIK
+            audioPlayer.src = currentTrack.previewUrl;
+            audioPlayer.currentTime = 0;
+            audioPlayer.play().then(() => {
+                isPreviewPlaying = true;
+                btnPreviewAudio.querySelector('#preview-btn-icon').textContent = '⏸';
+                btnPreviewAudio.childNodes[1].textContent = ' Hentikan Sampel Lagu (30s)';
+            }).catch(err => {
+                console.log("Auto-play blocked by browser policy:", err);
+                isPreviewPlaying = false;
+                btnPreviewAudio.querySelector('#preview-btn-icon').textContent = '▶';
+                btnPreviewAudio.childNodes[1].textContent = ' Putar Sampel Lagu Penuh (30s)';
+            });
         }
 
-        function handleNextStage() {
-            stopAudio();
-            currentLevelIndex++;
-            if (currentLevelIndex < 5) {
-                loadLevelTrack();
+        function togglePreviewAudio() {
+            initAudioContext();
+            if (isPreviewPlaying) {
+                audioPlayer.pause();
+                isPreviewPlaying = false;
+                btnPreviewAudio.querySelector('#preview-btn-icon').textContent = '▶';
+                btnPreviewAudio.childNodes[1].textContent = ' Putar Sampel Lagu Penuh (30s)';
             } else {
-                // CYCLE COMPLETED (5 STEPS DONE)
-                playSfx('complete');
-                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-                document.getElementById('cycle-final-score').innerText = score;
-                document.getElementById('cycle-message').innerText = `Selamat! Kamu berhasil menyelesaikan 5 tahap permainan dengan total skor ${score}.`;
-                resultCard.classList.add('hidden');
-                cycleCompleteModal.classList.remove('hidden');
+                audioPlayer.play().then(() => {
+                    isPreviewPlaying = true;
+                    btnPreviewAudio.querySelector('#preview-btn-icon').textContent = '⏸';
+                    btnPreviewAudio.childNodes[1].textContent = ' Hentikan Sampel Lagu (30s)';
+                }).catch(e => console.log("Preview play blocked:", e));
             }
+        }
+
+        function showCycleCompleteModal() {
+            playSfx('complete');
+            try {
+                confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+            } catch(e){}
+
+            document.getElementById('cycle-final-score').textContent = score;
+            document.getElementById('cycle-message').textContent = `Hebat! Kamu telah menyelesaikan 5 tahap permainan dengan perolehan total skor ${score}.`;
+            cycleCompleteModal.classList.remove('hidden');
         }
     </script>
 </body>
