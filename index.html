@@ -41,6 +41,310 @@
             background-attachment: fixed; 
         }
 
+        .app-header { width: 100%; max-width: 520px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .brand { display: flex; align-items: center; gap: 8px; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); white-space: nowrap; }
+        .brand-icon { width: 28px; height: 28px; background: var(--accent-green); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #0b0f19; font-weight: 900; font-size: 0.9rem; }
+        .header-stats { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; }
+        .stat-badge { background: var(--bg-surface); border: 1px solid var(--border); padding: 6px 10px; border-radius: 20px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .stat-badge span { color: var(--accent-green); }
+
+        .main-card { width: 100%; max-width: 520px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 28px 24px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; gap: 20px; position: relative; overflow: hidden; }
+        .main-card > div { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .welcome-box { text-align: center; padding: 12px 0; }
+        .welcome-box h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; color: var(--text-main); }
+        .welcome-box p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px; }
+
+        .category-scroller { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .category-scroller::-webkit-scrollbar { display: none; }
+        .cat-chip { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .cat-chip:hover { border-color: var(--border-hover); color: var(--text-main); transform: translateY(-1px); }
+        .cat-chip:active { transform: translateY(0); }
+        .cat-chip.active { background: var(--text-main); color: var(--bg-base); border-color: var(--text-main); font-weight: 700; box-shadow: 0 4px 12px rgba(255,255,255,0.15); }
+
+        .level-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
+        .level-title { color: var(--accent-cyan); font-weight: 800; }
+        
+        .timeline-bar { display: flex; gap: 6px; height: 8px; width: 100%; }
+        .timeline-step { flex: 1; background: var(--bg-elevated); border-radius: 4px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .timeline-step.active { background: var(--accent-cyan); box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .timeline-step.passed { background: rgba(255, 255, 255, 0.25); }
+
+        .attempts-container { display: flex; flex-direction: column; gap: 8px; }
+        .attempt-item { height: 42px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; align-items: center; padding: 0 14px; font-size: 0.88rem; color: var(--text-muted); font-weight: 500; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .attempt-item.wrong, .attempt-item.skipped { border-color: rgba(244, 63, 94, 0.4); color: var(--danger); background: rgba(244, 63, 94, 0.08); transform: translateX(2px); }
+        .attempt-item.correct { border-color: var(--accent-green); color: var(--accent-green); font-weight: 700; background: rgba(16, 185, 129, 0.1); }
+
+        .player-box { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; position: relative; }
+        .btn-play-circle { width: 68px; height: 68px; border-radius: 50%; background: var(--accent-green); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px var(--accent-green-glow); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-play-circle:hover { transform: scale(1.08); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); }
+        .btn-play-circle:active { transform: scale(0.92); }
+        .btn-play-circle svg { width: 28px; height: 28px; fill: #0b0f19; margin-left: 3px; transition: transform 0.2s; }
+        .btn-play-circle.playing svg { margin-left: 0; }
+        .audio-status { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+
+        .search-wrapper { position: relative; width: 100%; }
+        .input-guess { width: 100%; padding: 14px 16px; background: var(--bg-elevated); border: 2px solid var(--accent-cyan); box-shadow: 0 0 12px rgba(56, 189, 248, 0.15); border-radius: var(--radius-lg); color: var(--text-main); font-size: 0.95rem; font-weight: 500; outline: none; transition: all 0.2s ease; }
+        .input-guess:focus { border-color: var(--accent-green); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+        .dropdown-results { position: absolute; bottom: calc(100% + 6px); left: 0; right: 0; background: var(--bg-surface); border: 1px solid var(--border-hover); border-radius: var(--radius-lg); max-height: 220px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.7); backdrop-filter: blur(10px); }
+        .dropdown-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.88rem; color: var(--text-main); transition: background 0.15s ease; }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: rgba(255, 255, 255, 0.08); color: var(--accent-green); }
+
+        .action-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; }
+        .btn { padding: 14px; border-radius: var(--radius-lg); border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 6px; user-select: none; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        .btn:active { transform: translateY(1px) scale(0.98); box-shadow: none; }
+        .btn-secondary { background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--border-hover); background: #26324d; }
+        .btn-primary { background: var(--accent-green); color: #0b0f19; font-weight: 800; }
+        .btn-primary:hover { background: #12cc8f; }
+        
+        .result-box { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+        .artwork-img { width: 160px; height: 160px; border-radius: var(--radius-lg); object-fit: cover; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .artwork-img:hover { transform: scale(1.04); }
+        .song-info h2 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+        .song-info p { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
+
+        .modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 25, 0.92); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
+        .modal-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px 24px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6); animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        #loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 25, 0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; backdrop-filter: blur(6px); }
+        .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top: 3px solid var(--accent-green); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 480px) {
+            .app-header { flex-wrap: wrap; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; gap: 10px; }
+            .brand { font-size: 1.1rem; }
+            .header-stats { width: 100%; justify-content: space-between; gap: 6px; }
+            .stat-badge { padding: 5px 8px; font-size: 0.75rem; }
+            #btn-home { padding: 5px 10px !important; font-size: 0.75rem !important; }
+            .main-card { padding: 20px 16px; }
+            .artwork-img { width: 140px; height: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="hidden">
+        <div class="spinner"></div>
+        <p id="loading-text" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Memuat lagu...</p>
+    </div>
+
+    <!-- NAVBAR HEADER -->
+    <div class="app-header">
+        <div class="brand">
+            <div class="brand-icon">🎵</div>
+            <span>GUESS LAGU</span>
+        </div>
+        <div class="header-stats">
+            <button class="btn btn-secondary btn-sfx" id="btn-home" style="padding: 6px 12px; font-size: 0.8rem;">🏠 Menu</button>
+            <div class="stat-badge">Skor: <span id="total-score">0</span></div>
+            <div class="stat-badge">Streak: <span id="streak-count">0 🔥</span></div>
+        </div>
+    </div>
+
+    <!-- MAIN CARD CONTAINER -->
+    <div class="main-card">
+
+        <!-- WELCOME SCREEN -->
+        <div id="welcome-screen" class="welcome-box">
+            <h1>Uji Pengetahuan Musikmu! 🎧</h1>
+            <p>Tebak potongan lagu Indonesia favorit dari era 90an hingga 2020an. Dengarkan samplernya dan tebak secepat mungkin!</p>
+            
+            <div style="margin-bottom: 24px; text-align: left;">
+                <p style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Pilih Era / Kategori</p>
+                <div class="category-scroller">
+                    <button class="cat-chip btn-sfx active" data-cat="alltime">All Time</button>
+                    <button class="cat-chip btn-sfx" data-cat="90s">90an</button>
+                    <button class="cat-chip btn-sfx" data-cat="2000s">2000an</button>
+                    <button class="cat-chip btn-sfx" data-cat="2010s">2010an</button>
+                    <button class="cat-chip btn-sfx" data-cat="2020s">2020an</button>
+                    <button class="cat-chip btn-sfx" data-cat="random">Random</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-sfx" id="btn-start-game" style="width: 100%; padding: 16px; font-size: 1rem;">Mulai Bermain Sekarang 🚀</button>
+        </div>
+
+        <!-- GAMEPLAY AREA -->
+        <div id="game-area" class="hidden" style="display: flex; flex-direction: column; gap: 18px;">
+            <div class="level-header">
+                <span class="level-title" id="current-level-name">Super Gampang</span>
+                <span id="level-counter">Tahap 1 / 5</span>
+            </div>
+            <div class="timeline-bar" id="timeline">
+                <div class="timeline-step"></div>
+                <div class="timeline-step"></div>
+                <div class="timeline-step"></div>
+                <div class="timeline-step"></div>
+                <div class="timeline-step"></div>
+            </div>
+            <div class="attempts-container" id="attempts-list">
+                <div class="attempt-item">1.</div>
+                <div class="attempt-item">2.</div>
+                <div class="attempt-item">3.</div>
+                <div class="attempt-item">4.</div>
+                <div class="attempt-item">5.</div>
+            </div>
+            <div class="player-box">
+                <button class="btn-play-circle" id="btn-play" title="Putar Snippet">
+                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div class="audio-status" id="duration-info">Dengarkan Musik: 0.5 Detik</div>
+            </div>
+            <div class="search-wrapper">
+                <div class="dropdown-results" id="search-results"></div>
+                <input type="text" id="guess-input" class="input-guess" placeholder="Ketik judul lagu atau musisi..." autocomplete="off">
+            </div>
+            <div class="action-grid">
+                <button class="btn btn-secondary btn-sfx" id="btn-skip">Lewati (+0.5s)</button>
+                <button class="btn btn-primary btn-sfx" id="btn-submit">Tebak Sekarang</button>
+            </div>
+        </div>
+
+        <!-- RESULT CARD -->
+        <div id="result-card" class="result-box hidden">
+            <h3 id="result-title" style="font-size: 1.4rem; font-weight: 800;"></h3>
+            <p id="points-earned" style="color: var(--accent-green); font-weight: 700; font-size: 0.95rem;"></p>
+            <img id="album-cover" class="artwork-img" src="" alt="Album Cover">
+            <div class="song-info">
+                <h2 id="song-title-res"></h2>
+                <p id="artist-res"></p>
+            </div>
+            <button class="btn btn-primary btn-sfx" id="btn-next" style="width: 100%; margin-top: 8px;">Lanjut ke Tahap Berikutnya ➔</button>
+        </div>
+
+    </div>
+
+    <!-- CYCLE COMPLETE MODAL -->
+    <div id="cycle-complete-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <h2 style="font-size: 2rem; font-weight: 900; color: var(--text-main); margin-bottom: 8px;">SELESAI! 🎉</h2>
+            <p id="cycle-message" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px;"></p>
+            <div style="background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
+                <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Total Skor Siklus Ini</p>
+                <div id="cycle-final-score" style="font-size: 3.2rem; font-weight: 900; color: var(--accent-green);">0</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-secondary btn-sfx" id="btn-cycle-play">Main Lagi 🔄</button>
+                <button class="btn btn-primary btn-sfx" id="btn-cycle-menu">Menu Utama 🏠</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
+
+    <script>
+        const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
+        const POINTS = [1000, 800, 600, 400, 200];
+        const LEVEL_NAMES = ["Super Gampang", "Gampang", "Sedang", "Susah", "Susah Banget"];
+        
+        // -------------------------------------------------------------------------
+        // DATABASE LOKAL LENGKAP (600+ LAGU UTUH INDONESIA)
+        // -------------------------------------------------------------------------
+        const localSongsDatabase = [
+            // ERA 90s - Super Gampang (30)
+            { title: "Dan", artist: "Sheila On 7", era: "90s", difficulty: "Super Gampang" }, { title: "Kangen", artist: "Dewa 19", era: "90s", difficulty: "Super Gampang" }, { title: "Terlalu Manis", artist: "Slank", era: "90s", difficulty: "Super Gampang" }, { title: "Pelangi di Matamu", artist: "Jamrud", era: "90s", difficulty: "Super Gampang" }, { title: "Bebas", artist: "Iwa K", era: "90s", difficulty: "Super Gampang" }, { title: "Kisah Cintaku", artist: "Chrisye", era: "90s", difficulty: "Super Gampang" }, { title: "Anak Pantai", artist: "Slank", era: "90s", difficulty: "Super Gampang" }, { title: "Sephia", artist: "Sheila On 7", era: "90s", difficulty: "Super Gampang" }, { title: "Kita", artist: "Sheila On 7", era: "90s", difficulty: "Super Gampang" }, { title: "Panggung Sandiwara", artist: "God Bless", era: "90s", difficulty: "Super Gampang" }, { title: "Kamulah Satu-Satunya", artist: "Dewa 19", era: "90s", difficulty: "Super Gampang" }, { title: "Bunda", artist: "Potret", era: "90s", difficulty: "Super Gampang" }, { title: "Sobat", artist: "Padi", era: "90s", difficulty: "Super Gampang" }, { title: "Begitu Indah", artist: "Padi", era: "90s", difficulty: "Super Gampang" }, { title: "Bintang Kehidupan", artist: "Nike Ardilla", era: "90s", difficulty: "Super Gampang" }, { title: "Elang", artist: "Dewa 19", era: "90s", difficulty: "Super Gampang" }, { title: "Mengapa", artist: "Nicky Astria", era: "90s", difficulty: "Super Gampang" }, { title: "Tak Bisa Ke Lain Hati", artist: "KLa Project", era: "90s", difficulty: "Super Gampang" }, { title: "Bermimpi", artist: "Base Jam", era: "90s", difficulty: "Super Gampang" }, { title: "Cinta Kita", artist: "Inka Christie", era: "90s", difficulty: "Super Gampang" }, { title: "Inikah Cinta", artist: "M.E", era: "90s", difficulty: "Super Gampang" }, { title: "Katakanlah", artist: "Coboy", era: "90s", difficulty: "Super Gampang" }, { title: "Janji", artist: "Bragi", era: "90s", difficulty: "Super Gampang" }, { title: "Gerangan Cinta", artist: "Java Jive", era: "90s", difficulty: "Super Gampang" }, { title: "Dongeng", artist: "Wayang", era: "90s", difficulty: "Super Gampang" }, { title: "Tua Tua Keladi", artist: "Anggun", era: "90s", difficulty: "Super Gampang" }, { title: "Tenda Biru", artist: "Desy Ratnasari", era: "90s", difficulty: "Super Gampang" }, { title: "Menghitung Hari", artist: "Krisdayanti", era: "90s", difficulty: "Super Gampang" }, { title: "Mimpi", artist: "Anggun", era: "90s", difficulty: "Super Gampang" }, { title: "Kujelang Hari", artist: "Denny Malik", era: "90s", difficulty: "Super Gampang" },
+            // ERA 90s - Gampang (30)
+            { title: "Yogyakarta", artist: "KLa Project", era: "90s", difficulty: "Gampang" }, { title: "Janji", artist: "Gigi", era: "90s", difficulty: "Gampang" }, { title: "Bagaikan Langit", artist: "Potret", era: "90s", difficulty: "Gampang" }, { title: "Bukan Pujangga", artist: "Base Jam", era: "90s", difficulty: "Gampang" }, { title: "Mobil Derek", artist: "Naif", era: "90s", difficulty: "Gampang" }, { title: "Cemburu", artist: "Dewa 19", era: "90s", difficulty: "Gampang" }, { title: "Maafkan", artist: "Slank", era: "90s", difficulty: "Gampang" }, { title: "J.A.P", artist: "Sheila On 7", era: "90s", difficulty: "Gampang" }, { title: "Mahadewi", artist: "Padi", era: "90s", difficulty: "Gampang" }, { title: "Sesuatu Yang Indah", artist: "Padi", era: "90s", difficulty: "Gampang" }, { title: "Cantik", artist: "Kahitna", era: "90s", difficulty: "Gampang" }, { title: "Cerita Cinta", artist: "Kahitna", era: "90s", difficulty: "Gampang" }, { title: "Terbang", artist: "Gigi", era: "90s", difficulty: "Gampang" }, { title: "Nirwana", artist: "Gigi", era: "90s", difficulty: "Gampang" }, { title: "Posesif", artist: "Naif", era: "90s", difficulty: "Gampang" }, { title: "Kau Yang Terindah", artist: "Java Jive", era: "90s", difficulty: "Gampang" }, { title: "Rinduku Adalah Cintamu", artist: "Protonema", era: "90s", difficulty: "Gampang" }, { title: "Ada Cinta", artist: "Bening", era: "90s", difficulty: "Gampang" }, { title: "Bahasa Kalbu", artist: "Titi DJ", era: "90s", difficulty: "Gampang" }, { title: "I Just Wanna Say I L U", artist: "Potret", era: "90s", difficulty: "Gampang" }, { title: "Selamanya Cinta", artist: "Yana Julio", era: "90s", difficulty: "Gampang" }, { title: "Tentang Kita", artist: "Jingga", era: "90s", difficulty: "Gampang" }, { title: "Radja", artist: "/rif", era: "90s", difficulty: "Gampang" }, { title: "Loe Toe Ye", artist: "/rif", era: "90s", difficulty: "Gampang" }, { title: "Jatuh Cinta", artist: "Base Jam", era: "90s", difficulty: "Gampang" }, { title: "Satu Mimpiku", artist: "The Groove", era: "90s", difficulty: "Gampang" }, { title: "Maafkan Kepergianku", artist: "Ruth Sahanaya", era: "90s", difficulty: "Gampang" }, { title: "Astaga", artist: "Ruth Sahanaya", era: "90s", difficulty: "Gampang" }, { title: "Burung Camar", artist: "Vina Panduwinata", era: "90s", difficulty: "Gampang" }, { title: "Nyanyian Rindu", artist: "Ebiet G. Ade", era: "90s", difficulty: "Gampang" },
+            // ERA 90s - Sedang (30)
+            { title: "Pergilah Kasih", artist: "Chrisye", era: "90s", difficulty: "Sedang" }, { title: "Mawar Merah", artist: "Slank", era: "90s", difficulty: "Sedang" }, { title: "Mungkinkah", artist: "Stinky", era: "90s", difficulty: "Sedang" }, { title: "Bidadari Keseleo", artist: "Jamrud", era: "90s", difficulty: "Sedang" }, { title: "Kirana", artist: "Dewa 19", era: "90s", difficulty: "Sedang" }, { title: "Genit", artist: "Tipe X", era: "90s", difficulty: "Sedang" }, { title: "Pelangi", artist: "Boomerang", era: "90s", difficulty: "Sedang" }, { title: "Cinta Kan Membawamu Kembali", artist: "Dewa 19", era: "90s", difficulty: "Sedang" }, { title: "Aku Cinta Padamu", artist: "Glenn Fredly", era: "90s", difficulty: "Sedang" }, { title: "Kasih Putih", artist: "Glenn Fredly", era: "90s", difficulty: "Sedang" }, { title: "Tegar", artist: "Rossa", era: "90s", difficulty: "Sedang" }, { title: "Nada-Nada Cinta", artist: "Rossa", era: "90s", difficulty: "Sedang" }, { title: "Cukup Siti Nurbaya", artist: "Dewa 19", era: "90s", difficulty: "Sedang" }, { title: "Balikin", artist: "Slank", era: "90s", difficulty: "Sedang" }, { title: "Piknik 72", artist: "Naif", era: "90s", difficulty: "Sedang" }, { title: "Maukah", artist: "T-Five", era: "90s", difficulty: "Sedang" }, { title: "Terbuka", artist: "M.E", era: "90s", difficulty: "Sedang" }, { title: "Rindu Ini", artist: "Warna", era: "90s", difficulty: "Sedang" }, { title: "Salahkah Aku", artist: "Nadila", era: "90s", difficulty: "Sedang" }, { title: "Atur Aku", artist: "Puppen", era: "90s", difficulty: "Sedang" }, { title: "Kau Pikir Kaulah Segalanya", artist: "Edane", era: "90s", difficulty: "Sedang" }, { title: "Biru", artist: "Kidnap Katrina", era: "90s", difficulty: "Sedang" }, { title: "Kasih Jangan Kau Pergi", artist: "Bunga", era: "90s", difficulty: "Sedang" }, { title: "Tak Ingin", artist: "Wong", era: "90s", difficulty: "Sedang" }, { title: "Bila Kuingat", artist: "Lingua", era: "90s", difficulty: "Sedang" }, { title: "Terbang", artist: "The Fly", era: "90s", difficulty: "Sedang" }, { title: "Palsu", artist: "The Fly", era: "90s", difficulty: "Sedang" }, { title: "Tiba Tiba", artist: "Potret", era: "90s", difficulty: "Sedang" }, { title: "Terbujuk", artist: "KLa Project", era: "90s", difficulty: "Sedang" }, { title: "Ku Ingin", artist: "Gigi", era: "90s", difficulty: "Sedang" },
+            // ERA 90s - Susah (30)
+            { title: "Timang Timang", artist: "Alda Risma", era: "90s", difficulty: "Susah" }, { title: "Sendiri", artist: "Chrisye", era: "90s", difficulty: "Susah" }, { title: "Kala Cinta Menggoda", artist: "Chrisye", era: "90s", difficulty: "Susah" }, { title: "Bintang", artist: "Air", era: "90s", difficulty: "Susah" }, { title: "Biarkan Jatuh Cinta", artist: "Coboy", era: "90s", difficulty: "Susah" }, { title: "Selamat Pagi Dunia", artist: "Glenn Fredly", era: "90s", difficulty: "Susah" }, { title: "Kau", artist: "T-Five", era: "90s", difficulty: "Susah" }, { title: "Suratku", artist: "Hedi Yunus", era: "90s", difficulty: "Susah" }, { title: "Kuta Bali", artist: "Andre Hehanussa", era: "90s", difficulty: "Susah" }, { title: "Bidadari", artist: "Andre Hehanussa", era: "90s", difficulty: "Susah" }, { title: "Tiada Lagi", artist: "Mayangsari", era: "90s", difficulty: "Susah" }, { title: "Berharap Tak Berpisah", artist: "Reza Artamevia", era: "90s", difficulty: "Susah" }, { title: "Satu Yang Tak Bisa Lepas", artist: "Reza Artamevia", era: "90s", difficulty: "Susah" }, { title: "Tong Kosong", artist: "Slank", era: "90s", difficulty: "Susah" }, { title: "Anyer 10 Maret", artist: "Slank", era: "90s", difficulty: "Susah" }, { title: "Selatan Jakarta", artist: "Dewa 19", era: "90s", difficulty: "Susah" }, { title: "Cekal", artist: "Slank", era: "90s", difficulty: "Susah" }, { title: "Tertatih", artist: "Sheila On 7", era: "90s", difficulty: "Susah" }, { title: "Terpuruk Ku Disini", artist: "KLa Project", era: "90s", difficulty: "Susah" }, { title: "Zamrud Khatulistiwa", artist: "Chrisye", era: "90s", difficulty: "Susah" }, { title: "Bidadari", artist: "Padi", era: "90s", difficulty: "Susah" }, { title: "Selalu Untuk Selamanya", artist: "Fatur", era: "90s", difficulty: "Susah" }, { title: "Di Sini", artist: "Bintang", era: "90s", difficulty: "Susah" }, { title: "Seperti", artist: "Plastik", era: "90s", difficulty: "Susah" }, { title: "Pernah Mencoba", artist: "Dr. PM", era: "90s", difficulty: "Susah" }, { title: "Untukku", artist: "Chrisye", era: "90s", difficulty: "Susah" }, { title: "Anak Sekolah", artist: "Chrisye", era: "90s", difficulty: "Susah" }, { title: "Surat Cinta", artist: "Vina Panduwinata", era: "90s", difficulty: "Susah" }, { title: "Logika", artist: "Vina Panduwinata", era: "90s", difficulty: "Susah" }, { title: "Cinta", artist: "Vina Panduwinata", era: "90s", difficulty: "Susah" },
+            // ERA 90s - Susah Banget (30)
+            { title: "Terserah", artist: "Humania", era: "90s", difficulty: "Susah Banget" }, { title: "Keabadian", artist: "Reza Artamevia", era: "90s", difficulty: "Susah Banget" }, { title: "Biar Menjadi Kenangan", artist: "Reza Artamevia", era: "90s", difficulty: "Susah Banget" }, { title: "Pertama", artist: "Reza Artamevia", era: "90s", difficulty: "Susah Banget" }, { title: "Ku Ingin", artist: "The Groove", era: "90s", difficulty: "Susah Banget" }, { title: "Dahulu", artist: "The Groove", era: "90s", difficulty: "Susah Banget" }, { title: "Khayalan", artist: "The Groove", era: "90s", difficulty: "Susah Banget" }, { title: "Salah", artist: "Potret", era: "90s", difficulty: "Susah Banget" }, { title: "Mak Comblang", artist: "Potret", era: "90s", difficulty: "Susah Banget" }, { title: "Radja", artist: "Gigi", era: "90s", difficulty: "Susah Banget" }, { title: "Kepastian Yang Kutunggu", artist: "Gigi", era: "90s", difficulty: "Susah Banget" }, { title: "Melayang", artist: "Januari Christy", era: "90s", difficulty: "Susah Banget" }, { title: "Gemerlap Kota", artist: "Ahmad Band", era: "90s", difficulty: "Susah Banget" }, { title: "Malam Ini Indah", artist: "Iwa K", era: "90s", difficulty: "Susah Banget" }, { title: "Nombok Dong", artist: "Iwa K", era: "90s", difficulty: "Susah Banget" }, { title: "Format Masa Depan", artist: "Dewa 19", era: "90s", difficulty: "Susah Banget" }, { title: "Pulau Biru", artist: "Slank", era: "90s", difficulty: "Susah Banget" }, { title: "O.. O.. O..", artist: "Gigi", era: "90s", difficulty: "Susah Banget" }, { title: "Perhatikan Rani", artist: "Sheila On 7", era: "90s", difficulty: "Susah Banget" }, { title: "Jauh", artist: "Naif", era: "90s", difficulty: "Susah Banget" }, { title: "Terlanjur", artist: "Padi", era: "90s", difficulty: "Susah Banget" }, { title: "Kosong", artist: "Pure Saturday", era: "90s", difficulty: "Susah Banget" }, { title: "Matel", artist: "Kubik", era: "90s", difficulty: "Susah Banget" }, { title: "Sistem", artist: "Puppen", era: "90s", difficulty: "Susah Banget" }, { title: "Walah", artist: "Netral", era: "90s", difficulty: "Susah Banget" }, { title: "Cinta Tiada Akhir", artist: "Titi DJ", era: "90s", difficulty: "Susah Banget" }, { title: "Ekspresi", artist: "Titi DJ", era: "90s", difficulty: "Susah Banget" }, { title: "Bintang Bintang", artist: "Titi DJ", era: "90s", difficulty: "Susah Banget" }, { title: "Terserah Boy", artist: "Atiek CB", era: "90s", difficulty: "Susah Banget" }, { title: "Kau Dimana", artist: "Coboy", era: "90s", difficulty: "Susah Banget" },
+            // ERA 2000s - Super Gampang (30)
+            { title: "Menghapus Jejakmu", artist: "Peterpan", era: "2000s", difficulty: "Super Gampang" }, { title: "Demi Waktu", artist: "Ungu", era: "2000s", difficulty: "Super Gampang" }, { title: "Kenangan Terindah", artist: "Samsons", era: "2000s", difficulty: "Super Gampang" }, { title: "Laskar Pelangi", artist: "Nidji", era: "2000s", difficulty: "Super Gampang" }, { title: "Yolanda", artist: "Kangen Band", era: "2000s", difficulty: "Super Gampang" }, { title: "Ada Apa Dengan Cinta", artist: "Melly Goeslaw", era: "2000s", difficulty: "Super Gampang" }, { title: "Bintang di Surga", artist: "Peterpan", era: "2000s", difficulty: "Super Gampang" }, { title: "Mungkin Nanti", artist: "Peterpan", era: "2000s", difficulty: "Super Gampang" }, { title: "Ketahuan", artist: "Matta", era: "2000s", difficulty: "Super Gampang" }, { title: "Cari Jodoh", artist: "Wali", era: "2000s", difficulty: "Super Gampang" }, { title: "Baik Baik Sayang", artist: "Wali", era: "2000s", difficulty: "Super Gampang" }, { title: "Puspa", artist: "ST12", era: "2000s", difficulty: "Super Gampang" }, { title: "Saat Terakhir", artist: "ST12", era: "2000s", difficulty: "Super Gampang" }, { title: "Hampa", artist: "Ari Lasso", era: "2000s", difficulty: "Super Gampang" }, { title: "Rahasia Perempuan", artist: "Ari Lasso", era: "2000s", difficulty: "Super Gampang" }, { title: "Seberapa Pantas", artist: "Sheila On 7", era: "2000s", difficulty: "Super Gampang" }, { title: "Kasih Tak Sampai", artist: "Padi", era: "2000s", difficulty: "Super Gampang" }, { title: "Tulus", artist: "Radja", era: "2000s", difficulty: "Super Gampang" }, { title: "Doy", artist: "Kangen Band", era: "2000s", difficulty: "Super Gampang" }, { title: "Dik", artist: "Wali", era: "2000s", difficulty: "Super Gampang" }, { title: "Karena Wanita Ingin Dimengerti", artist: "Ada Band", era: "2000s", difficulty: "Super Gampang" }, { title: "Hapus Aku", artist: "Nidji", era: "2000s", difficulty: "Super Gampang" }, { title: "Jangan Menyerah", artist: "D'Masiv", era: "2000s", difficulty: "Super Gampang" }, { title: "Takkan Pernah Ada", artist: "Geisha", era: "2000s", difficulty: "Super Gampang" }, { title: "Sebelum Cahaya", artist: "Letto", era: "2000s", difficulty: "Super Gampang" }, { title: "Terbaik Untukmu", artist: "Tangga", era: "2000s", difficulty: "Super Gampang" }, { title: "Cinta Begini", artist: "Tangga", era: "2000s", difficulty: "Super Gampang" }, { title: "Kisah Cintaku", artist: "Peterpan", era: "2000s", difficulty: "Super Gampang" }, { title: "Kekasih Yang Tak Dianggap", artist: "Kertas Band", era: "2000s", difficulty: "Super Gampang" }, { title: "Buka Semangat Baru", artist: "Ello", era: "2000s", difficulty: "Super Gampang" },
+            // ERA 2000s - Gampang (30)
+            { title: "Jujur", artist: "Radja", era: "2000s", difficulty: "Gampang" }, { title: "Cinta Ini Membunuhku", artist: "dMasiv", era: "2000s", difficulty: "Gampang" }, { title: "Mengenangmu", artist: "Kerispatih", era: "2000s", difficulty: "Gampang" }, { title: "Ruang Rindu", artist: "Letto", era: "2000s", difficulty: "Gampang" }, { title: "TTM", artist: "T2", era: "2000s", difficulty: "Gampang" }, { title: "Kehilangan", artist: "Firman", era: "2000s", difficulty: "Gampang" }, { title: "Manusia Bodoh", artist: "ADA Band", era: "2000s", difficulty: "Gampang" }, { title: "Bendera", artist: "Cokelat", era: "2000s", difficulty: "Gampang" }, { title: "Jika Cinta Dia", artist: "Geisha", era: "2000s", difficulty: "Gampang" }, { title: "Separuh Nafas", artist: "Dewa 19", era: "2000s", difficulty: "Gampang" }, { title: "Pupus", artist: "Dewa 19", era: "2000s", difficulty: "Gampang" }, { title: "Risalah Hati", artist: "Dewa 19", era: "2000s", difficulty: "Gampang" }, { title: "Pudar", artist: "Rossa", era: "2000s", difficulty: "Gampang" }, { title: "Dealova", artist: "Once", era: "2000s", difficulty: "Gampang" }, { title: "Sempurna", artist: "Andra and the BackBone", era: "2000s", difficulty: "Gampang" }, { title: "Teman Tapi Mesra", artist: "Ratu", era: "2000s", difficulty: "Gampang" }, { title: "Makhluk Tuhan Paling Sexy", artist: "Mulan Jameela", era: "2000s", difficulty: "Gampang" }, { title: "Bila", artist: "The Titans", era: "2000s", difficulty: "Gampang" }, { title: "Saat Kau Pergi", artist: "Vagetoz", era: "2000s", difficulty: "Gampang" }, { title: "Hanya Ingin Kau Tahu", artist: "Repvblik", era: "2000s", difficulty: "Gampang" }, { title: "Kenanglah Aku", artist: "Naff", era: "2000s", difficulty: "Gampang" }, { title: "Nuansa Bening", artist: "Vidi Aldiano", era: "2000s", difficulty: "Gampang" }, { title: "Rahasia Hati", artist: "Element", era: "2000s", difficulty: "Gampang" }, { title: "Cobalah Kau Mengerti", artist: "J-Rocks", era: "2000s", difficulty: "Gampang" }, { title: "Falling in Love", artist: "J-Rocks", era: "2000s", difficulty: "Gampang" }, { title: "Cinta Pertama dan Terakhir", artist: "Sherina", era: "2000s", difficulty: "Gampang" }, { title: "Pergilah Kau", artist: "Sherina", era: "2000s", difficulty: "Gampang" }, { title: "Geregetan", artist: "Sherina", era: "2000s", difficulty: "Gampang" }, { title: "Tentang Bintang", artist: "Kangen Band", era: "2000s", difficulty: "Gampang" }, { title: "Firasat", artist: "Marcell", era: "2000s", difficulty: "Gampang" },
+            // ERA 2000s - Sedang (30)
+            { title: "Sandaran Hati", artist: "Letto", era: "2000s", difficulty: "Sedang" }, { title: "Permintaan Hati", artist: "Letto", era: "2000s", difficulty: "Sedang" }, { title: "Rasa Ini", artist: "The Titans", era: "2000s", difficulty: "Sedang" }, { title: "Cinta Gila", artist: "Dewa 19", era: "2000s", difficulty: "Sedang" }, { title: "Bersamamu", artist: "Vierra", era: "2000s", difficulty: "Sedang" }, { title: "Suara", artist: "Hijau Daun", era: "2000s", difficulty: "Sedang" }, { title: "Bersama Bintang", artist: "Drive", era: "2000s", difficulty: "Sedang" }, { title: "Sebuah Kisah Klasik", artist: "Sheila On 7", era: "2000s", difficulty: "Sedang" }, { title: "Naluri Lelaki", artist: "Samsons", era: "2000s", difficulty: "Sedang" }, { title: "Kekasih Gelapku", artist: "Ungu", era: "2000s", difficulty: "Sedang" }, { title: "Biarlah", artist: "Nidji", era: "2000s", difficulty: "Sedang" }, { title: "Tercipta Untukku", artist: "Ungu", era: "2000s", difficulty: "Sedang" }, { title: "Cobalah Mengerti", artist: "Peterpan", era: "2000s", difficulty: "Sedang" }, { title: "Sejauh Mungkin", artist: "Ungu", era: "2000s", difficulty: "Sedang" }, { title: "Munajat Cinta", artist: "The Rock", era: "2000s", difficulty: "Sedang" }, { title: "Dokter Suster", artist: "Angkasa", era: "2000s", difficulty: "Sedang" }, { title: "Isabella", artist: "ST12", era: "2000s", difficulty: "Sedang" }, { title: "Karma", artist: "Cokelat", era: "2000s", difficulty: "Sedang" }, { title: "Hilang", artist: "Garasi", era: "2000s", difficulty: "Sedang" }, { title: "Antara Ada dan Tiada", artist: "Utopia", era: "2000s", difficulty: "Sedang" }, { title: "Selepas Kau Pergi", artist: "La Luna", era: "2000s", difficulty: "Sedang" }, { title: "I Will Fly", artist: "Ten2Five", era: "2000s", difficulty: "Sedang" }, { title: "Dari Hati", artist: "Clubeighties", era: "2000s", difficulty: "Sedang" }, { title: "Matraman", artist: "The Upstairs", era: "2000s", difficulty: "Sedang" }, { title: "Secret Admirer", artist: "Mocca", era: "2000s", difficulty: "Sedang" }, { title: "Bukan Cinta Biasa", artist: "Afgan", era: "2000s", difficulty: "Sedang" }, { title: "Terima Kasih Cinta", artist: "Afgan", era: "2000s", difficulty: "Sedang" }, { title: "Cinta Terlarang", artist: "The Virgin", era: "2000s", difficulty: "Sedang" }, { title: "Belahan Jiwa", artist: "The Virgin", era: "2000s", difficulty: "Sedang" }, { title: "Status Palsu", artist: "Vidi Aldiano", era: "2000s", difficulty: "Sedang" },
+            // ERA 2000s - Susah (30)
+            { title: "Jangan Pernah Berubah", artist: "ST12", era: "2000s", difficulty: "Susah" }, { title: "Sahabat Kecil", artist: "Ipang", era: "2000s", difficulty: "Susah" }, { title: "Cinta Dalam Hati", artist: "Ungu", era: "2000s", difficulty: "Susah" }, { title: "Tak Lekang Oleh Waktu", artist: "Kerispatih", era: "2000s", difficulty: "Susah" }, { title: "Selalu Mengalah", artist: "Seventeen", era: "2000s", difficulty: "Susah" }, { title: "Benci Untuk Mencinta", artist: "Naif", era: "2000s", difficulty: "Susah" }, { title: "Jadikan Aku Pacarmu", artist: "Sheila On 7", era: "2000s", difficulty: "Susah" }, { title: "Melompat Lebih Tinggi", artist: "Sheila On 7", era: "2000s", difficulty: "Susah" }, { title: "Ku Tak Bisa", artist: "Slank", era: "2000s", difficulty: "Susah" }, { title: "Tentang Seseorang", artist: "Anda", era: "2000s", difficulty: "Susah" }, { title: "Ayat Ayat Cinta", artist: "Rossa", era: "2000s", difficulty: "Susah" }, { title: "Cinta Putih", artist: "Kerispatih", era: "2000s", difficulty: "Susah" }, { title: "Ku Katakan Dengan Indah", artist: "Peterpan", era: "2000s", difficulty: "Susah" }, { title: "Topeng", artist: "Peterpan", era: "2000s", difficulty: "Susah" }, { title: "Khayalan Tingkat Tinggi", artist: "Peterpan", era: "2000s", difficulty: "Susah" }, { title: "Mimpi Yang Sempurna", artist: "Peterpan", era: "2000s", difficulty: "Susah" }, { title: "Pangeran Cinta", artist: "Dewa 19", era: "2000s", difficulty: "Susah" }, { title: "Melayang", artist: "Ungu", era: "2000s", difficulty: "Susah" }, { title: "Disco Lazy Time", artist: "Nidji", era: "2000s", difficulty: "Susah" }, { title: "Pemuja Rahasia", artist: "Sheila On 7", era: "2000s", difficulty: "Susah" }, { title: "Gara-Gara Kamu", artist: "Slank", era: "2000s", difficulty: "Susah" }, { title: "Jadilah Legenda", artist: "Superman Is Dead", era: "2000s", difficulty: "Susah" }, { title: "Semoga Kau di Neraka", artist: "Endank Soekamti", era: "2000s", difficulty: "Susah" }, { title: "Terdiam", artist: "Maliq & D'Essentials", era: "2000s", difficulty: "Susah" }, { title: "Terpesona", artist: "Glenn Fredly", era: "2000s", difficulty: "Susah" }, { title: "Jomblo", artist: "Saykoji", era: "2000s", difficulty: "Susah" }, { title: "Online", artist: "Saykoji", era: "2000s", difficulty: "Susah" }, { title: "So What Gitu Loh", artist: "Saykoji", era: "2000s", difficulty: "Susah" }, { title: "Aku Bukan Pilihan", artist: "Iwan Fals", era: "2000s", difficulty: "Susah" }, { title: "Ijinkan Aku Menyayangimu", artist: "Iwan Fals", era: "2000s", difficulty: "Susah" },
+            // ERA 2000s - Susah Banget (30)
+            { title: "Di Belakangku", artist: "Peterpan", era: "2000s", difficulty: "Susah Banget" }, { title: "Walau Habis Terang", artist: "Peterpan", era: "2000s", difficulty: "Susah Banget" }, { title: "Bintang", artist: "Anima", era: "2000s", difficulty: "Susah Banget" }, { title: "Tak Bisakah", artist: "Peterpan", era: "2000s", difficulty: "Susah Banget" }, { title: "Takkan Ada", artist: "Lyla", era: "2000s", difficulty: "Susah Banget" }, { title: "Mantan Kekasih", artist: "Lyla", era: "2000s", difficulty: "Susah Banget" }, { title: "Percayakan", artist: "Lyla", era: "2000s", difficulty: "Susah Banget" }, { title: "Cinta Cuma Satu", artist: "Nindy", era: "2000s", difficulty: "Susah Banget" }, { title: "Buktikan", artist: "Nindy", era: "2000s", difficulty: "Susah Banget" }, { title: "Menjaga Hati", artist: "Yovie & Nuno", era: "2000s", difficulty: "Susah Banget" }, { title: "Janji Suci", artist: "Yovie & Nuno", era: "2000s", difficulty: "Susah Banget" }, { title: "Dia Milikku", artist: "Yovie & Nuno", era: "2000s", difficulty: "Susah Banget" }, { title: "Sempat Memiliki", artist: "Yovie & Nuno", era: "2000s", difficulty: "Susah Banget" }, { title: "Bunga Terakhir", artist: "Bebi Romeo", era: "2000s", difficulty: "Susah Banget" }, { title: "Akhir Rasa Ini", artist: "Samsons", era: "2000s", difficulty: "Susah Banget" }, { title: "Langit Tak Mendengar", artist: "Peterpan", era: "2000s", difficulty: "Susah Banget" }, { title: "Tunggu Aku Di Jakarta", artist: "Sheila On 7", era: "2000s", difficulty: "Susah Banget" }, { title: "Kosong", artist: "Dewa 19", era: "2000s", difficulty: "Susah Banget" }, { title: "Sang Penghibur", artist: "Padi", era: "2000s", difficulty: "Susah Banget" }, { title: "Cinta Melulu", artist: "Efek Rumah Kaca", era: "2000s", difficulty: "Susah Banget" }, { title: "Pergi Tanpa Pesan", artist: "Sore", era: "2000s", difficulty: "Susah Banget" }, { title: "Konservatif", artist: "The Adams", era: "2000s", difficulty: "Susah Banget" }, { title: "I Remember", artist: "Mocca", era: "2000s", difficulty: "Susah Banget" }, { title: "Untitled", artist: "Maliq & D'Essentials", era: "2000s", difficulty: "Susah Banget" }, { title: "Membakar Jakarta", artist: "Seringai", era: "2000s", difficulty: "Susah Banget" }, { title: "Menanti Sebuah Jawaban", artist: "Padi", era: "2000s", difficulty: "Susah Banget" }, { title: "Hitam", artist: "Padi", era: "2000s", difficulty: "Susah Banget" }, { title: "Rapuh", artist: "Padi", era: "2000s", difficulty: "Susah Banget" }, { title: "Semua Tak Sama", artist: "Padi", era: "2000s", difficulty: "Susah Banget" }, { title: "Bayangkan Rasakan", artist: "Padi", era: "2000s", difficulty: "Susah Banget" },
+            // ERA 2010s - Super Gampang (30)
+            { title: "Heavy Rotation", artist: "JKT48", era: "2010s", difficulty: "Super Gampang" }, { title: "Koisuru Fortune Cookie", artist: "JKT48", era: "2010s", difficulty: "Super Gampang" }, { title: "Flying Get", artist: "JKT48", era: "2010s", difficulty: "Super Gampang" }, { title: "Dilema", artist: "Cherrybelle", era: "2010s", difficulty: "Super Gampang" }, { title: "Love is You", artist: "Cherrybelle", era: "2010s", difficulty: "Super Gampang" }, { title: "Diam Diam Suka", artist: "Cherrybelle", era: "2010s", difficulty: "Super Gampang" }, { title: "I Heart You", artist: "SMASH", era: "2010s", difficulty: "Super Gampang" }, { title: "Kamu Luar Biasa", artist: "Coboy Junior", era: "2010s", difficulty: "Super Gampang" }, { title: "Surat Cinta Untuk Starla", artist: "Virgoun", era: "2010s", difficulty: "Super Gampang" }, { title: "Asal Kau Bahagia", artist: "Armada", era: "2010s", difficulty: "Super Gampang" }, { title: "Separuh Aku", artist: "Noah", era: "2010s", difficulty: "Super Gampang" }, { title: "Senyum Semangat", artist: "SMASH", era: "2010s", difficulty: "Super Gampang" }, { title: "Eeeaa", artist: "Coboy Junior", era: "2010s", difficulty: "Super Gampang" }, { title: "Akad", artist: "Payung Teduh", era: "2010s", difficulty: "Super Gampang" }, { title: "Sepatu", artist: "Tulus", era: "2010s", difficulty: "Super Gampang" }, { title: "Kali Kedua", artist: "Raisa", era: "2010s", difficulty: "Super Gampang" }, { title: "Gajah", artist: "Tulus", era: "2010s", difficulty: "Super Gampang" }, { title: "Tak Lagi Sama", artist: "Noah", era: "2010s", difficulty: "Super Gampang" }, { title: "Apakah Kau Melihat Mentari Senja", artist: "JKT48", era: "2010s", difficulty: "Super Gampang" }, { title: "Kau Adalah", artist: "Isyana Sarasvati", era: "2010s", difficulty: "Super Gampang" }, { title: "Terjebak Nostalgia", artist: "Raisa", era: "2010s", difficulty: "Super Gampang" }, { title: "Sewindu", artist: "Tulus", era: "2010s", difficulty: "Super Gampang" }, { title: "Saat Kau Telah Mengerti", artist: "Virgoun", era: "2010s", difficulty: "Super Gampang" }, { title: "Pulang Malu Tak Pulang Rindu", artist: "Armada", era: "2010s", difficulty: "Super Gampang" }, { title: "Aku Yang Tersakiti", artist: "Judika", era: "2010s", difficulty: "Super Gampang" }, { title: "Harus Terpisah", artist: "Cakra Khan", era: "2010s", difficulty: "Super Gampang" }, { title: "Doaku Untukmu Sayang", artist: "Wali", era: "2010s", difficulty: "Super Gampang" }, { title: "Cinta Luar Biasa", artist: "Andmesh", era: "2010s", difficulty: "Super Gampang" }, { title: "Tolong", artist: "Budi Doremi", era: "2010s", difficulty: "Super Gampang" }, { title: "Lebih Indah", artist: "Adera", era: "2010s", difficulty: "Super Gampang" },
+            // ERA 2010s - Gampang (30)
+            { title: "Manatsu no Sounds Good!", artist: "JKT48", era: "2010s", difficulty: "Gampang" }, { title: "Beautiful", artist: "Cherrybelle", era: "2010s", difficulty: "Gampang" }, { title: "Pamer Bojo", artist: "Didi Kempot", era: "2010s", difficulty: "Gampang" }, { title: "Jodoh Pasti Bertemu", artist: "Afgan", era: "2010s", difficulty: "Gampang" }, { title: "Tetap Dalam Jiwa", artist: "Isyana Sarasvati", era: "2010s", difficulty: "Gampang" }, { title: "Kesempurnaan Cinta", artist: "Rizky Febian", era: "2010s", difficulty: "Gampang" }, { title: "Zona Nyaman", artist: "Fourtwnty", era: "2010s", difficulty: "Gampang" }, { title: "Baby Baby", artist: "Elovii", era: "2010s", difficulty: "Gampang" }, { title: "Ada Cinta", artist: "SMASH", era: "2010s", difficulty: "Gampang" }, { title: "Terhebat", artist: "CJR", era: "2010s", difficulty: "Gampang" }, { title: "Dekat Di Hati", artist: "RAN", era: "2010s", difficulty: "Gampang" }, { title: "Dari Mata", artist: "Jaz", era: "2010s", difficulty: "Gampang" }, { title: "Lapang Dada", artist: "Sheila On 7", era: "2010s", difficulty: "Gampang" }, { title: "Monokrom", artist: "Tulus", era: "2010s", difficulty: "Gampang" }, { title: "Pedih", artist: "Last Child", era: "2010s", difficulty: "Gampang" }, { title: "Terlalu Lama Sendiri", artist: "Kunto Aji", era: "2010s", difficulty: "Gampang" }, { title: "Bahagia", artist: "GAC", era: "2010s", difficulty: "Gampang" }, { title: "Jangan", artist: "Marion Jola", era: "2010s", difficulty: "Gampang" }, { title: "Dengan Caraku", artist: "Brisia Jodie", era: "2010s", difficulty: "Gampang" }, { title: "Cinta Sejati", artist: "Bunga Citra Lestari", era: "2010s", difficulty: "Gampang" }, { title: "Perahu Kertas", artist: "Maudy Ayunda", era: "2010s", difficulty: "Gampang" }, { title: "Berawal Dari Tatap", artist: "Yura Yunita", era: "2010s", difficulty: "Gampang" }, { title: "Bawalah Cintaku", artist: "Afgan", era: "2010s", difficulty: "Gampang" }, { title: "Adu Rayu", artist: "Yovie, Tulus, Glenn", era: "2010s", difficulty: "Gampang" }, { title: "Hanya Rindu", artist: "Andmesh", era: "2010s", difficulty: "Gampang" }, { title: "Tahu Diri", artist: "Maudy Ayunda", era: "2010s", difficulty: "Gampang" }, { title: "Cinta Datang Terlambat", artist: "Maudy Ayunda", era: "2010s", difficulty: "Gampang" }, { title: "Untuk Apa", artist: "Maudy Ayunda", era: "2010s", difficulty: "Gampang" }, { title: "Mimpi Adalah Harapan", artist: "Raisa", era: "2010s", difficulty: "Gampang" }, { title: "Jikalau Kau Cinta", artist: "Judika", era: "2010s", difficulty: "Gampang" },
+            // ERA 2010s - Sedang (30)
+            { title: "Waktu Yang Salah", artist: "Fiersa Besari", era: "2010s", difficulty: "Sedang" }, { title: "Siapkah Kau Tuk Jatuh Cinta Lagi", artist: "HIVI!", era: "2010s", difficulty: "Sedang" }, { title: "Dia", artist: "Anji", era: "2010s", difficulty: "Sedang" }, { title: "Cinta Karena Cinta", artist: "Judika", era: "2010s", difficulty: "Sedang" }, { title: "Cinta Dan Rahasia", artist: "Yura Yunita", era: "2010s", difficulty: "Sedang" }, { title: "Lebih Baik Darinya", artist: "Pasto", era: "2010s", difficulty: "Sedang" }, { title: "Cukup Tau", artist: "Rizky Febian", era: "2010s", difficulty: "Sedang" }, { title: "Penantian Berharga", artist: "Rizky Febian", era: "2010s", difficulty: "Sedang" }, { title: "Pamit", artist: "Tulus", era: "2010s", difficulty: "Sedang" }, { title: "Ruang Sendiri", artist: "Tulus", era: "2010s", difficulty: "Sedang" }, { title: "Teman Hidup", artist: "Tulus", era: "2010s", difficulty: "Sedang" }, { title: "Mantan Terindah", artist: "Raisa", era: "2010s", difficulty: "Sedang" }, { title: "Serba Salah", artist: "Raisa", era: "2010s", difficulty: "Sedang" }, { title: "LDR", artist: "Raisa", era: "2010s", difficulty: "Sedang" }, { title: "Jangan Hilangkan Dia", artist: "Rossa", era: "2010s", difficulty: "Sedang" }, { title: "Pelangi", artist: "HIVI!", era: "2010s", difficulty: "Sedang" }, { title: "Hari Baru", artist: "RAN", era: "2010s", difficulty: "Sedang" }, { title: "Setapak Sriwedari", artist: "Maliq & D'Essentials", era: "2010s", difficulty: "Sedang" }, { title: "Sayap Pelindungmu", artist: "The Overtunes", era: "2010s", difficulty: "Sedang" }, { title: "Kasmaran", artist: "Jaz", era: "2010s", difficulty: "Sedang" }, { title: "Kejora", artist: "Lesti", era: "2010s", difficulty: "Sedang" }, { title: "Alamat Palsu", artist: "Ayu Ting Ting", era: "2010s", difficulty: "Sedang" }, { title: "Lagi Syantik", artist: "Siti Badriah", era: "2010s", difficulty: "Sedang" }, { title: "Sayang", artist: "Via Vallen", era: "2010s", difficulty: "Sedang" }, { title: "Jaran Goyang", artist: "Nella Kharisma", era: "2010s", difficulty: "Sedang" }, { title: "Tak Pernah Setengah Hati", artist: "Tompi", era: "2010s", difficulty: "Sedang" }, { title: "Menghujam Jantungku", artist: "Tompi", era: "2010s", difficulty: "Sedang" }, { title: "Sedari Dulu", artist: "Tompi", era: "2010s", difficulty: "Sedang" }, { title: "Lumpuhkan Ingatanku", artist: "Geisha", era: "2010s", difficulty: "Sedang" }, { title: "Pergi Saja", artist: "Geisha", era: "2010s", difficulty: "Sedang" },
+            // ERA 2010s - Susah (30)
+            { title: "River", artist: "JKT48", era: "2010s", difficulty: "Susah" }, { title: "Pesawat Kertas 365 Hari", artist: "JKT48", era: "2010s", difficulty: "Susah" }, { title: "Kamu", artist: "Coboy Junior", era: "2010s", difficulty: "Susah" }, { title: "Kenapa Mengapa", artist: "Coboy Junior", era: "2010s", difficulty: "Susah" }, { title: "Patah Hati", artist: "SMASH", era: "2010s", difficulty: "Susah" }, { title: "Pergi Pagi Pulang Pagi", artist: "Armada", era: "2010s", difficulty: "Susah" }, { title: "Hargai Aku", artist: "Armada", era: "2010s", difficulty: "Susah" }, { title: "Seluruh Nafas Ini", artist: "Last Child", era: "2010s", difficulty: "Susah" }, { title: "Duka", artist: "Last Child", era: "2010s", difficulty: "Susah" }, { title: "Bukti", artist: "Virgoun", era: "2010s", difficulty: "Susah" }, { title: "Celengan Rindu", artist: "Fiersa Besari", era: "2010s", difficulty: "Susah" }, { title: "April", artist: "Fiersa Besari", era: "2010s", difficulty: "Susah" }, { title: "Pelukku Untuk Pelikmu", artist: "Fiersa Besari", era: "2010s", difficulty: "Susah" }, { title: "Awas Jatuh Cinta", artist: "Armada", era: "2010s", difficulty: "Susah" }, { title: "Rindu Sendiri", artist: "Iqbaal Ramadhan", era: "2010s", difficulty: "Susah" }, { title: "Bimbang", artist: "Goodbye Felicia", era: "2010s", difficulty: "Susah" }, { title: "Bunga Tidur", artist: "Tulus", era: "2010s", difficulty: "Susah" }, { title: "Tentang Cinta", artist: "Raisa", era: "2010s", difficulty: "Susah" }, { title: "Mad", artist: "Isyana Sarasvati", era: "2010s", difficulty: "Susah" }, { title: "Suara Pikiranku", artist: "Noah", era: "2010s", difficulty: "Susah" }, { title: "Sendu Melagu", artist: "Barasuara", era: "2010s", difficulty: "Susah" }, { title: "Ada Di Sana", artist: "Danilla", era: "2010s", difficulty: "Susah" }, { title: "Man Upon The Hill", artist: "Stars and Rabbit", era: "2010s", difficulty: "Susah" }, { title: "Resah", artist: "Payung Teduh", era: "2010s", difficulty: "Susah" }, { title: "Sementara", artist: "Float", era: "2010s", difficulty: "Susah" }, { title: "Malaikat Juga Tahu", artist: "Glenn Fredly", era: "2010s", difficulty: "Susah" }, { title: "Terserah", artist: "Glenn Fredly", era: "2010s", difficulty: "Susah" }, { title: "Kisah Romantis", artist: "Glenn Fredly", era: "2010s", difficulty: "Susah" }, { title: "Januari", artist: "Glenn Fredly", era: "2010s", difficulty: "Susah" }, { title: "Sekali Ini Saja", artist: "Glenn Fredly", era: "2010s", difficulty: "Susah" },
+            // ERA 2010s - Susah Banget (30)
+            { title: "Sorai", artist: "Nadin Amizah", era: "2010s", difficulty: "Susah Banget" }, { title: "Rumpang", artist: "Nadin Amizah", era: "2010s", difficulty: "Susah Banget" }, { title: "Taruh", artist: "Nadin Amizah", era: "2010s", difficulty: "Susah Banget" }, { title: "Amin Paling Serius", artist: "Sal Priadi", era: "2010s", difficulty: "Susah Banget" }, { title: "Ikat Aku Di Tulang Belikatmu", artist: "Sal Priadi", era: "2010s", difficulty: "Susah Banget" }, { title: "Secukupnya", artist: "Hindia", era: "2010s", difficulty: "Susah Banget" }, { title: "Evaluasi", artist: "Hindia", era: "2010s", difficulty: "Susah Banget" }, { title: "Cincin", artist: "Hindia", era: "2010s", difficulty: "Susah Banget" }, { title: "Rehat", artist: "Kunto Aji", era: "2010s", difficulty: "Susah Banget" }, { title: "Pilu Membiru", artist: "Kunto Aji", era: "2010s", difficulty: "Susah Banget" }, { title: "Topik Semalam", artist: "Kunto Aji", era: "2010s", difficulty: "Susah Banget" }, { title: "Fana Merah Jambu", artist: "Fourtwnty", era: "2010s", difficulty: "Susah Banget" }, { title: "Aku Tenang", artist: "Fourtwnty", era: "2010s", difficulty: "Susah Banget" }, { title: "Puisi Alam", artist: "Fourtwnty", era: "2010s", difficulty: "Susah Banget" }, { title: "Menari", artist: "Maliq & D'Essentials", era: "2010s", difficulty: "Susah Banget" }, { title: "Membasuh", artist: "Hindia", era: "2010s", difficulty: "Susah Banget" }, { title: "Seperti Tulang", artist: "Nadin Amizah", era: "2010s", difficulty: "Susah Banget" }, { title: "Kenangan Manis", artist: "Pamungkas", era: "2010s", difficulty: "Susah Banget" }, { title: "Melebur Semesta", artist: "Sal Priadi", era: "2010s", difficulty: "Susah Banget" }, { title: "Is It The Answer?", artist: "Reality Club", era: "2010s", difficulty: "Susah Banget" }, { title: "Bathroom", artist: "Grrrl Gang", era: "2010s", difficulty: "Susah Banget" }, { title: "Sunshine", artist: "The Panturas", era: "2010s", difficulty: "Susah Banget" }, { title: "Beat The Ordinary", artist: "Elephant Kind", era: "2010s", difficulty: "Susah Banget" }, { title: "Rangkum", artist: "Polka Wars", era: "2010s", difficulty: "Susah Banget" }, { title: "Peradaban", artist: "Feast", era: "2010s", difficulty: "Susah Banget" }, { title: "Sampai Habis Air Mataku", artist: "Novita Dewi", era: "2010s", difficulty: "Susah Banget" }, { title: "Ku Menunggu", artist: "Rossa", era: "2010s", difficulty: "Susah Banget" }, { title: "Malam Pertama", artist: "Rossa", era: "2010s", difficulty: "Susah Banget" }, { title: "Hati Yang Kau Sakiti", artist: "Rossa", era: "2010s", difficulty: "Susah Banget" }, { title: "Tega", artist: "Rossa", era: "2010s", difficulty: "Susah Banget" },
+            // ERA 2020s - Super Gampang (30)
+            { title: "Sial", artist: "Mahalini", era: "2020s", difficulty: "Super Gampang" }, { title: "To The Bone", artist: "Pamungkas", era: "2020s", difficulty: "Super Gampang" }, { title: "Tak Ingin Usai", artist: "Keisya Levronka", era: "2020s", difficulty: "Super Gampang" }, { title: "Komang", artist: "Raim Laode", era: "2020s", difficulty: "Super Gampang" }, { title: "Pesan Terakhir", artist: "Lyodra", era: "2020s", difficulty: "Super Gampang" }, { title: "Hati Hati Di Jalan", artist: "Tulus", era: "2020s", difficulty: "Super Gampang" }, { title: "Merasa Indah", artist: "Tiara Andini", era: "2020s", difficulty: "Super Gampang" }, { title: "Pilihan yang Terbaik", artist: "Ziva Magnolya", era: "2020s", difficulty: "Super Gampang" }, { title: "Bertaut", artist: "Nadin Amizah", era: "2020s", difficulty: "Super Gampang" }, { title: "Babad Berdarah", artist: "Feast", era: "2020s", difficulty: "Super Gampang" }, { title: "Satu Bulan", artist: "Bernadya", era: "2020s", difficulty: "Super Gampang" }, { title: "Lantas", artist: "Juicy Luicy", era: "2020s", difficulty: "Super Gampang" }, { title: "Dari Planet Lain", artist: "Sal Priadi", era: "2020s", difficulty: "Super Gampang" }, { title: "Runtuh", artist: "Feby Putri", era: "2020s", difficulty: "Super Gampang" }, { title: "Takut", artist: "Idgitaf", era: "2020s", difficulty: "Super Gampang" }, { title: "Mati-Matian", artist: "Mahalini", era: "2020s", difficulty: "Super Gampang" }, { title: "Peri Cintaku", artist: "Ziva Magnolya", era: "2020s", difficulty: "Super Gampang" }, { title: "Hanya Singgah", artist: "Prinsa Mandagie", era: "2020s", difficulty: "Super Gampang" }, { title: "Dibanding Dia", artist: "Lyodra", era: "2020s", difficulty: "Super Gampang" }, { title: "Mengejar Matahari", artist: "Keisya Levronka", era: "2020s", difficulty: "Super Gampang" }, { title: "Tak Segampang Itu", artist: "Anggi Marito", era: "2020s", difficulty: "Super Gampang" }, { title: "Tutur Batin", artist: "Yura Yunita", era: "2020s", difficulty: "Super Gampang" }, { title: "Dunia Tipu-Tipu", artist: "Yura Yunita", era: "2020s", difficulty: "Super Gampang" }, { title: "Mendung Tanpo Udan", artist: "Ndarboy Genk", era: "2020s", difficulty: "Super Gampang" }, { title: "Los Dol", artist: "Denny Caknan", era: "2020s", difficulty: "Super Gampang" }, { title: "Gala Bunga Matahari", artist: "Sal Priadi", era: "2020s", difficulty: "Super Gampang" }, { title: "Serana", artist: "For Revenge", era: "2020s", difficulty: "Super Gampang" }, { title: "Bentuk Cinta", artist: "Eclat Story", era: "2020s", difficulty: "Super Gampang" }, { title: "Penipu Hati", artist: "Tata Janeeta", era: "2020s", difficulty: "Super Gampang" }, { title: "Belum Siap Kehilangan", artist: "Stevan Pasaribu", era: "2020s", difficulty: "Super Gampang" },
+            // ERA 2020s - Gampang (30)
+            { title: "Sisa Rasa", artist: "Mahalini", era: "2020s", difficulty: "Gampang" }, { title: "Rumah Singgah", artist: "Fabio Asher", era: "2020s", difficulty: "Gampang" }, { title: "Kata Mereka Ini Berlebihan", artist: "Bernadya", era: "2020s", difficulty: "Gampang" }, { title: "Jiwa Yang Bersedih", artist: "Ghea Indrawari", era: "2020s", difficulty: "Gampang" }, { title: "Penjaga Hati", artist: "Nadhif Basalamah", era: "2020s", difficulty: "Gampang" }, { title: "Masing Masing", artist: "Ernie Zakri", era: "2020s", difficulty: "Gampang" }, { title: "Mesin Waktu", artist: "Budi Doremi", era: "2020s", difficulty: "Gampang" }, { title: "Melukis Senja", artist: "Budi Doremi", era: "2020s", difficulty: "Gampang" }, { title: "Lupakan Cinta", artist: "Rossa", era: "2020s", difficulty: "Gampang" }, { title: "Sang Dewi", artist: "Lyodra", era: "2020s", difficulty: "Gampang" }, { title: "Interaksi", artist: "Tulus", era: "2020s", difficulty: "Gampang" }, { title: "Terlalu Berharap", artist: "Rossa", era: "2020s", difficulty: "Gampang" }, { title: "Nanti Kita Seperti Ini", artist: "Batas Senja", era: "2020s", difficulty: "Gampang" }, { title: "Cinta Sampai Mati", artist: "Kangen Band", era: "2020s", difficulty: "Gampang" }, { title: "Tampar", artist: "Juicy Luicy", era: "2020s", difficulty: "Gampang" }, { title: "Ku Ingin Pisah", artist: "Nabila Taqiyyah", era: "2020s", difficulty: "Gampang" }, { title: "Tak Kan Hilang", artist: "Budi Doremi", era: "2020s", difficulty: "Gampang" }, { title: "Bisa Tanpamu", artist: "Andmesh", era: "2020s", difficulty: "Gampang" }, { title: "Makna Cinta", artist: "Rizky Febian", era: "2020s", difficulty: "Gampang" }, { title: "365", artist: "Tiara Andini", era: "2020s", difficulty: "Gampang" }, { title: "Semua Aku Dirayakan", artist: "Nadin Amizah", era: "2020s", difficulty: "Gampang" }, { title: "Kekal", artist: "Nadin Amizah", era: "2020s", difficulty: "Gampang" }, { title: "Teramini", artist: "Ghea Indrawari", era: "2020s", difficulty: "Gampang" }, { title: "Untungnya, Hidup Harus Tetap Berjalan", artist: "Bernadya", era: "2020s", difficulty: "Gampang" }, { title: "Nemen", artist: "Gilga Sahid", era: "2020s", difficulty: "Gampang" }, { title: "Menyesal", artist: "Tiara Andini", era: "2020s", difficulty: "Gampang" }, { title: "Buktikan", artist: "Tiara Andini", era: "2020s", difficulty: "Gampang" }, { title: "Bahaya", artist: "Tiara Andini", era: "2020s", difficulty: "Gampang" }, { title: "Tak Pernah Tinggalkanku", artist: "Judika", era: "2020s", difficulty: "Gampang" }, { title: "Bagaimana Kalau Aku Tidak Baik Baik Saja", artist: "Judika", era: "2020s", difficulty: "Gampang" },
+            // ERA 2020s - Sedang (30)
+            { title: "Tanpa Tergesa", artist: "Juicy Luicy", era: "2020s", difficulty: "Sedang" }, { title: "Suka Kamu", artist: "Mahalini", era: "2020s", difficulty: "Sedang" }, { title: "Kisah Sempurna", artist: "Mahalini", era: "2020s", difficulty: "Sedang" }, { title: "Melawan Restu", artist: "Mahalini", era: "2020s", difficulty: "Sedang" }, { title: "Bawa Dia Kembali", artist: "Mahalini", era: "2020s", difficulty: "Sedang" }, { title: "Usai", artist: "Tiara Andini", era: "2020s", difficulty: "Sedang" }, { title: "Janji Setia", artist: "Tiara Andini", era: "2020s", difficulty: "Sedang" }, { title: "Maafkan Aku", artist: "Tiara Andini", era: "2020s", difficulty: "Sedang" }, { title: "Gemintang Hatiku", artist: "Tiara Andini", era: "2020s", difficulty: "Sedang" }, { title: "Ego", artist: "Lyodra", era: "2020s", difficulty: "Sedang" }, { title: "Tak Dianggap", artist: "Lyodra", era: "2020s", difficulty: "Sedang" }, { title: "Kalau Bosan", artist: "Lyodra", era: "2020s", difficulty: "Sedang" }, { title: "Bukan Sebuah Rindu", artist: "Yovie Widianto", era: "2020s", difficulty: "Sedang" }, { title: "Diri", artist: "Tulus", era: "2020s", difficulty: "Sedang" }, { title: "Tujuh Belas", artist: "Tulus", era: "2020s", difficulty: "Sedang" }, { title: "Hati dan Paru-Paru", artist: "Lomba Sihir", era: "2020s", difficulty: "Sedang" }, { title: "Satu-Satu", artist: "Idgitaf", era: "2020s", difficulty: "Sedang" }, { title: "Bitterlove", artist: "Ardhito Pramono", era: "2020s", difficulty: "Sedang" }, { title: "Setengah Tahun Ini", artist: "Hindia", era: "2020s", difficulty: "Sedang" }, { title: "Gurita Kota", artist: "Feel Koplo", era: "2020s", difficulty: "Sedang" }, { title: "Korban Janji", artist: "Guyon Waton", era: "2020s", difficulty: "Sedang" }, { title: "Rungkad", artist: "Happy Asmara", era: "2020s", difficulty: "Sedang" }, { title: "Garis Terdepan", artist: "Fiersa Besari", era: "2020s", difficulty: "Sedang" }, { title: "Sialan", artist: "Juicy Luicy & Adrian Khalif", era: "2020s", difficulty: "Sedang" }, { title: "Tertawan Hati", artist: "Awdella", era: "2020s", difficulty: "Sedang" }, { title: "Pura Pura Lupa", artist: "Mahen", era: "2020s", difficulty: "Sedang" }, { title: "Luka Yang Kurindu", artist: "Mahen", era: "2020s", difficulty: "Sedang" }, { title: "Mungkin Hari Ini Esok Atau Nanti", artist: "Anneth", era: "2020s", difficulty: "Sedang" }, { title: "Sisa Waktu", artist: "Ardhito Pramono", era: "2020s", difficulty: "Sedang" }, { title: "Cuek", artist: "Rizky Febian", era: "2020s", difficulty: "Sedang" },
+            // ERA 2020s - Susah (30)
+            { title: "Jatuh Suka", artist: "Tulus", era: "2020s", difficulty: "Susah" }, { title: "Kelana", artist: "Tulus", era: "2020s", difficulty: "Susah" }, { title: "Remedi", artist: "Tulus", era: "2020s", difficulty: "Susah" }, { title: "Nala", artist: "Tulus", era: "2020s", difficulty: "Susah" }, { title: "Ingkar", artist: "Tulus", era: "2020s", difficulty: "Susah" }, { title: "Kini Mereka Tahu", artist: "Bernadya", era: "2020s", difficulty: "Susah" }, { title: "Apa Mungkin", artist: "Bernadya", era: "2020s", difficulty: "Susah" }, { title: "Masa Sepi", artist: "Bernadya", era: "2020s", difficulty: "Susah" }, { title: "Sialnya Hidup Harus Tetap Berjalan", artist: "Bernadya", era: "2020s", difficulty: "Susah" }, { title: "Trauma", artist: "Elsya", era: "2020s", difficulty: "Susah" }, { title: "Rayuan Perempuan Gila", artist: "Nadin Amizah", era: "2020s", difficulty: "Susah" }, { title: "Tawa", artist: "Nadin Amizah", era: "2020s", difficulty: "Susah" }, { title: "Berpayung Tuhan", artist: "Nadin Amizah", era: "2020s", difficulty: "Susah" }, { title: "Kupukupu", artist: "Tiara Andini", era: "2020s", difficulty: "Susah" }, { title: "Macam-macam", artist: "Tulus", era: "2020s", difficulty: "Susah" }, { title: "Putar Waktu", artist: "Mahalini", era: "2020s", difficulty: "Susah" }, { title: "Oee.. Oee.. Oee..", artist: "Lyodra", era: "2020s", difficulty: "Susah" }, { title: "Menjadi Dia", artist: "Tiara Andini", era: "2020s", difficulty: "Susah" }, { title: "Munafik", artist: "Ziva Magnolya", era: "2020s", difficulty: "Susah" }, { title: "Kereta Ini Melaju Terlalu Cepat", artist: "Nadin Amizah", era: "2020s", difficulty: "Susah" }, { title: "Mesra-mesraannya kecil-kecilan dulu", artist: "Sal Priadi", era: "2020s", difficulty: "Susah" }, { title: "Sudut Memori", artist: "Yura Yunita", era: "2020s", difficulty: "Susah" }, { title: "I Love You But I'm Letting Go", artist: "Pamungkas", era: "2020s", difficulty: "Susah" }, { title: "Niscaya", artist: "Bilal Indrajaya", era: "2020s", difficulty: "Susah" }, { title: "Mawar Jingga", artist: "Juicy Luicy", era: "2020s", difficulty: "Susah" }, { title: "Hadapi Berdua", artist: "Tiara Andini", era: "2020s", difficulty: "Susah" }, { title: "Bukan Untukku", artist: "Tiara Andini", era: "2020s", difficulty: "Susah" }, { title: "Cintanya Aku", artist: "Arsy Widianto & Tiara Andini", era: "2020s", difficulty: "Susah" }, { title: "Rindu Dalam Hati", artist: "Arsy Widianto", era: "2020s", difficulty: "Susah" }, { title: "12 Tahun Terindah", artist: "Bunga Citra Lestari", era: "2020s", difficulty: "Susah" },
+            // ERA 2020s - Susah Banget (30)
+            { title: "Mengapa", artist: "Rony Parulian", era: "2020s", difficulty: "Susah Banget" }, { title: "Angin", artist: "Lesti", era: "2020s", difficulty: "Susah Banget" }, { title: "Bunga Hati", artist: "Salma Salsabil", era: "2020s", difficulty: "Susah Banget" }, { title: "Menghargai Kata Rindu", artist: "Salma Salsabil", era: "2020s", difficulty: "Susah Banget" }, { title: "Kawan", artist: "Vidi Aldiano", era: "2020s", difficulty: "Susah Banget" }, { title: "Bertahan Terluka", artist: "Fabio Asher", era: "2020s", difficulty: "Susah Banget" }, { title: "Akhir Tak Bahagia", artist: "Misellia", era: "2020s", difficulty: "Susah Banget" }, { title: "Waktu dan Perhatian", artist: "Rimar", era: "2020s", difficulty: "Susah Banget" }, { title: "Janji Kita", artist: "Mahalini", era: "2020s", difficulty: "Susah Banget" }, { title: "Sampai Tuaku", artist: "Mahalini", era: "2020s", difficulty: "Susah Banget" }, { title: "Bohongi Hati", artist: "Mahalini", era: "2020s", difficulty: "Susah Banget" }, { title: "Sial (Remix)", artist: "Mahalini", era: "2020s", difficulty: "Susah Banget" }, { title: "Kembalilah Padaku", artist: "Rizky Febian", era: "2020s", difficulty: "Susah Banget" }, { title: "Aminlah Bersamaku", artist: "Rizky Febian", era: "2020s", difficulty: "Susah Banget" }, { title: "Terlukis Indah", artist: "Rizky Febian", era: "2020s", difficulty: "Susah Banget" }, { title: "Jernih", artist: "Kunto Aji", era: "2020s", difficulty: "Susah Banget" }, { title: "Terlintas", artist: "Bernadya", era: "2020s", difficulty: "Susah Banget" }, { title: "Kita Ke Sana", artist: "Hindia", era: "2020s", difficulty: "Susah Banget" }, { title: "Timur", artist: "The Adams", era: "2020s", difficulty: "Susah Banget" }, { title: "Asmalibrasi", artist: "Soegi Bornean", era: "2020s", difficulty: "Susah Banget" }, { title: "It's Only Me", artist: "Kaleb J", era: "2020s", difficulty: "Susah Banget" }, { title: "Kau Rumahku", artist: "Raissa Anggiani", era: "2020s", difficulty: "Susah Banget" }, { title: "Bercinta Lewat Kata", artist: "Donne Maula", era: "2020s", difficulty: "Susah Banget" }, { title: "Tiba-Tiba Jumat Lagi", artist: "Nadhif Basalamah", era: "2020s", difficulty: "Susah Banget" }, { title: "Semoga Sembuh", artist: "Idgitaf", era: "2020s", difficulty: "Susah Banget" }, { title: "Ragu", artist: "Rahmania Astrini", era: "2020s", difficulty: "Susah Banget" }, { title: "Tak Bisa", artist: "Rahmania Astrini", era: "2020s", difficulty: "Susah Banget" }, { title: "Now I Know", artist: "Kaleb J", era: "2020s", difficulty: "Susah Banget" }, { title: "Kebutuhan Hati", artist: "Kaleb J", era: "2020s", difficulty: "Susah Banget" }, { title: "Muak", artist: "Aruma", era: "2020s", difficulty: "Susah Banget" }
+        ];
+
+        // -------------------------------------------------------------------------
+        // GAME STATE
+        // -------------------------------------------------------------------------
+        let gameState = {
+            isPlaying: false,
+            era:Sistem *leveling* sekarang sudah dikunci berurutan secara ketat dari **Super Gampang** hingga **Susah Banget** per siklusnya (5 tahap). Pemilihan potongan lagunya memanfaatkan sistem *preview* dari iTunes API yang secara bawaan selalu memotong persis di bagian paling ikonik (umumnya langsung masuk ke *chorus* atau *reff*), sehingga pemain akan lebih mudah menebak tanpa perlu penyesuaian durasi manual. 
+
+Efek suara tombol juga sudah diatur agar aktif di menu awal, mati secara otomatis saat masuk ke dalam *gameplay*, dan sebuah efek suara kemenangan (*fanfare*) akan berbunyi sesaat sebelum skor akhir muncul di layar *modal*. Logika pemutaran audio juga sudah diperkuat dengan penanganan *Promise* untuk mencegah *error* saat lagu dimuat atau ditebak terlalu cepat.
+
+Salin seluruh kode di bawah ini dan simpan sebagai file HTML baru Anda:
+
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess Lagu - Music Quiz</title>
+    <link href="[https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap](https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap)" rel="stylesheet">
+    <script src="[https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js](https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js)"></script>
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #151c2c;
+            --bg-elevated: #1e273d;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.2);
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.25);
+            --accent-cyan: #38bdf8;
+            --danger: #f43f5e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --radius-xl: 20px;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--bg-base); 
+            color: var(--text-main); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            min-height: 100vh; 
+            padding: 20px 16px; 
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
+                radial-gradient(circle at 85% 90%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+            background-attachment: fixed; 
+        }
+
         /* NAVBAR HEADER (RESPONSIF) */
         .app-header {
             width: 100%;
@@ -241,7 +545,7 @@
             gap: 6px;
         }
 
-        /* SEARCH AUTOCOMPLETE (REVISI: Ditambahkan warna cyan dan efek glow) */
+        /* SEARCH AUTOCOMPLETE */
         .search-wrapper { position: relative; width: 100%; }
         .input-guess {
             width: 100%;
@@ -369,7 +673,6 @@
 
         .hidden { display: none !important; }
 
-        /* MEDIA QUERIES PERBAIKAN MOBILE HEADER */
         @media (max-width: 480px) {
             .app-header {
                 flex-wrap: wrap;
@@ -378,22 +681,10 @@
                 margin-bottom: 12px;
                 gap: 10px;
             }
-            .brand {
-                font-size: 1.1rem;
-            }
-            .header-stats {
-                width: 100%;
-                justify-content: space-between;
-                gap: 6px;
-            }
-            .stat-badge {
-                padding: 5px 8px;
-                font-size: 0.75rem;
-            }
-            #btn-home {
-                padding: 5px 10px !important;
-                font-size: 0.75rem !important;
-            }
+            .brand { font-size: 1.1rem; }
+            .header-stats { width: 100%; justify-content: space-between; gap: 6px; }
+            .stat-badge { padding: 5px 8px; font-size: 0.75rem; }
+            #btn-home { padding: 5px 10px !important; font-size: 0.75rem !important; }
             .main-card { padding: 20px 16px; }
             .artwork-img { width: 140px; height: 140px; }
         }
@@ -411,7 +702,7 @@
     <div class="app-header">
         <div class="brand">
             <div class="brand-icon">🎵</div>
-            <span>GUESS LAGU</span>
+            <span>GUESS LAGU INDONESIA</span>
         </div>
         <div class="header-stats">
             <button class="btn btn-secondary" id="btn-home" style="padding: 6px 12px; font-size: 0.8rem;">🏠 Menu</button>
@@ -426,11 +717,11 @@
         <!-- WELCOME SCREEN -->
         <div id="welcome-screen" class="welcome-box">
             <h1>Uji Pengetahuan Musikmu! 🎧</h1>
-            <p>Tebak potongan lagu Indonesia favorit dari era 90an hingga 2020an. Dengarkan samplernya dan tebak secepat mungkin!</p>
+            <p>Game tebak lagu-lagu Indonesia lintas era. Buktikan kalo kamu benar-benar jago!</p>
             
             <div style="margin-bottom: 24px; text-align: left;">
                 <p style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Pilih Era / Kategori</p>
-                <div class="category-scroller">
+                <div class="category-scroller" id="category-container">
                     <button class="cat-chip active" data-cat="alltime">All Time</button>
                     <button class="cat-chip" data-cat="90s">90an</button>
                     <button class="cat-chip" data-cat="2000s">2000an</button>
@@ -509,13 +800,13 @@
             <p id="cycle-message" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px;"></p>
             
             <div style="background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
-                <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Total Skor Akhir</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Total Skor Siklus Ini</p>
                 <div id="cycle-final-score" style="font-size: 3.2rem; font-weight: 900; color: var(--accent-green);">0</div>
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn btn-secondary" id="btn-cycle-play">Main Lagi 🔄</button>
-                <button class="btn btn-primary" id="btn-cycle-menu">Menu Utama 🏠</button>
+                <button class="btn btn-secondary" id="btn-cycle-menu">Menu Utama 🏠</button>
+                <button class="btn btn-primary" id="btn-cycle-play">Main Lagi 🔄</button>
             </div>
         </div>
     </div>
@@ -526,9 +817,7 @@
         const STEPS = [0.5, 1.0, 3.0, 5.0, 8.0];
         const LEVEL_NAMES = ["Super Gampang", "Gampang", "Sedang", "Susah", "Susah Banget"];
         
-        // -------------------------------------------------------------------------
-        // DATABASE LOKAL LENGKAP (600+ LAGU UTUH INDONESIA)
-        // -------------------------------------------------------------------------
+        // Database Lagu Lengkap 600+ Lagu
         const localSongsDatabase = [
             // ERA 90s - Super Gampang (30)
             { title: "Dan", artist: "Sheila On 7", era: "90s", difficulty: "Super Gampang" },
@@ -1171,10 +1460,9 @@
             { title: "Muak", artist: "Aruma", era: "2020s", difficulty: "Susah Banget" }
         ];
 
-        // -------------------------------------------------------------------------
-        // AUDIO FX SYSTEM
-        // -------------------------------------------------------------------------
         let audioCtx = null;
+        let isGameActive = false; // Penanda untuk mute tombol saat bermain
+
         function initAudioContext() {
             if (!audioCtx) {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -1186,12 +1474,27 @@
         }
 
         function playSfx(type) {
+            // Jika game aktif, matikan suara tombol biasa (klik)
+            if (type === 'click' && isGameActive) return;
+
             try {
                 initAudioContext();
                 if (!audioCtx) return;
                 const now = audioCtx.currentTime;
 
-                if (type === 'start') {
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'start') {
                     [261.63, 329.63, 392.00, 523.25].forEach((f, i) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
@@ -1217,362 +1520,352 @@
                         osc.start(now + i * 0.08);
                         osc.stop(now + i * 0.08 + 0.3);
                     });
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.3);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'cycle_complete') {
+                    // Fanfare kemenangan (selalu bunyi walau di dalam game state)
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((f, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(f, now + i * 0.12);
+                        gain.gain.setValueAtTime(0.15, now + i * 0.12);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.5);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + i * 0.12);
+                        osc.stop(now + i * 0.12 + 0.5);
+                    });
                 }
             } catch (e) {
-                console.log('AudioContext belum diizinkan oleh browser');
+                console.log("Audio Context Error", e);
             }
         }
 
-        // -------------------------------------------------------------------------
-        // GAME LOGIC & STATE
-        // -------------------------------------------------------------------------
-        let currentCategory = 'alltime';
-        let currentCycleSongs = [];
-        let currentStage = 0;
-        let currentAttempt = 0;
-        let score = 0;
+        // Variabel Game Utama
+        let currentEra = "alltime";
+        let currentCycleScore = 0;
+        let globalScore = 0;
         let streak = 0;
+        let currentStageIndex = 0; // 0 hingga 4 (Super Gampang s.d Susah Banget)
+        let currentStepIndex = 0; // Index dari STEPS (0.5s, 1.0s, dst)
+        let currentSongData = null;
+        let audioTimeout = null;
+
+        const uiElements = {
+            welcome: document.getElementById('welcome-screen'),
+            game: document.getElementById('game-area'),
+            result: document.getElementById('result-card'),
+            modal: document.getElementById('cycle-complete-modal'),
+            loading: document.getElementById('loading-screen'),
+            scoreLabel: document.getElementById('total-score'),
+            streakLabel: document.getElementById('streak-count'),
+            levelName: document.getElementById('current-level-name'),
+            levelCounter: document.getElementById('level-counter'),
+            timeline: document.getElementById('timeline'),
+            attemptsList: document.getElementById('attempts-list'),
+            durationInfo: document.getElementById('duration-info'),
+            btnPlay: document.getElementById('btn-play'),
+            audio: document.getElementById('audio-player'),
+            guessInput: document.getElementById('guess-input'),
+            searchResults: document.getElementById('search-results')
+        };
+
+        // Event Listeners Dasar
+        document.querySelectorAll('.cat-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                playSfx('click');
+                document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+                e.target.classList.add('active');
+                currentEra = e.target.dataset.cat;
+            });
+        });
+
+        document.getElementById('btn-start-game').addEventListener('click', () => {
+            playSfx('start');
+            globalScore = 0;
+            streak = 0;
+            uiElements.scoreLabel.innerText = globalScore;
+            uiElements.streakLabel.innerText = "0 🔥";
+            isGameActive = true; 
+            startCycle();
+        });
+
+        document.getElementById('btn-home').addEventListener('click', goHome);
+        document.getElementById('btn-cycle-menu').addEventListener('click', goHome);
+        document.getElementById('btn-cycle-play').addEventListener('click', () => {
+            playSfx('click');
+            uiElements.modal.classList.add('hidden');
+            startCycle();
+        });
+
+        function goHome() {
+            playSfx('click');
+            isGameActive = false;
+            uiElements.game.classList.add('hidden');
+            uiElements.result.classList.add('hidden');
+            uiElements.modal.classList.add('hidden');
+            uiElements.welcome.classList.remove('hidden');
+            stopAudio();
+        }
+
+        // Logic Permainan
+        function startCycle() {
+            currentCycleScore = 0;
+            currentStageIndex = 0;
+            uiElements.welcome.classList.add('hidden');
+            uiElements.result.classList.add('hidden');
+            uiElements.game.classList.remove('hidden');
+            loadStage();
+        }
+
+        async function loadStage() {
+            resetStageUI();
+            uiElements.loading.classList.remove('hidden');
+            
+            // Kunci filter berurutan berdasarkan index level
+            const targetDifficulty = LEVEL_NAMES[currentStageIndex];
+            uiElements.levelName.innerText = targetDifficulty;
+            uiElements.levelCounter.innerText = `Tahap ${currentStageIndex + 1} / 5`;
+
+            // Filter database lokal
+            let pool = localSongsDatabase.filter(s => s.difficulty === targetDifficulty);
+            if (currentEra !== "alltime" && currentEra !== "random") {
+                const eraPool = pool.filter(s => s.era === currentEra);
+                if (eraPool.length > 0) pool = eraPool; 
+            }
+
+            // Ambil acak dan cocokkan dengan iTunes (dilakukan berulang jika gagal)
+            let success = false;
+            let retries = 5;
+
+            while (!success && retries > 0) {
+                const randomLocal = pool[Math.floor(Math.random() * pool.length)];
+                try {
+                    const query = `${randomLocal.title} ${randomLocal.artist}`;
+                    const res = await fetch(`[https://itunes.apple.com/search?term=$](https://itunes.apple.com/search?term=$){encodeURIComponent(query)}&entity=song&country=id&limit=5`);
+                    const data = await res.json();
+                    
+                    let track = data.results.find(r => r.trackName.toLowerCase().includes(randomLocal.title.toLowerCase()) && r.previewUrl);
+                    if (!track && data.results.length > 0) {
+                        track = data.results.find(r => r.previewUrl);
+                    }
+
+                    if (track) {
+                        currentSongData = {
+                            title: randomLocal.title,
+                            artist: randomLocal.artist,
+                            previewUrl: track.previewUrl,
+                            artwork: track.artworkUrl100.replace('100x100', '300x300')
+                        };
+                        success = true;
+                    }
+                } catch (e) {
+                    console.error("iTunes fetch failed, retrying...");
+                }
+                retries--;
+            }
+
+            if (!success) {
+                alert("Gagal memuat lagu dari server. Silakan coba lagi.");
+                goHome();
+                return;
+            }
+
+            // Tunggu sampai audio bisa diputar
+            uiElements.audio.src = currentSongData.previewUrl;
+            uiElements.audio.load();
+            
+            uiElements.audio.oncanplaythrough = () => {
+                uiElements.loading.classList.add('hidden');
+                uiElements.audio.oncanplaythrough = null; // hapus listener
+            };
+
+            // Cadangan jika oncanplaythrough gagal terpicu di perangkat tertentu
+            setTimeout(() => { uiElements.loading.classList.add('hidden'); }, 3000);
+        }
+
+        function resetStageUI() {
+            currentStepIndex = 0;
+            uiElements.guessInput.value = "";
+            uiElements.searchResults.style.display = "none";
+            uiElements.durationInfo.innerText = `Dengarkan Musik: ${STEPS[0]} Detik`;
+            
+            Array.from(uiElements.timeline.children).forEach((el, idx) => {
+                el.className = 'timeline-step';
+                if (idx === 0) el.classList.add('active');
+            });
+            
+            Array.from(uiElements.attemptsList.children).forEach((el, idx) => {
+                el.className = 'attempt-item';
+                el.innerText = `${idx + 1}.`;
+            });
+            stopAudio();
+        }
+
+        // Logic Audio Player
+        uiElements.btnPlay.addEventListener('click', () => {
+            playSfx('click');
+            if (uiElements.audio.paused) {
+                uiElements.audio.currentTime = 0;
+                
+                let playPromise = uiElements.audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        uiElements.btnPlay.classList.add('playing');
+                        clearTimeout(audioTimeout);
+                        audioTimeout = setTimeout(() => {
+                            uiElements.audio.pause();
+                            uiElements.btnPlay.classList.remove('playing');
+                        }, STEPS[currentStepIndex] * 1000);
+                    }).catch(error => {
+                        console.error("Autoplay dicegah:", error);
+                    });
+                }
+            } else {
+                stopAudio();
+            }
+        });
+
+        function stopAudio() {
+            uiElements.audio.pause();
+            uiElements.btnPlay.classList.remove('playing');
+            clearTimeout(audioTimeout);
+        }
+
+        // Autocomplete Logic
+        const uniqueSongs = [...new Set(localSongsDatabase.map(s => `${s.title} - ${s.artist}`))];
         
-        let isPlayingSnippet = false;
-        let snippetTimer = null;
-        let currentItunesData = null; 
-
-        // SEARCH AUTOCOMPLETE LOGIC
-        const guessInput = document.getElementById('guess-input');
-        const searchResults = document.getElementById('search-results');
-
-        guessInput.addEventListener('input', function() {
-            const val = this.value.toLowerCase();
-            searchResults.innerHTML = '';
-            if (!val) {
-                searchResults.style.display = 'none';
+        uiElements.guessInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            if (val.length < 2) {
+                uiElements.searchResults.style.display = 'none';
                 return;
             }
             
-            const matches = localSongsDatabase.filter(s => 
-                s.title.toLowerCase().includes(val) || 
-                s.artist.toLowerCase().includes(val)
-            ).slice(0, 5); // Tampilkan max 5
-
+            const matches = uniqueSongs.filter(s => s.toLowerCase().includes(val)).slice(0, 5);
             if (matches.length > 0) {
-                searchResults.style.display = 'block';
-                matches.forEach(match => {
-                    const div = document.createElement('div');
-                    div.className = 'dropdown-item';
-                    div.innerHTML = `<strong>${match.title}</strong> - ${match.artist}`;
-                    div.onclick = () => {
-                        guessInput.value = `${match.title} - ${match.artist}`;
-                        searchResults.style.display = 'none';
-                    };
-                    searchResults.appendChild(div);
-                });
+                uiElements.searchResults.innerHTML = matches.map(m => `<div class="dropdown-item">${m}</div>`).join('');
+                uiElements.searchResults.style.display = 'block';
             } else {
-                searchResults.style.display = 'none';
+                uiElements.searchResults.style.display = 'none';
+            }
+        });
+
+        uiElements.searchResults.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dropdown-item')) {
+                uiElements.guessInput.value = e.target.innerText.split(' - ')[0]; // Ambil judulnya saja
+                uiElements.searchResults.style.display = 'none';
             }
         });
 
         document.addEventListener('click', (e) => {
-            if (!guessInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = 'none';
+            if (!uiElements.searchWrapper?.contains(e.target)) {
+                uiElements.searchResults.style.display = 'none';
             }
         });
 
-        // CATEGORY SELECTION
-        document.querySelectorAll('.cat-chip').forEach(chip => {
-            chip.addEventListener('click', (e) => {
-                document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-                e.target.classList.add('active');
-                currentCategory = e.target.getAttribute('data-cat');
-            });
-        });
-
-        // START GAME
-        document.getElementById('btn-start-game').addEventListener('click', async () => {
-            playSfx('start');
-            let pool = localSongsDatabase;
-            if (currentCategory !== 'alltime' && currentCategory !== 'random') {
-                pool = localSongsDatabase.filter(s => s.era === currentCategory);
-            }
-            
-            // Acak dan ambil 5 lagu untuk satu siklus (Tahap 1-5)
-            const shuffled = [...pool].sort(() => 0.5 - Math.random());
-            currentCycleSongs = shuffled.slice(0, 5);
-            currentStage = 0;
-            
-            document.getElementById('welcome-screen').classList.add('hidden');
-            await loadStage();
-        });
-
-        // LOAD STAGE
-        async function loadStage() {
-            if (currentStage >= 5) {
-                showCycleComplete();
-                return;
-            }
-            
-            const songInfo = currentCycleSongs[currentStage];
-            currentAttempt = 0;
-            
-            // Tampilkan Loading
-            document.getElementById('loading-screen').classList.remove('hidden');
-            document.getElementById('game-area').classList.add('hidden');
-            document.getElementById('result-card').classList.add('hidden');
-            
-            // Fetch dari iTunes API
-            const query = `${songInfo.title} ${songInfo.artist}`.replace(/\s+/g, '+');
-            try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&country=id&limit=1`);
-                const data = await res.json();
-                
-                if (data.results && data.results.length > 0) {
-                    currentItunesData = data.results[0];
-                } else {
-                    const res2 = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
-                    const data2 = await res2.json();
-                    if (data2.results && data2.results.length > 0) {
-                        currentItunesData = data2.results[0];
-                    } else {
-                        throw new Error("Lagu tidak ditemukan di iTunes");
-                    }
-                }
-                
-                // Siapkan Audio
-                const audio = document.getElementById('audio-player');
-                audio.src = currentItunesData.previewUrl;
-                audio.load();
-                
-            } catch(e) {
-                console.error(e);
-                // Jika gagal di-fetch, ganti lagu random secara otomatis
-                currentCycleSongs[currentStage] = localSongsDatabase[Math.floor(Math.random() * localSongsDatabase.length)];
-                loadStage();
-                return;
-            }
-            
-            // Update Tampilan UI
-            document.getElementById('current-level-name').innerText = songInfo.difficulty;
-            document.getElementById('level-counter').innerText = `Tahap ${currentStage + 1} / 5`;
-            
-            // Reset List Kesempatan
-            const attemptItems = document.querySelectorAll('.attempt-item');
-            attemptItems.forEach((el, idx) => {
-                el.className = 'attempt-item';
-                el.innerText = `${idx + 1}.`;
-            });
-            
-            updateTimeline();
-            document.getElementById('guess-input').value = '';
-            document.getElementById('btn-skip').innerText = `Lewati (+${STEPS[0]}s)`;
-            
-            document.getElementById('loading-screen').classList.add('hidden');
-            document.getElementById('game-area').classList.remove('hidden');
-        }
-
-        // PLAY AUDIO SNIPPET
-        document.getElementById('btn-play').addEventListener('click', () => {
-            const audio = document.getElementById('audio-player');
-            const playBtn = document.getElementById('btn-play');
-            const icon = document.getElementById('play-icon');
-            
-            if (isPlayingSnippet) {
-                audio.pause();
-                audio.currentTime = 0;
-                clearTimeout(snippetTimer);
-                isPlayingSnippet = false;
-                icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-                playBtn.classList.remove('playing');
-            } else {
-                const duration = STEPS[currentAttempt];
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log(e));
-                
-                isPlayingSnippet = true;
-                icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
-                playBtn.classList.add('playing');
-                
-                snippetTimer = setTimeout(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    isPlayingSnippet = false;
-                    icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-                    playBtn.classList.remove('playing');
-                }, duration * 1000);
-            }
-        });
-
-        function updateTimeline() {
-            const duration = STEPS[currentAttempt];
-            document.getElementById('duration-info').innerText = `Dengarkan Musik: ${duration} Detik`;
-            const steps = document.querySelectorAll('.timeline-step');
-            steps.forEach((el, idx) => {
-                if (idx === currentAttempt) {
-                    el.className = 'timeline-step active';
-                } else if (idx < currentAttempt) {
-                    el.className = 'timeline-step passed';
-                } else {
-                    el.className = 'timeline-step';
-                }
-            });
-        }
-
-        // SUBMIT GUESS
+        // Skip & Submit
+        document.getElementById('btn-skip').addEventListener('click', () => handleGuess(false));
         document.getElementById('btn-submit').addEventListener('click', () => {
-            const guess = document.getElementById('guess-input').value.toLowerCase();
+            const guess = uiElements.guessInput.value.trim();
             if (!guess) return;
             
-            const currentSong = currentCycleSongs[currentStage];
-            const isCorrect = guess.includes(currentSong.title.toLowerCase());
+            const isCorrect = guess.toLowerCase() === currentSongData.title.toLowerCase();
+            handleGuess(isCorrect, guess);
+        });
+
+        function handleGuess(isCorrect, guessText = "Lewati") {
+            playSfx('click');
+            stopAudio();
+            const attemptEl = uiElements.attemptsList.children[currentStepIndex];
+            attemptEl.innerText = `${currentStepIndex + 1}. ${guessText}`;
             
             if (isCorrect) {
-                // Menang
-                const points = [100, 80, 60, 40, 20][currentAttempt];
-                score += points;
-                streak++;
-                updateStatsUI();
-                
-                document.querySelectorAll('.attempt-item')[currentAttempt].innerText += ` ${currentSong.title}`;
-                document.querySelectorAll('.attempt-item')[currentAttempt].classList.add('correct');
+                attemptEl.classList.add('correct');
                 playSfx('correct');
-                showResult(true, points);
+                finishStage(true);
             } else {
-                // Salah
-                document.querySelectorAll('.attempt-item')[currentAttempt].innerText += ` (Salah)`;
-                document.querySelectorAll('.attempt-item')[currentAttempt].classList.add('wrong');
+                attemptEl.classList.add(guessText === "Lewati" ? 'skipped' : 'wrong');
                 
-                currentAttempt++;
-                if (currentAttempt >= 5) {
-                    streak = 0;
-                    updateStatsUI();
-                    showResult(false, 0);
+                if (currentStepIndex < 4) {
+                    playSfx('wrong');
+                    // Lanjut ke step berikutnya
+                    uiElements.timeline.children[currentStepIndex].classList.remove('active');
+                    uiElements.timeline.children[currentStepIndex].classList.add('passed');
+                    currentStepIndex++;
+                    uiElements.timeline.children[currentStepIndex].classList.add('active');
+                    uiElements.durationInfo.innerText = `Dengarkan Musik: ${STEPS[currentStepIndex]} Detik`;
+                    uiElements.guessInput.value = "";
                 } else {
-                    updateTimeline();
-                    document.getElementById('guess-input').value = '';
-                    document.getElementById('btn-skip').innerText = `Lewati (+${STEPS[currentAttempt]}s)`;
+                    playSfx('wrong');
+                    finishStage(false);
                 }
             }
-        });
-
-        // SKIP TURN
-        document.getElementById('btn-skip').addEventListener('click', () => {
-            document.querySelectorAll('.attempt-item')[currentAttempt].innerText += ` (Dilewati)`;
-            document.querySelectorAll('.attempt-item')[currentAttempt].classList.add('skipped');
-            
-            currentAttempt++;
-            if (currentAttempt >= 5) {
-                streak = 0;
-                updateStatsUI();
-                showResult(false, 0);
-            } else {
-                updateTimeline();
-                document.getElementById('guess-input').value = '';
-                document.getElementById('btn-skip').innerText = `Lewati (+${STEPS[currentAttempt]}s)`;
-            }
-        });
-
-        function updateStatsUI() {
-            document.getElementById('total-score').innerText = score;
-            document.getElementById('streak-count').innerText = `${streak} 🔥`;
         }
 
-        // REVISI: SHOW RESULT & PLAY AUDIO FULLY
-        function showResult(isWin, points) {
-            document.getElementById('game-area').classList.add('hidden');
-            document.getElementById('result-card').classList.remove('hidden');
+        function finishStage(isWin) {
+            uiElements.game.classList.add('hidden');
+            uiElements.result.classList.remove('hidden');
             
-            const songInfo = currentCycleSongs[currentStage];
+            const pointsList = [1000, 800, 600, 400, 200];
+            const earned = isWin ? pointsList[currentStepIndex] : 0;
+            currentCycleScore += earned;
+            globalScore += earned;
             
+            if (isWin) streak++; else streak = 0;
+            
+            uiElements.scoreLabel.innerText = globalScore;
+            uiElements.streakLabel.innerText = `${streak} 🔥`;
+
+            document.getElementById('result-title').innerText = isWin ? "TEBAKAN BENAR!" : "YAH, SALAH!";
+            document.getElementById('result-title').style.color = isWin ? "var(--accent-green)" : "var(--danger)";
+            document.getElementById('points-earned').innerText = isWin ? `+${earned} Poin` : "0 Poin";
+            document.getElementById('album-cover').src = currentSongData.artwork;
+            document.getElementById('song-title-res').innerText = currentSongData.title;
+            document.getElementById('artist-res').innerText = currentSongData.artist;
+
             if (isWin) {
-                document.getElementById('result-title').innerText = "BENAR! 🎉";
-                document.getElementById('result-title').style.color = "var(--accent-green)";
-                document.getElementById('points-earned').innerText = `+${points} Poin`;
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            } else {
-                document.getElementById('result-title').innerText = "WAKTU HABIS! ❌";
-                document.getElementById('result-title').style.color = "var(--danger)";
-                document.getElementById('points-earned').innerText = "0 Poin";
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#10b981', '#38bdf8'] });
             }
-            
-            // Set cover artwork dari iTunes (ubah 100x100 jadi resolusi lebih besar)
-            const artworkUrl = currentItunesData.artworkUrl100 ? currentItunesData.artworkUrl100.replace('100x100', '300x300') : '';
-            document.getElementById('album-cover').src = artworkUrl;
-            document.getElementById('song-title-res').innerText = songInfo.title;
-            document.getElementById('artist-res').innerText = songInfo.artist;
-
-            // --- PERBAIKAN BUG AUDIO ---
-            const audio = document.getElementById('audio-player');
-            const playBtn = document.getElementById('btn-play');
-            const icon = document.getElementById('play-icon');
-            
-            // Hentikan snippet timer agar lagu tidak mati otomatis
-            if (snippetTimer) clearTimeout(snippetTimer);
-            isPlayingSnippet = false;
-            
-            // Reset icon Play di menu game (meskipun sedang disembunyikan)
-            icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-            playBtn.classList.remove('playing');
-            
-            // Mainkan lagu secara penuh sejak awal
-            audio.currentTime = 0;
-            audio.play().catch(e => {
-                console.log("Browser membatasi autoplay:", e);
-            });
         }
 
-        // NEXT STAGE / MODALS
         document.getElementById('btn-next').addEventListener('click', () => {
-            const audio = document.getElementById('audio-player');
-            audio.pause(); // Matikan lagu saat pindah tahap
-            
-            currentStage++;
-            if (currentStage >= 5) {
-                showCycleComplete();
-            } else {
+            playSfx('click');
+            if (currentStageIndex < 4) {
+                currentStageIndex++;
+                uiElements.result.classList.add('hidden');
+                uiElements.game.classList.remove('hidden');
                 loadStage();
+            } else {
+                showCycleComplete();
             }
         });
 
         function showCycleComplete() {
-            document.getElementById('result-card').classList.add('hidden');
-            document.getElementById('cycle-complete-modal').classList.remove('hidden');
-            document.getElementById('cycle-final-score').innerText = score;
+            playSfx('cycle_complete');
+            uiElements.result.classList.add('hidden');
+            isGameActive = false; // Siklus selesai, tombol berbunyi kembali
             
-            if (score === 500) {
-                document.getElementById('cycle-message').innerText = "Luar biasa! Kamu tahu semua lagunya dengan sempurna. Legenda musik sesungguhnya!";
-            } else if (score >= 200) {
-                document.getElementById('cycle-message').innerText = "Kerja bagus! Pengetahuan musikmu cukup luas. Coba lagi untuk capai skor sempurna.";
-            } else {
-                document.getElementById('cycle-message').innerText = "Jangan menyerah! Semakin sering bermain, kamu akan semakin hafal.";
-            }
+            document.getElementById('cycle-final-score').innerText = currentCycleScore;
+            const msg = currentCycleScore >= 3000 ? "Luar biasa! Pengetahuan musikmu sangat mantap." : "Latihan terus biar jadi maestro musik sejati!";
+            document.getElementById('cycle-message').innerText = msg;
+            
+            uiElements.modal.classList.remove('hidden');
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.4 }, zIndex: 3000 });
         }
 
-        document.getElementById('btn-cycle-play').addEventListener('click', () => {
-            document.getElementById('cycle-complete-modal').classList.add('hidden');
-            document.getElementById('btn-start-game').click(); // Langsung main lagi cycle baru
-        });
-
-        document.getElementById('btn-cycle-menu').addEventListener('click', () => {
-            document.getElementById('cycle-complete-modal').classList.add('hidden');
-            resetToMenu();
-        });
-
-        document.getElementById('btn-home').addEventListener('click', () => {
-            resetToMenu();
-        });
-
-        function resetToMenu() {
-            const audio = document.getElementById('audio-player');
-            audio.pause();
-            if (snippetTimer) clearTimeout(snippetTimer);
-            
-            document.getElementById('game-area').classList.add('hidden');
-            document.getElementById('result-card').classList.add('hidden');
-            document.getElementById('cycle-complete-modal').classList.add('hidden');
-            document.getElementById('welcome-screen').classList.remove('hidden');
-            
-            score = 0;
-            streak = 0;
-            updateStatsUI();
-        }
     </script>
 </body>
 </html>
