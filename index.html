@@ -160,6 +160,18 @@
             color: var(--text-muted);
         }
         .level-title { color: var(--accent-cyan); font-weight: 800; }
+        
+        .era-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green-glow);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
         /* TIMELINE STEPS */
         .timeline-bar {
@@ -433,13 +445,11 @@
         <!-- GAMEPLAY AREA -->
         <div id="game-area" class="hidden" style="display: flex; flex-direction: column; gap: 18px;">
             
-            <!-- NEW ERA BADGE -->
-            <div id="era-badge" style="align-self: center; background: rgba(16, 185, 129, 0.1); color: var(--accent-green); padding: 4px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; border: 1px solid var(--accent-green); margin-bottom: -10px; z-index: 10;">
-                Era: All Time
-            </div>
-
             <div class="level-header">
-                <span class="level-title" id="current-level-name">Super Gampang</span>
+                <div>
+                    <span class="level-title" id="current-level-name">Super Gampang</span>
+                    <span class="era-badge" id="era-display">ERA: ALL TIME</span>
+                </div>
                 <span id="level-counter">Tahap 1 / 5</span>
             </div>
 
@@ -498,7 +508,7 @@
     <div id="cycle-complete-modal" class="modal-backdrop hidden">
         <div class="modal-card">
             <h2 style="font-size: 2rem; font-weight: 900; color: var(--text-main); margin-bottom: 8px;">SELESAI! 🎉</h2>
-            <p id="cycle-message" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px;"></p>
+            <p id="cycle-message" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px;">Kamu telah menyelesaikan siklus ini.</p>
             
             <div style="background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);">
                 <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Total Skor Level Ini</p>
@@ -520,7 +530,7 @@
         const SCORES = [1000, 800, 600, 400, 200];
         const LEVEL_NAMES = ["Super Gampang", "Gampang", "Sedang", "Susah", "Susah Banget"];
         
-        // DATABASE LOKAL LENGKAP (600+ LAGU INDONESIA)
+        // DATABASE LOKAL LENGKAP (600+ LAGU INDONESIA) - Disalin utuh sesuai permintaan
         const localSongsDatabase = [
             // ERA 90s - Super Gampang
             { title: "Dan", artist: "Sheila On 7", era: "90s", difficulty: "Super Gampang" },
@@ -1145,301 +1155,394 @@
         ];
 
         // -------------------------------------------------------------------------
-        // APLIKASI CORE LOGIC & BUG FIX
+        // AUDIO FX SYSTEM
         // -------------------------------------------------------------------------
-        
-        let state = {
-            era: 'alltime',
-            eraLabel: 'All Time',
-            song: null,
-            previewUrl: '',
-            artworkUrl: '',
-            step: 0,
-            attempts: [],
-            gameOver: false,
-            score: 0,
-            streak: 0,
-            level: 1,
-            maxLevel: 5
-        };
+        let audioCtx = null;
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
 
-        const els = {
-            welcome: document.getElementById('welcome-screen'),
-            game: document.getElementById('game-area'),
-            result: document.getElementById('result-card'),
-            loading: document.getElementById('loading-screen'),
-            eraBadge: document.getElementById('era-badge'),
-            playBtn: document.getElementById('btn-play'),
-            audio: document.getElementById('audio-player'),
-            durationInfo: document.getElementById('duration-info'),
-            timeline: document.getElementById('timeline'),
-            attemptsList: document.getElementById('attempts-list'),
-            guessInput: document.getElementById('guess-input'),
-            searchResults: document.getElementById('search-results'),
-            btnSubmit: document.getElementById('btn-submit'),
-            btnSkip: document.getElementById('btn-skip'),
-            btnNext: document.getElementById('btn-next'),
-            catChips: document.querySelectorAll('.cat-chip')
-        };
+        function playMenuSfx() {
+            const gameArea = document.getElementById('game-area');
+            if (gameArea && !gameArea.classList.contains('hidden')) return; 
+            
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } catch (e) {}
+        }
 
-        // Kategori / Era Filter
-        els.catChips.forEach(chip => {
-            chip.addEventListener('click', (e) => {
-                els.catChips.forEach(c => c.classList.remove('active'));
-                e.target.classList.add('active');
-                state.era = e.target.dataset.cat;
-                state.eraLabel = e.target.textContent;
+        function playSfx(type) {
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+
+                if (type === 'start') {
+                    [261.63, 329.63, 392.00, 523.25].forEach((f, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(f, now + i * 0.06);
+                        gain.gain.setValueAtTime(0.1, now + i * 0.06);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + i * 0.06);
+                        osc.stop(now + i * 0.06 + 0.3);
+                    });
+                } else if (type === 'correct') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.3);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch(e) {}
+        }
+
+        // -------------------------------------------------------------------------
+        // GAME STATE & LOGIC
+        // -------------------------------------------------------------------------
+
+        // Elements
+        const audioPlayer = document.getElementById('audio-player');
+        const btnPlay = document.getElementById('btn-play');
+        const playIcon = document.getElementById('play-icon');
+        const durationInfo = document.getElementById('duration-info');
+        const gameArea = document.getElementById('game-area');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const resultCard = document.getElementById('result-card');
+        const guessInput = document.getElementById('guess-input');
+        const searchResults = document.getElementById('search-results');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnSkip = document.getElementById('btn-skip');
+        const btnNext = document.getElementById('btn-next');
+        const attemptsList = document.getElementById('attempts-list').children;
+        const timelineSteps = document.getElementById('timeline').children;
+        const catChips = document.querySelectorAll('.cat-chip');
+        const loadingScreen = document.getElementById('loading-screen');
+        const eraDisplay = document.getElementById('era-display');
+
+        // State Variables
+        let currentEra = 'alltime';
+        let currentEraText = 'All Time';
+        let targetSong = null;
+        let targetAudioUrl = '';
+        let targetCoverUrl = '';
+        let currentStep = 0;
+        let totalScore = 0;
+        let streak = 0;
+        let cycleScore = 0;
+        let currentRound = 1;
+        const MAX_ROUNDS = 5;
+        let playTimeout = null;
+        let isPlaying = false;
+
+        // Kategori / Era Selection
+        catChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                catChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                currentEra = chip.dataset.cat;
+                currentEraText = chip.innerText;
             });
         });
 
-        document.getElementById('btn-start-game').addEventListener('click', startGame);
+        document.getElementById('btn-start-game').addEventListener('click', () => {
+            playMenuSfx();
+            welcomeScreen.classList.add('hidden');
+            totalScore = 0;
+            streak = 0;
+            cycleScore = 0;
+            currentRound = 1;
+            
+            document.getElementById('total-score').innerText = totalScore;
+            document.getElementById('streak-count').innerText = streak + " 🔥";
+            
+            startNewLevel();
+        });
 
-        async function startGame() {
-            state.score = 0;
-            state.streak = 0;
-            state.level = 1;
-            document.getElementById('total-score').textContent = '0';
-            document.getElementById('streak-count').textContent = '0 🔥';
-            els.welcome.classList.add('hidden');
-            els.game.classList.remove('hidden');
-            await loadLevel();
-        }
+        async function startNewLevel() {
+            loadingScreen.classList.remove('hidden');
+            currentStep = 0;
+            guessInput.value = '';
+            searchResults.style.display = 'none';
 
-        async function loadLevel() {
-            state.step = 0;
-            state.attempts = [];
-            state.gameOver = false;
-            els.guessInput.value = '';
-            els.searchResults.style.display = 'none';
-            document.querySelector('.action-grid').classList.remove('hidden');
-            document.querySelector('.search-wrapper').classList.remove('hidden');
-            els.result.classList.add('hidden');
-
-            els.eraBadge.textContent = `Era: ${state.eraLabel}`;
-            document.getElementById('level-counter').textContent = `Tahap ${state.level} / ${state.maxLevel}`;
-            document.getElementById('current-level-name').textContent = LEVEL_NAMES[state.level - 1] || "Acak";
-
-            updateTimeline();
-            updateAttemptsUI();
-            els.durationInfo.textContent = `Dengarkan Musik: ${STEPS[state.step]} Detik`;
-
-            let pool = localSongsDatabase;
-            if (state.era !== 'alltime' && state.era !== 'random') {
-                pool = localSongsDatabase.filter(s => s.era === state.era);
+            // Reset Level UI
+            for (let i = 0; i < 5; i++) {
+                attemptsList[i].className = 'attempt-item';
+                attemptsList[i].innerText = (i + 1) + '.';
+                timelineSteps[i].className = 'timeline-step';
             }
+            timelineSteps[0].classList.add('active');
             
-            let levelDifficulty = LEVEL_NAMES[state.level - 1];
-            let levelPool = pool.filter(s => s.difficulty === levelDifficulty);
-            if (levelPool.length === 0) levelPool = pool;
+            // Stop previous audio if running
+            stopAudio();
             
-            state.song = levelPool[Math.floor(Math.random() * levelPool.length)];
+            updateDurationInfo();
+            eraDisplay.innerText = "ERA: " + currentEraText;
+            document.getElementById('level-counter').innerText = `Tahap ${currentRound} / ${MAX_ROUNDS}`;
 
-            await fetchAudio();
-        }
+            // Pilih Lagu Random Berdasarkan Filter Era
+            let pool = localSongsDatabase;
+            if (currentEra !== 'alltime' && currentEra !== 'random') {
+                pool = localSongsDatabase.filter(s => s.era === currentEra);
+            }
+            targetSong = pool[Math.floor(Math.random() * pool.length)];
+            document.getElementById('current-level-name').innerText = targetSong.difficulty;
 
-        async function fetchAudio() {
-            els.loading.classList.remove('hidden');
+            // Fetch Data dari iTunes API
             try {
-                const query = encodeURIComponent(`${state.song.title} ${state.song.artist}`);
-                const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1&country=id`);
+                const query = encodeURIComponent(targetSong.title + " " + targetSong.artist);
+                const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&country=id&limit=1`);
                 const data = await res.json();
                 
-                if (data.results.length > 0) {
-                    state.previewUrl = data.results[0].previewUrl;
-                    state.artworkUrl = data.results[0].artworkUrl100.replace('100x100bb', '400x400bb');
-                    els.audio.src = state.previewUrl;
-                    els.audio.load();
+                if (data.results && data.results.length > 0) {
+                    targetAudioUrl = data.results[0].previewUrl;
+                    // Tingkatkan kualitas gambar cover
+                    targetCoverUrl = data.results[0].artworkUrl100.replace('100x100', '300x300');
                 } else {
-                    loadLevel(); // Bypass apabila API iTunes tidak menemukan sampel audio
-                    return;
+                    // Fallback jika lagu spesifik tidak ketemu di API, retrying dengan lagu lain
+                    console.log("Song preview not found on iTunes API, searching another...");
+                    return startNewLevel(); 
                 }
-            } catch(e) {
-                console.error(e);
-                loadLevel();
-                return;
+            } catch (err) {
+                console.error("API Error", err);
+                return startNewLevel();
             }
-            els.loading.classList.add('hidden');
+
+            // Load Audio Snippet
+            audioPlayer.src = targetAudioUrl;
+            audioPlayer.load();
+
+            loadingScreen.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            
+            playSfx('start');
         }
 
-        // PLAYER CONTROLS & TIME LIMITATION
-        els.playBtn.addEventListener('click', () => {
-            if (els.audio.paused) {
-                if (!state.gameOver && els.audio.currentTime >= STEPS[state.step]) {
-                    els.audio.currentTime = 0;
-                }
-                els.audio.play();
-            } else {
-                els.audio.pause();
+        function updateDurationInfo() {
+            durationInfo.innerText = `Dengarkan Musik: ${STEPS[currentStep]} Detik`;
+            btnSkip.innerText = currentStep < 4 ? `Lewati (+${STEPS[currentStep + 1]}s)` : "Lewati";
+        }
+
+        btnPlay.addEventListener('click', () => {
+            if (isPlaying) {
+                stopAudio();
+                return;
             }
+            isPlaying = true;
+            btnPlay.classList.add('playing');
+            playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            
+            audioPlayer.currentTime = 0;
+            audioPlayer.play();
+            
+            playTimeout = setTimeout(() => {
+                stopAudio();
+            }, STEPS[currentStep] * 1000);
         });
 
-        els.audio.addEventListener('play', () => els.playBtn.classList.add('playing'));
-        els.audio.addEventListener('pause', () => els.playBtn.classList.remove('playing'));
+        function stopAudio() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            isPlaying = false;
+            btnPlay.classList.remove('playing');
+            playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+            clearTimeout(playTimeout);
+        }
 
-        els.audio.addEventListener('timeupdate', () => {
-            // FIX ERROR: Jika gameOver === true, audio TIDAK AKAN di-pause otomatis.
-            if (!state.gameOver && els.audio.currentTime >= STEPS[state.step]) {
-                els.audio.pause();
-            }
-        });
-
-        // AUTOCOMPLETE ALGORITMA
-        els.guessInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            if (val.length < 2) {
-                els.searchResults.style.display = 'none';
+        // Live Search Autocomplete Functionality
+        guessInput.addEventListener('input', () => {
+            const val = guessInput.value.toLowerCase();
+            searchResults.innerHTML = '';
+            if (!val) {
+                searchResults.style.display = 'none';
                 return;
             }
             
-            const matches = [];
-            const seen = new Set();
-            for (let s of localSongsDatabase) {
-                const str = `${s.title} - ${s.artist}`;
-                if (str.toLowerCase().includes(val) && !seen.has(str)) {
-                    seen.add(str);
-                    matches.push(s);
-                    if (matches.length >= 6) break;
-                }
-            }
+            // Search algorithm
+            const matches = localSongsDatabase.filter(s => 
+                s.title.toLowerCase().includes(val) || 
+                s.artist.toLowerCase().includes(val)
+            ).slice(0, 5);
 
-            els.searchResults.innerHTML = '';
             if (matches.length > 0) {
+                searchResults.style.display = 'block';
                 matches.forEach(m => {
                     const div = document.createElement('div');
                     div.className = 'dropdown-item';
-                    div.textContent = `${m.title} - ${m.artist}`;
+                    div.innerText = `${m.title} - ${m.artist}`;
                     div.onclick = () => {
-                        els.guessInput.value = `${m.title} - ${m.artist}`;
-                        els.searchResults.style.display = 'none';
+                        guessInput.value = `${m.title} - ${m.artist}`;
+                        searchResults.style.display = 'none';
                     };
-                    els.searchResults.appendChild(div);
+                    searchResults.appendChild(div);
                 });
-                els.searchResults.style.display = 'block';
             } else {
-                els.searchResults.style.display = 'none';
+                searchResults.style.display = 'none';
             }
         });
 
-        // GAMEPLAY ACTIONS
-        els.btnSkip.addEventListener('click', () => processAttempt(false, true));
-        els.btnSubmit.addEventListener('click', () => {
-            const val = els.guessInput.value.toLowerCase();
-            if (!val) return;
-            const target = `${state.song.title} - ${state.song.artist}`.toLowerCase();
-            const isCorrect = val === target || val.includes(state.song.title.toLowerCase());
-            processAttempt(isCorrect, false);
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.search-wrapper')) {
+                searchResults.style.display = 'none';
+            }
         });
 
-        function processAttempt(isCorrect, isSkipped) {
+        // Guess Logic Process
+        btnSkip.addEventListener('click', () => handleGuess(true));
+        btnSubmit.addEventListener('click', () => handleGuess(false));
+
+        function handleGuess(isSkip) {
+            stopAudio();
+            const guess = guessInput.value;
+            const correctAnswerFormat = `${targetSong.title.toLowerCase()} - ${targetSong.artist.toLowerCase()}`;
+            
+            const isCorrect = guess.toLowerCase() === correctAnswerFormat;
+
             if (isCorrect) {
-                state.attempts.push('correct');
-                revealAnswer(true);
+                attemptsList[currentStep].innerText = `✓ ${targetSong.title}`;
+                attemptsList[currentStep].classList.add('correct');
+                showResult(true);
             } else {
-                state.attempts.push(isSkipped ? 'skipped' : 'wrong');
-                if (state.step < STEPS.length - 1) {
-                    state.step++;
-                    els.guessInput.value = '';
-                    els.durationInfo.textContent = `Dengarkan Musik: ${STEPS[state.step]} Detik`;
-                    updateTimeline();
-                    updateAttemptsUI();
-                    els.audio.currentTime = 0;
-                    els.audio.play();
+                if (isSkip) {
+                    attemptsList[currentStep].innerText = 'Lewati';
+                    attemptsList[currentStep].classList.add('skipped');
                 } else {
-                    revealAnswer(false);
+                    attemptsList[currentStep].innerText = '✗ ' + (guess || 'Kosong');
+                    attemptsList[currentStep].classList.add('wrong');
+                }
+                
+                timelineSteps[currentStep].classList.remove('active');
+                timelineSteps[currentStep].classList.add('passed');
+                
+                currentStep++;
+                
+                if (currentStep >= 5) {
+                    showResult(false);
+                } else {
+                    timelineSteps[currentStep].classList.add('active');
+                    updateDurationInfo();
+                    guessInput.value = '';
+                    playSfx('wrong');
                 }
             }
         }
 
-        function updateTimeline() {
-            const steps = els.timeline.children;
-            for (let i = 0; i < steps.length; i++) {
-                steps[i].className = 'timeline-step';
-                if (i === state.step) steps[i].classList.add('active');
-                else if (i < state.step) steps[i].classList.add('passed');
-            }
-        }
-
-        function updateAttemptsUI() {
-            const children = els.attemptsList.children;
-            for (let i = 0; i < 5; i++) {
-                children[i].className = 'attempt-item';
-                if (state.attempts[i] === 'wrong') {
-                    children[i].classList.add('wrong');
-                    children[i].textContent = `${i+1}. ❌ Salah`;
-                } else if (state.attempts[i] === 'skipped') {
-                    children[i].classList.add('skipped');
-                    children[i].textContent = `${i+1}. ⏭️ Lewati`;
-                } else if (state.attempts[i] === 'correct') {
-                    children[i].classList.add('correct');
-                    children[i].textContent = `${i+1}. ✅ Benar!`;
-                } else {
-                    children[i].textContent = `${i+1}.`;
-                }
-            }
-        }
-
-        function revealAnswer(isWin) {
-            state.gameOver = true; 
-            els.result.classList.remove('hidden');
-            document.querySelector('.action-grid').classList.add('hidden');
-            document.querySelector('.search-wrapper').classList.add('hidden');
-            updateAttemptsUI();
-
-            document.getElementById('album-cover').src = state.artworkUrl || 'https://via.placeholder.com/150';
-            document.getElementById('song-title-res').textContent = state.song.title;
-            document.getElementById('artist-res').textContent = state.song.artist;
+        function showResult(isWin) {
+            gameArea.classList.add('hidden');
+            resultCard.classList.remove('hidden');
+            
+            document.getElementById('album-cover').src = targetCoverUrl;
+            document.getElementById('song-title-res').innerText = targetSong.title;
+            document.getElementById('artist-res').innerText = targetSong.artist;
 
             if (isWin) {
-                document.getElementById('result-title').textContent = 'BENAR! 🎉';
-                document.getElementById('points-earned').textContent = `+${SCORES[state.step]} Poin`;
-                state.score += SCORES[state.step];
-                state.streak++;
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                playSfx('correct');
+                // Play Confetti Celebration
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                document.getElementById('result-title').innerText = "Tebakan Benar! 🎉";
+                const pts = SCORES[currentStep];
+                document.getElementById('points-earned').innerText = `+${pts} Poin`;
+                totalScore += pts;
+                cycleScore += pts;
+                streak++;
             } else {
-                document.getElementById('result-title').textContent = 'SALAH 😢';
-                document.getElementById('points-earned').textContent = '0 Poin';
-                state.streak = 0;
+                playSfx('wrong');
+                document.getElementById('result-title').innerText = "Sayang Sekali! 😢";
+                document.getElementById('points-earned').innerText = "0 Poin";
+                streak = 0;
             }
 
-            document.getElementById('total-score').textContent = state.score;
-            document.getElementById('streak-count').textContent = state.streak + ' 🔥';
+            document.getElementById('total-score').innerText = totalScore;
+            document.getElementById('streak-count').innerText = streak + " 🔥";
 
-            // BUG FIX TERAPLIKASI: Reset waktu ke awal dan putar penuh (batas durasi diabaikan karena !state.gameOver)
-            els.audio.currentTime = 0;
-            els.audio.play();
+            // PERBAIKAN: Secara otomatis putar lagu utuh sampel dari API saat reveal jawaban
+            audioPlayer.currentTime = 0;
+            audioPlayer.play();
         }
 
-        els.btnNext.addEventListener('click', () => {
-            els.audio.pause();
-            if (state.level < state.maxLevel) {
-                state.level++;
-                loadLevel();
+        btnNext.addEventListener('click', () => {
+            playMenuSfx();
+            audioPlayer.pause();
+            
+            if (currentRound >= MAX_ROUNDS) {
+                // Selesaikan Siklus dan Tampilkan Modal Akhir Level
+                resultCard.classList.add('hidden');
+                document.getElementById('cycle-complete-modal').classList.remove('hidden');
+                document.getElementById('cycle-final-score').innerText = cycleScore;
+                
+                // Reset siklus
+                currentRound = 1;
+                cycleScore = 0;
             } else {
-                showModal();
+                currentRound++;
+                startNewLevel();
             }
         });
 
         document.getElementById('btn-home').addEventListener('click', () => {
-            els.audio.pause();
-            els.game.classList.add('hidden');
-            els.welcome.classList.remove('hidden');
-        });
-
-        function showModal() {
-            els.game.classList.add('hidden');
-            document.getElementById('cycle-complete-modal').classList.remove('hidden');
-            document.getElementById('cycle-message').textContent = `Kamu telah menyelesaikan semua tahap dengan total skor yang mengesankan!`;
-            document.getElementById('cycle-final-score').textContent = state.score;
-        }
-
-        document.getElementById('btn-cycle-play').addEventListener('click', () => {
+            audioPlayer.pause();
+            gameArea.classList.add('hidden');
+            resultCard.classList.add('hidden');
             document.getElementById('cycle-complete-modal').classList.add('hidden');
-            startGame();
+            welcomeScreen.classList.remove('hidden');
         });
 
         document.getElementById('btn-cycle-menu').addEventListener('click', () => {
+            document.getElementById('btn-home').click();
+        });
+        
+        document.getElementById('btn-cycle-play').addEventListener('click', () => {
             document.getElementById('cycle-complete-modal').classList.add('hidden');
-            els.welcome.classList.remove('hidden');
+            startNewLevel();
         });
     </script>
 </body>
